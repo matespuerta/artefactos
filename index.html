@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artefactos manipulables · Matemáticas</title>
+<style>
+:root{
+  --bg:#f4f7fb; --ink:#1c2541; --soft:#5b6684; --card:#ffffff; --line:#dfe3f2; --accent:#2f6fed;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#10131c; --ink:#e9ecf7; --soft:#a4adc9; --card:#161c2b; --line:#272f47; --accent:#6fa2ff; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:28px 18px 56px}
+main{max-width:980px;margin:0 auto}
+h1{font-size:clamp(26px,4.4vw,38px);margin:0 0 6px;line-height:1.1}
+.lede{margin:0 0 26px;color:var(--soft);max-width:62ch}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin:30px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+a.card{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-decoration:none;color:inherit;transition:transform .15s ease,border-color .15s ease}
+a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+a.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card b{font-size:1.05rem}
+.card span{color:var(--soft);font-size:.92rem}
+.card .tag{align-self:flex-start;font-size:.75rem;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:999px;padding:2px 9px}
+footer{margin-top:36px;color:var(--soft);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+  <h1>Artefactos manipulables</h1>
+  <p class="lede">Herramientas interactivas de Matemáticas para practicar y explorar en clase. Funcionan en el navegador, sin registrarse y sin guardar ningún dato.</p>
+
+  <h2>1.º ESO · Números y operaciones</h2>
+  <div class="grid">
+    <a class="card" href="operaciones-infinitas/"><span class="tag">Jerarquía</span><b>Operaciones infinitas</b><span>Genera expresiones nuevas por niveles y resuélvelas paso a paso.</span></a>
+    <a class="card" href="ruta-de-prioridad/"><span class="tag">Jerarquía</span><b>Ruta de prioridad</b><span>Ocho expresiones con paréntesis, potencias y raíces; cada paso explica qué toca.</span></a>
+    <a class="card" href="operaciones-en-bloque/"><span class="tag">Jerarquía</span><b>Operaciones en bloque</b><span>Por qué la multiplicación o la división se resuelven antes.</span></a>
+    <a class="card" href="llamas-y-gotas/"><span class="tag">Enteros</span><b>Llamas y gotas</b><span>Suma de enteros con cartas y pares nulos.</span></a>
+    <a class="card" href="fracciones-barras/"><span class="tag">Fracciones</span><b>Fracciones con barras</b><span>Fracción de una cantidad y fracción inversa, con modelo de barras.</span></a>
+    <a class="card" href="ramos-floristeria/"><span class="tag">Divisibilidad</span><b>Ramos de la floristería</b><span>Máximo común divisor a través de los divisores de cada número.</span></a>
+  </div>
+
+  <h2>Estadística y probabilidad</h2>
+  <div class="grid">
+    <a class="card" href="pizarra-de-sucesos/"><span class="tag">Probabilidad</span><b>Pizarra de sucesos</b><span>P(A), P(B), unión, intersección, complementarios y condicionada.</span></a>
+    <a class="card" href="muestras-y-medias/"><span class="tag">Inferencia</span><b>Muestras y medias</b><span>Distribución muestral de la media y teorema central del límite.</span></a>
+    <a class="card" href="intervalos-de-confianza/"><span class="tag">Inferencia</span><b>Intervalos de confianza</b><span>Intervalo para la media con n, z y nivel de confianza ajustables.</span></a>
+  </div>
+
+  <footer>IES Puerta de Cuartos · Departamento de Matemáticas</footer>
+</main>
+</body>
+</html>

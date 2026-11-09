@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fracciones con barras, paso a paso</title>
+<style>
+:root{
+  --navy:#1f2a5a; --ink:#2b3566; --sky:#cfe6ff; --sky-d:#7fb8f5; --coral:#ff6f61; --coral-l:#ffd6d0;
+  --mint:#25b585; --mint-l:#d3f5e8; --sun:#ffd15c; --card:#ffffff; --line:#dfe6f5;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:'Fredoka',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--navy);
+  background:linear-gradient(160deg,#e9f1ff 0%,#fff5e9 100%);min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:clamp(22px,5vw,30px);margin:6px 0 2px;text-align:center;font-weight:700}
+.sub{text-align:center;margin:0 0 14px;color:#5b668f;font-size:15px}
+.card{background:var(--card);border-radius:20px;box-shadow:0 6px 20px rgba(31,42,90,.10);padding:14px 16px;margin-bottom:12px;border:2px solid #fff}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{flex:1;border:0;border-radius:16px;padding:12px 8px;font:600 15px/1.2 'Fredoka',sans-serif;cursor:pointer;
+  background:#fff;color:var(--ink);box-shadow:0 3px 10px rgba(31,42,90,.08);transition:.2s}
+.tab small{display:block;font-weight:400;font-size:12px;color:#6a74a0;margin-top:2px}
+.tab.on{background:var(--navy);color:#fff}
+.tab.on small{color:#c9d3ff}
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;justify-content:center;align-items:flex-end}
+.ctl{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:#5b668f;font-weight:500}
+.stp{display:flex;align-items:center;gap:6px;background:#f2f6ff;border-radius:14px;padding:4px}
+.stp button{width:34px;height:34px;border:0;border-radius:10px;background:#fff;color:var(--navy);font:700 20px/1 'Fredoka';cursor:pointer;box-shadow:0 2px 5px rgba(31,42,90,.12)}
+.stp button:active{transform:scale(.92)}
+.stp output{min-width:38px;text-align:center;font-weight:700;font-size:20px;color:var(--navy)}
+.dice{border:0;border-radius:14px;background:var(--sun);color:var(--navy);font:700 15px 'Fredoka';padding:10px 14px;cursor:pointer;box-shadow:0 3px 0 #e0b23a}
+.dice:active{transform:translateY(2px);box-shadow:0 1px 0 #e0b23a}
+
+.statement{font-size:clamp(24px,6.4vw,38px);font-weight:600;text-align:center;line-height:1.5;padding:6px 0}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 5px;font-weight:700;font-size:.62em}
+.fr span:first-child{border-bottom:3px solid currentColor;padding:0 5px 3px}
+.fr span:last-child{padding-top:3px}
+.hl{color:var(--coral)} .ok{color:var(--mint)}
+.res{display:inline-block;animation:pop .5s both}
+
+.bar svg{width:100%;height:auto;display:block}
+.bar{position:relative;overflow:hidden}
+.pop{animation:pop .5s both;transform-box:fill-box;transform-origin:center}
+@keyframes pop{0%{opacity:0;transform:scale(.6)}70%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@keyframes slide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes rise{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(-260px) rotate(300deg)}}
+.conf{position:absolute;bottom:10px;font-size:24px;pointer-events:none;animation:rise 1.6s ease-out forwards}
+
+.work h3{margin:0 0 6px;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#6a74a0;font-weight:600}
+.row{display:grid;grid-template-columns:62px 1fr 62px;align-items:center;font-size:clamp(20px,5vw,28px);font-weight:500;min-height:44px}
+.row.new{animation:slide .45s both}
+.row .mid{text-align:center;white-space:nowrap}
+.row .mid .eq{display:inline-block;margin:0 .45em;opacity:.8}
+.op{justify-self:center;background:var(--coral-l);color:#c2362a;border-radius:12px;font-weight:700;font-size:16px;padding:4px 10px;animation:pop .5s both}
+.op::before{content:"↓ "}
+.row.one .mid{text-align:left;padding-left:12%}
+.rowline{display:grid;grid-template-columns:62px 1fr 62px}
+.line1{grid-column:2;text-align:center}
+.bubble{background:var(--mint-l);border-radius:18px;padding:14px 16px;font-size:clamp(17px,4.4vw,21px);line-height:1.45;min-height:84px;display:flex;align-items:center;gap:12px}
+.bubble .emo{font-size:30px}
+.bubble b{color:var(--coral)}
+.bubble .fr{font-size:.8em}
+.slidercard{padding:12px 16px 14px}
+.stephead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600}
+.badge{background:var(--navy);color:#fff;border-radius:999px;padding:4px 12px;font-size:14px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:14px;border-radius:10px;outline:none;
+  background:linear-gradient(90deg,var(--coral) var(--p,0%),#e3e9f7 var(--p,0%));margin:8px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;border-radius:50%;background:#fff;border:5px solid var(--coral);box-shadow:0 3px 8px rgba(0,0,0,.2);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:5px solid var(--coral);cursor:pointer}
+.dots{display:flex;justify-content:space-between;padding:0 8px}
+.dots i{width:8px;height:8px;border-radius:50%;background:#d5dcf0;display:block}
+.dots i.on{background:var(--coral)}
+.btns{display:flex;gap:8px;margin-top:10px}
+.btns button,.dice,.tab{font-family:'Fredoka',system-ui,sans-serif}
+.btns button{flex:1;border:0;border-radius:14px;padding:12px;font:600 16px 'Fredoka';cursor:pointer;background:#eef2ff;color:var(--navy)}
+.btns button.main{background:var(--coral);color:#fff;box-shadow:0 3px 0 #d9564a}
+.btns button:disabled{opacity:.4}
+.btns button:active{transform:translateY(2px)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🍕 Fracciones con barras</h1>
+  <p class="sub">Desliza los pasos y mira cómo se resuelve</p>
+
+  <div class="tabs">
+    <button class="tab on" data-mode="1">Fracción de una cantidad<small>ej.: 2/7 de 49</small></button>
+    <button class="tab" data-mode="2">Fracción inversa<small>ej.: 4/5 de x es 16</small></button>
+  </div>
+
+  <div class="card"><div class="controls" id="controls"></div></div>
+
+  <div class="card"><div class="statement" id="statement"></div></div>
+  <div class="card bar" id="bar"></div>
+  <div class="card work"><h3>Desarrollo</h3><div id="work"></div></div>
+  <div class="card"><div class="bubble"><span class="emo" id="emo">💡</span><span id="explain"></span></div></div>
+
+  <div class="card slidercard">
+    <div class="stephead"><span>Pasos</span><span class="badge" id="badge"></span></div>
+    <input type="range" id="slider" min="0" max="6" step="1" value="0" aria-label="Paso">
+    <div class="dots" id="dots"></div>
+    <div class="btns">
+      <button id="prev">◀ Atrás</button>
+      <button id="play" class="main">▶ Automático</button>
+      <button id="next">Siguiente ▶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const S={mode:1,n:2,d:7,k:7,step:0,prev:-1,timer:null};
+const $=id=>document.getElementById(id);
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+const maxStep=()=>S.mode===1?6:7;
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+
+/* ---------- controles ---------- */
+function stepper(label,id,val){
+  return `<div class="ctl">${label}<div class="stp"><button data-s="${id}" data-d="-1" aria-label="menos">−</button><output>${val}</output><button data-s="${id}" data-d="1" aria-label="más">+</button></div></div>`;
+}
+function renderControls(){
+  const q = S.mode===1
+    ? stepper('Cantidad','k',S.d*S.k)
+    : stepper('Vale (la parte)','k',S.n*S.k);
+  $('controls').innerHTML = stepper('Numerador','n',S.n)+stepper('Denominador','d',S.d)+q+
+    '<button class="dice" id="dice">🎲 Nuevo</button>';
+}
+function adjust(id,dir){
+  if(id==='n') S.n=clamp(S.n+dir,1,S.d-1);
+  if(id==='d'){ S.d=clamp(S.d+dir,2,12); S.n=Math.min(S.n,S.d-1); }
+  if(id==='k') S.k=clamp(S.k+dir,1,20);
+  S.step=0;S.prev=-1;stop();update();
+}
+function randomize(){
+  S.d=2+Math.floor(Math.random()*9);
+  S.n=1+Math.floor(Math.random()*(S.d-1));
+  S.k=2+Math.floor(Math.random()*8);
+  S.step=0;S.prev=-1;stop();update();
+}
+
+/* ---------- barra SVG ---------- */
+function barSVG(){
+  const {n,d,k,step,mode}=S;
+  const W=600,x0=30,w=540,cw=w/d;
+  const y=74,h=62,y2=158,h2=46;
+  const isNew=at=>S.step===at&&S.step>S.prev;
+  const pc=at=>isNew(at)?' pop':'';
+  let s=`<svg viewBox="0 0 ${W} 250" role="img" aria-label="Modelo de barras">`;
+  const barStep=1, splitStep=2;
+  if(step<barStep){
+    s+=`<text x="300" y="125" text-anchor="middle" font-size="26" fill="#9aa5cf" font-family="Fredoka">Pulsa «Siguiente» para empezar</text></svg>`;
+    return s;
+  }
+  // etiqueta superior
+  let top;
+  if(mode===1) top=String(d*k);
+  else top = step>=7 ? String(d*k) : (step>=6 ? Array(d).fill(k).join('+') : 'x');
+  const topFill = (mode===2&&step>=7)?'#25b585':'#1f2a5a';
+  const topSize = top.length>10?20:(top.length>6?26:30);
+  s+=`<g class="${(mode===2&&(step===6||step===7)&&isNew(step))?'pop':(isNew(1)?'pop':'')}">
+      <path d="M${x0} 58 v-8 h${w} v8" fill="none" stroke="#7a86b8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="${W/2}" y="38" text-anchor="middle" font-size="${topSize}" font-weight="700" fill="${topFill}" font-family="Fredoka">${top}</text></g>`;
+  // celdas
+  const colorStep = mode===1?4:3;
+  const valStepAll = mode===1?3:5;
+  const valStepSel = mode===1?3:4;
+  if(step<splitStep){
+    s+=`<rect x="${x0}" y="${y}" width="${w}" height="${h}" rx="10" fill="${'#cfe6ff'}" stroke="#1f2a5a" stroke-width="3"/>`;
+  } else {
+    for(let i=0;i<d;i++){
+      const sel=i<n && step>=colorStep;
+      const fill=sel?'#ffb4ab':'#cfe6ff';
+      s+=`<rect class="${isNew(splitStep)?'pop':''}" style="animation-delay:${isNew(splitStep)?i*60:0}ms" x="${x0+i*cw}" y="${y}" width="${cw}" height="${h}" fill="${fill}" stroke="#1f2a5a" stroke-width="3"/>`;
+      const showVal = (i<n && step>=valStepSel) || step>=valStepAll;
+      if(showVal){
+        const justNow = (i<n && isNew(valStepSel)) || isNew(valStepAll);
+        s+=`<text class="${justNow?'pop':''}" style="animation-delay:${justNow?i*50:0}ms" x="${x0+i*cw+cw/2}" y="${y+h/2+9}" text-anchor="middle" font-size="${d>9?20:26}" font-weight="600" fill="#1f2a5a" font-family="Fredoka">${k}</text>`;
+      }
+    }
+    // esquinas redondeadas del marco exterior
+    s+=`<rect x="${x0}" y="${y}" width="${w}" height="${h}" rx="10" fill="none" stroke="#1f2a5a" stroke-width="4"/>`;
+  }
+  // barra inferior
+  const lowStep = mode===1?5:3;
+  if(step>=lowStep){
+    const lw=n*cw;
+    let label;
+    if(mode===1) label = step>=6 ? String(n*k) : (n>1?`${n} × ${k}`:String(k));
+    else label = String(n*k);
+    const lc = (mode===1&&step>=6)?'#c2362a':'#1f2a5a';
+    s+=`<g class="${isNew(lowStep)||(mode===1&&isNew(6))?'pop':''}">
+      <path d="M${x0+lw} ${y+h+8} v10" stroke="#ff6f61" stroke-width="3" stroke-linecap="round"/>
+      <rect x="${x0}" y="${y2}" width="${lw}" height="${h2}" rx="10" fill="#ffd6d0" stroke="#ff6f61" stroke-width="4"/>
+      <text x="${x0+lw/2}" y="${y2+h2/2+9}" text-anchor="middle" font-size="26" font-weight="700" fill="${lc}" font-family="Fredoka">${label}</text></g>`;
+    s+=`<text x="${x0+lw/2}" y="${y2+h2+26}" text-anchor="middle" font-size="16" fill="#6a74a0" font-family="Fredoka">${n} ${n>1?'partes':'parte'} de ${d}</text>`;
+  }
+  s+='</svg>';
+  return s;
+}
+
+/* ---------- desarrollo ---------- */
+function workHTML(){
+  const {n,d,k,step,mode}=S;
+  const isNew=at=>S.step===at&&S.step>S.prev?' new':'';
+  let h='';
+  if(mode===1){
+    const Wt=d*k, res=n*k;
+    h+=`<div class="row"><span></span><span class="mid">${fr(n,d)} de ${Wt}</span><span></span></div>`;
+    const L=[
+      {f:1,u:2,t:`${Wt}`},
+      {f:2,u:(n>1?4:99),t:`${Wt} ÷ ${d}`},
+    ];
+    if(n>1){
+      L.push({f:4,u:99,t:`${Wt} ÷ ${d} × ${n}`});
+      L.push({f:5,u:99,t:`${k} × ${n}`});
+    }
+    L.push({f:6,u:99,t:`${res}`});
+    // el último no debe duplicar a la anterior cuando n==1
+    L.forEach(l=>{
+      if(step>=l.f && step<l.u) h+=`<div class="row${isNew(l.f)}"><span></span><span class="mid"><span class="eq">=</span>${l.t}</span><span></span></div>`;
+    });
+  } else {
+    const G=n*k,x=d*k;
+    h+=`<div class="row"><span></span><span class="mid">${fr(n,d)} de x <span class="eq">=</span> ${G}</span><span></span></div>`;
+    if(step>=4) h+=`<div class="row${isNew(4)}"><span>${n>1?`<span class="op">÷${n}</span>`:''}</span><span class="mid">${fr(1,d)} de x <span class="eq">=</span> ${k}</span><span>${n>1?`<span class="op">÷${n}</span>`:''}</span></div>`;
+    if(step>=6) h+=`<div class="row${isNew(6)}"><span><span class="op">×${d}</span></span><span class="mid">${fr(d,d)} de x <span class="eq">=</span> ${x}</span><span><span class="op">×${d}</span></span></div>`;
+    if(step>=7) h+=`<div class="row${isNew(7)}"><span></span><span class="mid ok"><b>x <span class="eq">=</span> ${x}</b></span><span></span></div>`;
+  }
+  return h;
+}
+
+/* ---------- textos ---------- */
+function explainTxt(){
+  const {n,d,k,step,mode}=S;
+  const pl=n>1?'partes':'parte';
+  if(mode===1){
+    const Wt=d*k,res=n*k;
+    return [
+      [`🎯`,`Queremos calcular ${fr(n,d)} de <b>${Wt}</b>. ¡Vamos paso a paso con una barra!`],
+      [`📏`,`Dibujamos una barra que representa el total: <b>${Wt}</b>.`],
+      [`✂️`,`El denominador es <b>${d}</b>: cortamos la barra en ${d} partes iguales. (${Wt} ÷ ${d})`],
+      [`🔎`,`Cada parte vale ${Wt} ÷ ${d} = <b>${k}</b>.`],
+      [`🖍️`,`El numerador es <b>${n}</b>: coloreamos ${n} ${pl}${n>1?` y multiplicamos por ${n}`:''}.`],
+      [`🧮`,n>1?`${n} partes valen ${k} × ${n}.`:`Solo es 1 parte, así que vale <b>${k}</b>.`],
+      [`🎉`,`¡Listo! ${fr(n,d)} de ${Wt} = <b>${res}</b>.`]
+    ][step];
+  }
+  const G=n*k,x=d*k;
+  return [
+    [`🎯`,`Sabemos que ${fr(n,d)} de x vale <b>${G}</b>. ¿Cuánto vale el total <b>x</b>?`],
+    [`📏`,`Dibujamos una barra: representa el total <b>x</b>, que todavía no conocemos.`],
+    [`✂️`,`El denominador es <b>${d}</b>: cortamos la barra en ${d} partes iguales.`],
+    [`🖍️`,`El numerador es <b>${n}</b>: ${n} ${pl} juntas valen <b>${G}</b>.`],
+    [`➗`,n>1?`Si ${n} partes valen ${G}, cada parte vale ${G} ÷ ${n} = <b>${k}</b>.`:`Con 1 sola parte ya lo sabemos: cada parte vale <b>${k}</b>.`],
+    [`🟰`,`Todas las partes son iguales: ¡cada una vale <b>${k}</b>!`],
+    [`✖️`,`El total tiene ${d} partes, así que multiplicamos: ${k} × ${d} = <b>${x}</b>.`],
+    [`🎉`,`¡Listo! El total es <b>x = ${x}</b>.`]
+  ][step];
+}
+
+function statementHTML(){
+  const {n,d,k,step,mode}=S;
+  if(mode===1){
+    return `Calcula ${fr(n,d)} de ${d*k}` + (step>=6?` <span class="res ok">= ${n*k}</span>`:'');
+  }
+  return `${fr(n,d)} de <i>x</i> es ${n*k}.<br>Halla <i>x</i>.` + (step>=7?` <span class="res ok">x = ${d*k}</span>`:'');
+}
+
+/* ---------- confeti ---------- */
+function confetti(){
+  const el=$('bar'); const em=['🎉','⭐','✨','🎈','🍕'];
+  for(let i=0;i<14;i++){
+    const c=document.createElement('span'); c.className='conf';
+    c.textContent=em[i%em.length]; c.style.left=(5+Math.random()*90)+'%';
+    c.style.animationDelay=(Math.random()*.4)+'s';
+    el.appendChild(c); setTimeout(()=>c.remove(),2200);
+  }
+}
+
+/* ---------- actualizar ---------- */
+function update(){
+  const m=maxStep();
+  S.step=clamp(S.step,0,m);
+  const sl=$('slider'); sl.max=m; sl.value=S.step;
+  sl.style.setProperty('--p',(S.step/m*100)+'%');
+  $('badge').textContent = `Paso ${S.step} de ${m}`;
+  $('dots').innerHTML=Array.from({length:m+1},(_,i)=>`<i class="${i<=S.step?'on':''}"></i>`).join('');
+  renderControls();
+  $('statement').innerHTML=statementHTML();
+  $('bar').innerHTML=barSVG();
+  $('work').innerHTML=workHTML();
+  const [emo,txt]=explainTxt();
+  $('emo').textContent=emo; $('explain').innerHTML=txt;
+  $('prev').disabled=S.step===0;
+  $('next').disabled=S.step===m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',+t.dataset.mode===S.mode));
+  if(S.step===m && S.prev<m && S.prev!==-1) confetti();
+  S.prev=S.step;
+}
+function go(v){ if(v===S.step)return; S.step=clamp(v,0,maxStep()); update(); }
+
+function stop(){ clearInterval(S.timer); S.timer=null; $('play').textContent='▶ Automático'; }
+function play(){
+  if(S.timer){stop();return;}
+  if(S.step>=maxStep()){S.step=0;S.prev=-1;update();}
+  $('play').textContent='⏸ Pausa';
+  S.timer=setInterval(()=>{
+    if(S.step>=maxStep()){stop();return;}
+    go(S.step+1);
+    if(S.step>=maxStep()) stop();
+  },2200);
+}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.s){ adjust(b.dataset.s,+b.dataset.d); }
+  else if(b.id==='dice'){ randomize(); }
+  else if(b.classList.contains('tab')){ S.mode=+b.dataset.mode; S.step=0;S.prev=-1;stop();update(); }
+  else if(b.id==='prev'){ stop(); go(S.step-1); }
+  else if(b.id==='next'){ stop(); go(S.step+1); }
+  else if(b.id==='play'){ play(); }
+});
+$('slider').addEventListener('input',e=>{ stop(); go(+e.target.value); });
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){stop();go(S.step+1)} if(e.key==='ArrowLeft'){stop();go(S.step-1)}
+});
+update();
+</script>
+</body>
+</html>

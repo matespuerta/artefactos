@@ -1,0 +1,488 @@
+<!doctype html><html lang="es"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><title>Llamas y Gotas</title><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<style>
+  :root{
+    --bg:#FAF6F0;
+    --bg-panel:#FFFFFF;
+    --bg-sunken:#F1EAE0;
+    --ink:#2B2420;
+    --ink-soft:#7A6C5C;
+    --line:#E7DDCE;
+    --accent:#C4791F;
+    --accent-ink:#5A3B12;
+
+    --flame-1:#FFD23F;
+    --flame-2:#FF8A3D;
+    --flame-3:#D9451E;
+    --flame-soft:#FFF1DE;
+    --flame-ring: 214,69,30;
+
+    --water-1:#CDEFFB;
+    --water-2:#4FB3DA;
+    --water-3:#1C6FA8;
+    --water-soft:#E6F7FC;
+    --water-ring: 28,111,168;
+
+    --shadow: 0 10px 24px -12px rgba(43,36,32,0.35);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#201810;
+      --bg-panel:#2B2119;
+      --bg-sunken:#241B14;
+      --ink:#F4ECE0;
+      --ink-soft:#C4B4A0;
+      --line:#42342A;
+      --accent:#E8A947;
+      --accent-ink:#FFE7BC;
+
+      --flame-1:#FFDD70;
+      --flame-2:#FF9A52;
+      --flame-3:#F0653A;
+      --flame-soft:#3A2A1E;
+
+      --water-1:#DBF4FC;
+      --water-2:#6AC3E6;
+      --water-3:#4C9BCF;
+      --water-soft:#1C2E36;
+
+      --shadow: 0 10px 26px -10px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#201810;
+    --bg-panel:#2B2119;
+    --bg-sunken:#241B14;
+    --ink:#F4ECE0;
+    --ink-soft:#C4B4A0;
+    --line:#42342A;
+    --accent:#E8A947;
+    --accent-ink:#FFE7BC;
+
+    --flame-1:#FFDD70;
+    --flame-2:#FF9A52;
+    --flame-3:#F0653A;
+    --flame-soft:#3A2A1E;
+
+    --water-1:#DBF4FC;
+    --water-2:#6AC3E6;
+    --water-3:#4C9BCF;
+    --water-soft:#1C2E36;
+
+    --shadow: 0 10px 26px -10px rgba(0,0,0,0.55);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Nunito', system-ui, sans-serif;
+    padding: clamp(16px, 4vw, 40px);
+  }
+  h1,h2,h3{ font-family:'Baloo 2', system-ui, sans-serif; margin:0; text-wrap:balance; }
+
+  .page{ max-width: 980px; margin: 0 auto; display:flex; flex-direction:column; gap:28px; }
+
+  header{ display:flex; flex-direction:column; gap:8px; }
+  .eyebrow{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  h1{ font-size: clamp(1.6rem, 3.4vw, 2.35rem); font-weight:800; color:var(--ink); }
+  .subtitle{ color:var(--ink-soft); font-size:1rem; max-width:62ch; line-height:1.55; }
+
+  .instructions{
+    display:flex; gap:14px; flex-wrap:wrap;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 18px;
+    box-shadow: var(--shadow);
+  }
+  .instructions .step{
+    display:flex; align-items:center; gap:9px;
+    font-size:0.92rem; color:var(--ink-soft);
+  }
+  .instructions .step b{ color:var(--ink); font-weight:700; }
+  .step-num{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    width:22px; height:22px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--bg-sunken);
+    color:var(--accent-ink);
+    font-size:0.78rem;
+    flex:none;
+  }
+
+  section.row-block{ display:flex; flex-direction:column; gap:10px; }
+  .row-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .row-title{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    display:flex; align-items:center; gap:8px;
+  }
+  .row-title .dot{ width:11px; height:11px; border-radius:50%; flex:none; }
+  .row-title.flame .dot{ background: linear-gradient(135deg,var(--flame-1),var(--flame-3)); }
+  .row-title.water .dot{ background: linear-gradient(135deg,var(--water-1),var(--water-3)); }
+  .row-hint{ font-size:0.82rem; color:var(--ink-soft); }
+
+  .card-row{
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding: 6px 4px 14px;
+    scroll-padding-inline:4px;
+  }
+  .card-row::-webkit-scrollbar{ height:8px; }
+  .card-row::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px; }
+
+  .num-card{
+    all:unset;
+    cursor:pointer;
+    flex:none;
+    width:82px;
+    display:flex;
+    justify-content:center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .num-card svg{ display:block; transition: transform .18s ease, filter .18s ease; }
+  .num-card:hover svg{ transform: translateY(-4px); }
+  .num-card:focus-visible svg{ outline: 3px solid var(--accent); outline-offset:3px; border-radius:12px; }
+  .num-card[aria-pressed="true"] svg{ transform: translateY(-8px) scale(1.03); filter: drop-shadow(0 12px 16px rgba(0,0,0,0.28)); }
+  .num-card[aria-pressed="true"] .card-frame{ stroke-width:3.5; }
+
+  .equation-zone{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding: clamp(20px,4vw,34px);
+    box-shadow: var(--shadow);
+  }
+
+  .equation-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: clamp(10px, 2.4vw, 22px);
+    flex-wrap:wrap;
+  }
+  .eq-slot{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .eq-label{ font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; }
+  .eq-card-wrap{ width:104px; height:151px; display:flex; align-items:center; justify-content:center; }
+  .eq-card-wrap.empty{
+    border:2px dashed var(--line);
+    border-radius:14px;
+    color:var(--ink-soft);
+    font-size:0.78rem;
+    text-align:center;
+    padding:8px;
+  }
+  .eq-symbol{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:clamp(1.6rem, 4vw, 2.2rem);
+    color:var(--accent);
+    align-self:center;
+    margin-top:18px;
+  }
+
+  .result-zone{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .result-title{ font-size:0.85rem; color:var(--ink-soft); font-weight:700; letter-spacing:0.04em; }
+  .result-equation{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:700;
+    font-size:1.2rem;
+    font-variant-numeric: tabular-nums;
+    color:var(--ink);
+  }
+  .result-note{ font-size:0.85rem; color:var(--ink-soft); max-width:44ch; text-align:center; line-height:1.5; min-height:1.3em; }
+
+  .toolbar{ display:flex; justify-content:center; }
+  button.reset{
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:0.92rem;
+    background:var(--bg-sunken);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:9px 20px;
+    cursor:pointer;
+    transition: background .15s ease, transform .15s ease;
+  }
+  button.reset:hover{ transform: translateY(-1px); }
+  button.reset:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  footer{ text-align:center; font-size:0.78rem; color:var(--ink-soft); padding-top:4px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .num-card svg, button.reset{ transition:none; }
+  }
+</style>
+
+<div class="page">
+  <header>
+    <span class="eyebrow">Maths4everything &middot; enteros</span>
+    <h1>Llamas y gotas: sumar enteros</h1>
+    <p class="subtitle">Cada llama vale un número negativo y cada gota vale un número positivo. Elige una de cada fila para ver su suma &mdash; si se cancelan del todo, forman un <strong>par nulo</strong> y la carta resultado sale en blanco.</p>
+  </header>
+
+  <div class="instructions">
+    <div class="step"><span class="step-num">1</span><span>Toca <b>una llama</b> (del &minus;10 al &minus;1).</span></div>
+    <div class="step"><span class="step-num">2</span><span>Toca <b>una gota</b> (del 1 al 10).</span></div>
+    <div class="step"><span class="step-num">3</span><span>Lee el resultado en la carta grande.</span></div>
+  </div>
+
+  <section class="row-block">
+    <div class="row-head">
+      <div class="row-title flame"><span class="dot"></span>Negativos &minus;10 &rarr; &minus;1</div>
+      <div class="row-hint">Llamas naranjas</div>
+    </div>
+    <div class="card-row" id="rowNeg" role="group" aria-label="Cartas de números negativos"></div>
+  </section>
+
+  <section class="row-block">
+    <div class="row-head">
+      <div class="row-title water"><span class="dot"></span>Positivos 1 &rarr; 10</div>
+      <div class="row-hint">Gotas azules</div>
+    </div>
+    <div class="card-row" id="rowPos" role="group" aria-label="Cartas de números positivos"></div>
+  </section>
+
+  <div class="equation-zone">
+    <div class="equation-row">
+      <div class="eq-slot">
+        <span class="eq-label">Llama</span>
+        <div class="eq-card-wrap" id="eqNeg"><span class="eq-card-wrap empty" style="display:flex;align-items:center;">Sin elegir</span></div>
+      </div>
+      <span class="eq-symbol">+</span>
+      <div class="eq-slot">
+        <span class="eq-label">Gota</span>
+        <div class="eq-card-wrap" id="eqPos"><span class="eq-card-wrap empty" style="display:flex;align-items:center;">Sin elegir</span></div>
+      </div>
+      <span class="eq-symbol">=</span>
+      <div class="eq-slot">
+        <span class="eq-label">Resultado</span>
+        <div class="eq-card-wrap" id="eqResult"><span class="eq-card-wrap empty" style="display:flex;align-items:center;">&#63;</span></div>
+      </div>
+    </div>
+    <div class="result-zone">
+      <div class="result-equation" id="resultEquation">Elige una llama y una gota</div>
+      <div class="result-note" id="resultNote"></div>
+    </div>
+    <div class="toolbar">
+      <button class="reset" id="resetBtn" type="button">Borrar selección</button>
+    </div>
+  </div>
+
+  <footer>Modelo de pares nulos para la suma de enteros &middot; Maths4everything</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  function svgCardMarkup(kind, n, size){
+    // kind: 'flame' | 'water' | 'blank'
+    var w = size.w, h = size.h;
+    var id = kind + '-' + n + '-' + Math.round(w);
+    var isFlame = kind === 'flame';
+    var isWater = kind === 'water';
+    var label = n === 0 ? '' : (isFlame ? '−' + Math.abs(n) : '+' + n);
+
+    var borderPattern = '';
+    var borderFill = '#ffffff';
+    var innerFace = '';
+
+    if(isFlame || isWater){
+      var c1 = isFlame ? 'var(--flame-1)' : 'var(--water-1)';
+      var c2 = isFlame ? 'var(--flame-2)' : 'var(--water-2)';
+      var c3 = isFlame ? 'var(--flame-3)' : 'var(--water-3)';
+      borderFill = 'url(#weave-' + id + ')';
+
+      borderPattern =
+        '<pattern id="weave-' + id + '" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+          '<rect width="10" height="10" fill="' + c3 + '"></rect>' +
+          '<rect width="5" height="10" fill="' + c2 + '" opacity="0.55"></rect>' +
+        '</pattern>';
+
+      if(isFlame){
+        innerFace =
+          '<g transform="translate(50,58)">' +
+            '<path d="M0,-46 C16,-30 30,-22 28,-4 C40,-8 44,10 34,20 C46,24 40,46 22,52 C26,62 12,74 0,74 C-12,74 -26,62 -22,52 C-40,46 -46,24 -34,20 C-44,10 -40,-8 -28,-4 C-30,-22 -16,-30 0,-46 Z" fill="' + c1 + '" stroke="' + c3 + '" stroke-width="2.5" stroke-linejoin="round"></path>' +
+            '<path d="M0,-24 C10,-14 18,-8 16,4 C24,2 26,16 18,22 C26,26 22,42 10,46 C13,52 6,60 0,60 C-6,60 -13,52 -10,46 C-22,42 -26,26 -18,22 C-26,16 -24,2 -16,4 C-18,-8 -10,-14 0,-24 Z" fill="' + c2 + '"></path>' +
+            '<ellipse cx="-9" cy="30" rx="6" ry="4" fill="#fff" opacity="0.55"></ellipse>' +
+            '<ellipse cx="-10" cy="46" rx="5.5" ry="3.5" fill="#F98C6B" opacity="0.75"></ellipse>' +
+            '<ellipse cx="11" cy="47" rx="5.5" ry="3.5" fill="#F98C6B" opacity="0.75"></ellipse>' +
+            '<g>' +
+              '<ellipse cx="-9" cy="38" rx="7.5" ry="9" fill="#fff"></ellipse>' +
+              '<ellipse cx="-9" cy="40" rx="4.6" ry="5.6" fill="#241407"></ellipse>' +
+              '<circle cx="-11" cy="37" r="1.6" fill="#fff"></circle>' +
+              '<path d="M-17,27 Q-9,21 -1,27" stroke="#241407" stroke-width="2.4" fill="none" stroke-linecap="round"></path>' +
+            '</g>' +
+            '<g>' +
+              '<ellipse cx="11" cy="39" rx="6" ry="7.2" fill="#fff"></ellipse>' +
+              '<ellipse cx="11" cy="40.5" rx="3.6" ry="4.4" fill="#241407"></ellipse>' +
+              '<circle cx="9.3" cy="38" r="1.2" fill="#fff"></circle>' +
+              '<path d="M5,29 Q11,25 17,29" stroke="#241407" stroke-width="2.2" fill="none" stroke-linecap="round"></path>' +
+            '</g>' +
+          '</g>';
+      } else {
+        innerFace =
+          '<g transform="translate(50,58)">' +
+            '<path d="M0,-46 C-24,-14 -38,10 -38,26 C-38,50 -21,68 0,68 C21,68 38,50 38,26 C38,10 24,-14 0,-46 Z" fill="' + c1 + '" stroke="' + c3 + '" stroke-width="2.5" stroke-linejoin="round"></path>' +
+            '<path d="M-14,-6 C-20,4 -22,14 -16,14 C-11,14 -10,4 -14,-6 Z" fill="#fff" opacity="0.6"></path>' +
+            '<ellipse cx="-13" cy="46" rx="5.5" ry="3.4" fill="#FF9BB0" opacity="0.7"></ellipse>' +
+            '<ellipse cx="13" cy="46" rx="5.5" ry="3.4" fill="#FF9BB0" opacity="0.7"></ellipse>' +
+            '<g>' +
+              '<ellipse cx="-11" cy="30" rx="8" ry="9.5" fill="#fff"></ellipse>' +
+              '<ellipse cx="-11" cy="32" rx="5" ry="6" fill="' + c3 + '"></ellipse>' +
+              '<circle cx="-13" cy="29" r="1.7" fill="#fff"></circle>' +
+              '<path d="M-20,20 Q-11,14 -2,20" stroke="' + c3 + '" stroke-width="2.4" fill="none" stroke-linecap="round"></path>' +
+            '</g>' +
+            '<g>' +
+              '<ellipse cx="11" cy="31" rx="6.4" ry="7.6" fill="#fff"></ellipse>' +
+              '<ellipse cx="11" cy="32.5" rx="4" ry="4.8" fill="' + c3 + '"></ellipse>' +
+              '<circle cx="9.4" cy="30" r="1.3" fill="#fff"></circle>' +
+              '<path d="M4.5,22 Q11,18 17.5,22" stroke="' + c3 + '" stroke-width="2.2" fill="none" stroke-linecap="round"></path>' +
+            '</g>' +
+          '</g>';
+      }
+    }
+
+    var badge = '';
+    if(n !== 0){
+      var badgeFill = isFlame ? 'var(--flame-2)' : (isWater ? 'var(--water-2)' : '#ddd');
+      badge =
+        '<g class="badge" transform="translate(76,16)">' +
+          '<circle r="13" fill="#fff"></circle>' +
+          '<circle r="10.5" fill="' + badgeFill + '"></circle>' +
+          '<text x="0" y="4.5" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="12" fill="#241407">' + label + '</text>' +
+        '</g>' +
+        '<g class="badge" transform="translate(10,90)">' +
+          '<circle r="13" fill="#fff"></circle>' +
+          '<circle r="10.5" fill="' + badgeFill + '"></circle>' +
+          '<text x="0" y="4.5" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="12" fill="#241407">' + label + '</text>' +
+        '</g>';
+    }
+
+    var frameFill = kind === 'blank' ? 'var(--bg-panel)' : borderFill;
+    var frameStroke = kind === 'blank' ? 'var(--line)' : (isFlame ? 'var(--flame-3)' : 'var(--water-3)');
+
+    return (
+      '<svg viewBox="0 0 100 144" width="' + w + '" height="' + h + '" role="img" aria-label="' +
+        (kind === 'blank' ? 'Carta en blanco, resultado cero' : (isFlame ? 'Carta llama ' + label : 'Carta gota ' + label)) +
+      '">' +
+        '<defs>' + borderPattern + '</defs>' +
+        '<rect class="card-frame" x="1.5" y="1.5" width="97" height="141" rx="12" fill="' + frameFill + '" stroke="' + frameStroke + '" stroke-width="2.5"></rect>' +
+        '<rect x="9" y="9" width="82" height="126" rx="8" fill="var(--bg-panel)"></rect>' +
+        (kind !== 'blank' ? innerFace : '') +
+        (kind !== 'blank' ? badge : '') +
+      '</svg>'
+    );
+  }
+
+  function buildRow(container, kind, values){
+    values.forEach(function(n){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'num-card';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.dataset.kind = kind;
+      btn.dataset.value = n;
+      btn.innerHTML = svgCardMarkup(kind, n, {w:82, h:118});
+      container.appendChild(btn);
+    });
+  }
+
+  var rowNeg = document.getElementById('rowNeg');
+  var rowPos = document.getElementById('rowPos');
+  var negVals = []; for(var i=-10;i<=-1;i++){ negVals.push(i); }
+  var posVals = []; for(var j=1;j<=10;j++){ posVals.push(j); }
+  buildRow(rowNeg, 'flame', negVals);
+  buildRow(rowPos, 'water', posVals);
+
+  var state = { neg:null, pos:null };
+
+  var eqNeg = document.getElementById('eqNeg');
+  var eqPos = document.getElementById('eqPos');
+  var eqResult = document.getElementById('eqResult');
+  var resultEquation = document.getElementById('resultEquation');
+  var resultNote = document.getElementById('resultNote');
+
+  function emptySlot(text){
+    return '<span class="eq-card-wrap empty" style="display:flex;align-items:center;">' + text + '</span>';
+  }
+
+  function render(){
+    eqNeg.innerHTML = state.neg !== null ? svgCardMarkup('flame', state.neg, {w:104,h:151}) : emptySlot('Sin elegir');
+    eqPos.innerHTML = state.pos !== null ? svgCardMarkup('water', state.pos, {w:104,h:151}) : emptySlot('Sin elegir');
+
+    Array.prototype.forEach.call(rowNeg.children, function(btn){
+      var pressed = state.neg === Number(btn.dataset.value);
+      btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    });
+    Array.prototype.forEach.call(rowPos.children, function(btn){
+      var pressed = state.pos === Number(btn.dataset.value);
+      btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    });
+
+    if(state.neg === null || state.pos === null){
+      eqResult.innerHTML = emptySlot('?');
+      resultEquation.textContent = 'Elige una llama y una gota';
+      resultNote.textContent = '';
+      return;
+    }
+
+    var sum = state.neg + state.pos;
+    var kindResult = sum === 0 ? 'blank' : (sum < 0 ? 'flame' : 'water');
+    eqResult.innerHTML = svgCardMarkup(kindResult, sum, {w:104,h:151});
+
+    var negLabel = '(' + state.neg + ')';
+    var posLabel = '(+' + state.pos + ')';
+    resultEquation.textContent = negLabel + ' + ' + posLabel + ' = ' + sum;
+
+    if(sum === 0){
+      resultNote.textContent = 'La llama y la gota forman un par nulo: se cancelan y la carta sale en blanco.';
+    } else if(sum < 0){
+      resultNote.textContent = 'Quedan ' + Math.abs(sum) + ' llama' + (Math.abs(sum)===1?'':'s') + ' sin pareja: el resultado es negativo.';
+    } else {
+      resultNote.textContent = 'Quedan ' + sum + ' gota' + (sum===1?'':'s') + ' sin pareja: el resultado es positivo.';
+    }
+  }
+
+  rowNeg.addEventListener('click', function(e){
+    var btn = e.target.closest('.num-card');
+    if(!btn) return;
+    var v = Number(btn.dataset.value);
+    state.neg = state.neg === v ? null : v;
+    render();
+  });
+  rowPos.addEventListener('click', function(e){
+    var btn = e.target.closest('.num-card');
+    if(!btn) return;
+    var v = Number(btn.dataset.value);
+    state.pos = state.pos === v ? null : v;
+    render();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    state.neg = null; state.pos = null; render();
+  });
+
+  render();
+})();
+</script>
+
+</body></html>

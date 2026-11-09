@@ -1,0 +1,578 @@
+<!doctype html><html lang="es"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Pizarra de Sucesos</title><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<style>
+  :root{
+    --board:#152922;
+    --board-2:#1c342b;
+    --board-edge:#0f201a;
+    --chalk:#f3efe1;
+    --chalk-dim:#a9baaf;
+    --chalk-faint:#7f9187;
+    --pink:#ff9fb0;
+    --pink-fill:rgba(255,159,176,.13);
+    --cyan:#8fe0e8;
+    --cyan-fill:rgba(143,224,232,.13);
+    --yellow:#f0c64c;
+    --yellow-ink:#1c2b1f;
+    --line:rgba(243,239,225,.28);
+    --line-soft:rgba(243,239,225,.14);
+    --font-display:'Kalam','Comic Sans MS','Segoe Print',cursive;
+    --font-body:'Work Sans',system-ui,sans-serif;
+    --font-mono:'Space Mono',ui-monospace,monospace;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:
+      radial-gradient(ellipse 90% 60% at 20% -10%, rgba(255,255,255,.05), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 100% 110%, rgba(255,255,255,.04), transparent 60%),
+      var(--board);
+    color:var(--chalk);
+    font-family:var(--font-body);
+    padding-inline:16px;
+    padding-block:28px 40px;
+    min-height:100%;
+  }
+
+  .wrap{
+    max-width:880px;
+    margin-inline:auto;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px dashed var(--line);
+    padding-bottom:16px;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(2.1rem,6vw,2.9rem);
+    margin:0;
+    line-height:1;
+    letter-spacing:.5px;
+    text-shadow:0 0 18px rgba(243,239,225,.12);
+  }
+  header p{
+    margin:6px 0 0;
+    color:var(--chalk-dim);
+    font-size:.92rem;
+    max-width:46ch;
+  }
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--yellow);
+  }
+
+  /* ---------- controls ---------- */
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+  }
+  .controls{justify-content:flex-end;}
+
+  .btn-primary{
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:.92rem;
+    color:var(--yellow-ink);
+    background:var(--yellow);
+    border:none;
+    border-radius:10px 13px 9px 14px;
+    padding:10px 18px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    box-shadow:0 3px 0 rgba(0,0,0,.28);
+    transition:transform .15s ease, box-shadow .15s ease, rotate .15s ease;
+  }
+  .btn-primary:hover{transform:translateY(-1px) rotate(-1deg);}
+  .btn-primary:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.28);}
+  .btn-primary:focus-visible{outline:2px solid var(--chalk);outline-offset:2px;}
+  .btn-primary svg{width:16px;height:16px;}
+
+  /* ---------- card ---------- */
+  .card{
+    position:relative;
+    background:linear-gradient(180deg, var(--board-2), var(--board));
+    border:1.5px dashed var(--line);
+    border-radius:16px 18px 15px 19px;
+    padding:22px clamp(16px,4vw,30px) 26px;
+    animation:rise .5s ease both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  @media (prefers-reduced-motion:reduce){.card{animation:none;}}
+
+  .statement{
+    font-size:1.08rem;
+    line-height:1.6;
+    color:var(--chalk);
+    margin:0 0 20px;
+  }
+  .ov{text-decoration:overline;text-decoration-thickness:1.5px;text-underline-offset:0;}
+  .statement .lead{font-family:var(--font-display);font-size:1.15rem;color:var(--pink);}
+
+  .body-grid{
+    display:grid;
+    grid-template-columns:1.05fr 1fr;
+    gap:26px;
+    align-items:start;
+  }
+  @media (max-width:680px){
+    .body-grid{grid-template-columns:1fr;}
+  }
+
+  /* ---------- venn ---------- */
+  .venn-box{
+    background:rgba(0,0,0,.12);
+    border:1px solid var(--line-soft);
+    border-radius:12px;
+    padding:10px;
+  }
+  svg.venn{width:100%;height:auto;display:block;}
+  .venn text{font-family:var(--font-mono);fill:var(--chalk);}
+  .universe{fill:none;stroke:var(--chalk-faint);stroke-width:1.5;}
+  .setA{fill:var(--pink-fill);stroke:var(--pink);stroke-width:2;}
+  .setB{fill:var(--cyan-fill);stroke:var(--cyan);stroke-width:2;}
+  .universe-label{font-family:var(--font-display);font-size:15px;fill:var(--chalk-faint);}
+  .set-label{font-family:var(--font-display);font-size:19px;}
+  .setA-label{fill:var(--pink);}
+  .setB-label{fill:var(--cyan);}
+  .region-val{font-size:15px;font-weight:700;fill:var(--chalk-faint);transition:fill .2s ease;}
+  .region-val.given{fill:var(--chalk);}
+  .region-val.asked{fill:var(--yellow);}
+  .region-val.solved-asked{fill:var(--yellow);}
+  .region-cap{font-family:var(--font-body);font-size:9.5px;letter-spacing:.05em;fill:var(--chalk-faint);text-transform:uppercase;}
+  .union-bracket line{stroke:var(--chalk-dim);stroke-width:1.3;}
+  .union-bracket text{font-size:12.5px;fill:var(--chalk-dim);}
+  .union-bracket.given text{fill:var(--chalk);}
+  .union-bracket.asked text{fill:var(--yellow);}
+  .pulse{animation:pulse .5s ease;}
+  @keyframes pulse{0%{opacity:.2;}100%{opacity:1;}}
+  @media (prefers-reduced-motion:reduce){.pulse{animation:none;}}
+
+  /* ---------- se pide ---------- */
+  .ask-title{
+    font-family:var(--font-display);
+    color:var(--yellow);
+    font-size:1.15rem;
+    margin:0 0 10px;
+  }
+  .ask-pre{
+    display:none;
+    font-family:var(--font-mono);
+    font-size:.82rem;
+    color:var(--chalk-dim);
+    margin-bottom:10px;
+    padding-bottom:10px;
+    border-bottom:1px dashed var(--line-soft);
+  }
+  .ask-pre.show{display:block;}
+  .ask-list{display:flex;flex-direction:column;gap:12px;}
+  .ask-row{border-bottom:1px dashed var(--line-soft);padding-bottom:10px;}
+  .ask-row:last-child{border-bottom:none;}
+  .ask-formula{
+    font-family:var(--font-mono);
+    font-size:.94rem;
+    display:flex;
+    gap:8px;
+    align-items:baseline;
+    flex-wrap:wrap;
+  }
+  .ask-letter{color:var(--cyan);font-weight:700;}
+  .ask-blank{color:var(--yellow);font-weight:700;min-width:1ch;display:inline-block;}
+  .ask-steps{
+    font-family:var(--font-mono);
+    font-size:.78rem;
+    color:var(--chalk-faint);
+    margin-top:4px;
+  }
+
+  .solve-btn{
+    margin-top:18px;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:.86rem;
+    color:var(--chalk);
+    background:transparent;
+    border:1.5px dashed var(--line);
+    border-radius:9px 12px 8px 11px;
+    padding:9px 16px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .solve-btn:hover{border-color:var(--yellow);color:var(--yellow);}
+  .solve-btn:focus-visible{outline:2px solid var(--yellow);outline-offset:2px;}
+
+  footer{
+    text-align:center;
+    color:var(--chalk-faint);
+    font-size:.78rem;
+    padding-top:6px;
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Probabilidad · sucesos A y B</div>
+      <h1>Pizarra de Sucesos</h1>
+      <p>Ejercicios de P(A), P(B), unión, intersección, complementarios y probabilidad condicionada. Genera uno nuevo cuando quieras.</p>
+    </div>
+  </header>
+
+  <div class="controls">
+    <button class="btn-primary" id="newExercise">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg>
+      Nuevo ejercicio
+    </button>
+  </div>
+
+  <div class="card" id="card">
+    <p class="statement" id="statement"></p>
+
+    <div class="body-grid">
+      <div class="venn-box">
+        <svg class="venn" viewBox="0 0 400 260">
+          <defs>
+            <filter id="chalkRough" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"/>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4"/>
+            </filter>
+          </defs>
+          <g filter="url(#chalkRough)">
+            <rect class="universe" x="14" y="14" width="372" height="232" rx="16"/>
+            <circle class="setA" cx="150" cy="140" r="80"/>
+            <circle class="setB" cx="250" cy="140" r="80"/>
+          </g>
+          <g>
+            <text class="universe-label" x="26" y="34">E</text>
+            <text class="set-label setA-label" x="100" y="58">A</text>
+            <text class="set-label setB-label" x="292" y="58">B</text>
+
+            <g class="union-bracket" id="unionBracket" hidden>
+              <line x1="68" y1="46" x2="332" y2="46" stroke-dasharray="4 5"/>
+              <line x1="68" y1="46" x2="68" y2="52"/>
+              <line x1="332" y1="46" x2="332" y2="52"/>
+              <text id="unionLabel" x="200" y="38" text-anchor="middle">P(A∪B) = ?</text>
+            </g>
+
+            <text id="onlyAVal" class="region-val" x="106" y="140" text-anchor="middle">?</text>
+            <text class="region-cap" x="106" y="158" text-anchor="middle">solo A</text>
+
+            <text id="onlyBVal" class="region-val" x="294" y="140" text-anchor="middle">?</text>
+            <text class="region-cap" x="294" y="158" text-anchor="middle">solo B</text>
+
+            <text id="interVal" class="region-val" x="200" y="140" text-anchor="middle">?</text>
+            <text class="region-cap" x="200" y="158" text-anchor="middle">A∩B</text>
+
+            <text id="outsideVal" class="region-val" x="200" y="227" text-anchor="middle">?</text>
+            <text class="region-cap" x="200" y="242" text-anchor="middle">ninguno</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="ask-panel">
+        <h2 class="ask-title">Se pide</h2>
+        <div class="ask-pre" id="askPre"></div>
+        <div class="ask-list" id="askList"></div>
+        <button class="solve-btn" id="solveBtn">Ver solución</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Cada clic en «Nuevo ejercicio» genera datos y valores distintos, manteniendo el mismo tipo de problema.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- number helpers ----------
+  function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=b;b=a%b;a=t;}return a||1;}
+  function reduce(n,d){
+    if(n===0) return [0,1];
+    const sign = d<0 ? -1 : 1;
+    n*=sign; d*=sign;
+    const g=gcd(n,d);
+    return [n/g, d/g];
+  }
+  function onlyFactors25(d){
+    while(d%2===0) d/=2;
+    while(d%5===0) d/=5;
+    return d===1;
+  }
+  function toDecimalExact(n,d){
+    let count2=0,count5=0,dd=d;
+    while(dd%2===0){dd/=2;count2++;}
+    while(dd%5===0){dd/=5;count5++;}
+    const p=Math.max(count2,count5);
+    const mult2=Math.pow(2,p-count2);
+    const mult5=Math.pow(5,p-count5);
+    const numScaled=Math.round(n*mult2*mult5);
+    let str=String(numScaled).padStart(p+1,'0');
+    const intPart=str.slice(0,str.length-p)||'0';
+    const fracPart=p>0?str.slice(str.length-p):'';
+    return p>0? intPart+','+fracPart : intPart;
+  }
+  function fmtNum(n,d,style){
+    [n,d]=reduce(n,d);
+    if(d===1) return String(n);
+    if(n===0) return '0';
+    if(style==='decimal' && onlyFactors25(d)) return toDecimalExact(n,d);
+    const frac = n+'/'+d;
+    if(style==='decimal'){
+      const approx=(n/d).toFixed(3).replace('.',',');
+      return frac+' ≈ '+approx;
+    }
+    return frac;
+  }
+  function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+  function choice(arr){return arr[randInt(0,arr.length-1)];}
+
+  function ov(letter){return '<span class="ov">'+letter+'</span>';}
+
+  // ---------- exercise generators ----------
+  function type1Gen(style){
+    const D = style==='decimal' ? choice([10,20]) : choice([4,5,8,10]);
+    let a,b,abNum,outside,union;
+    for(let tries=0;tries<300;tries++){
+      a=randInt(2,D-2); b=randInt(2,D-2);
+      const lo=Math.max(0,a+b-D), hi=Math.min(a,b);
+      if(hi<lo) continue;
+      abNum=randInt(lo,hi);
+      union=a+b-abNum;
+      outside=D-union;
+      if(outside<1) continue;
+      if(abNum<0) continue;
+      break;
+    }
+    return {type:1,D,style,a,b,abNum,outside,union};
+  }
+  function type2Gen(style){
+    const D = style==='decimal' ? choice([10,20]) : choice([4,5,8,10]);
+    let a,b,abNum,onlyA,onlyB,outside,union;
+    for(let tries=0;tries<300;tries++){
+      a=randInt(3,D-2); b=randInt(3,D-2);
+      const lo=Math.max(0,a+b-D), hi=Math.min(a,b);
+      if(hi<lo) continue;
+      abNum=randInt(lo,hi);
+      onlyA=a-abNum; onlyB=b-abNum;
+      union=a+b-abNum; outside=D-union;
+      if(onlyA<1 || outside<1) continue;
+      break;
+    }
+    return {type:2,D,style,a,b,abNum,onlyA,onlyB,outside,union};
+  }
+  function type3Gen(style){
+    const D = style==='decimal' ? choice([10,20]) : choice([4,5,8,10]);
+    let a,b,abNum,compA,onlyA;
+    for(let tries=0;tries<300;tries++){
+      a=randInt(2,D-2);
+      const minB=D-a+1;
+      if(minB>D-1) continue;
+      b=randInt(Math.max(2,minB),D-1);
+      abNum=a+b-D;
+      if(abNum<1) continue;
+      if(abNum>Math.min(a,b)) continue;
+      onlyA=a-abNum;
+      compA=D-a;
+      break;
+    }
+    return {type:3,D,style,a,b,abNum,compA,onlyA};
+  }
+
+  // ---------- rendering ----------
+  const statementEl=document.getElementById('statement');
+  const askPre=document.getElementById('askPre');
+  const askList=document.getElementById('askList');
+  const solveBtn=document.getElementById('solveBtn');
+  const unionBracket=document.getElementById('unionBracket');
+  const unionLabel=document.getElementById('unionLabel');
+  const onlyAVal=document.getElementById('onlyAVal');
+  const onlyBVal=document.getElementById('onlyBVal');
+  const interVal=document.getElementById('interVal');
+  const outsideVal=document.getElementById('outsideVal');
+
+  let current=null;
+  let solved=false;
+
+  function setRegion(el,status,hiddenText,shownText){
+    el.textContent = hiddenText;
+    el.classList.remove('given','asked');
+    if(status==='given') el.classList.add('given');
+    else if(status==='asked') el.classList.add('asked');
+    el.dataset.shown=shownText;
+    el.dataset.status=status;
+  }
+
+  function render(ex){
+    current=ex; solved=false;
+    solveBtn.textContent='Ver solución';
+
+    const st=ex.style;
+    const Astr=fmtNum(ex.a,ex.D,st);
+    const Bstr=fmtNum(ex.b,ex.D,st);
+
+    if(ex.type===1){
+      const outsideStr=fmtNum(ex.outside,ex.D,st);
+      const unionStr=fmtNum(ex.union,ex.D,st);
+      const interStr=fmtNum(ex.abNum,ex.D,st);
+      const onlyAStr=fmtNum(ex.a-ex.abNum,ex.D,st);
+      const onlyBStr=fmtNum(ex.b-ex.abNum,ex.D,st);
+
+      statementEl.innerHTML='<span class="lead">Sean A y B</span> dos sucesos tales que: P(A) = '+Astr+'; P(B) = '+Bstr+'; P('+ov('A')+'∩'+ov('B')+') = '+outsideStr+'. Halla P(A∪B) y P(A∩B).';
+
+      unionBracket.hidden=false;
+      unionBracket.classList.remove('given');
+      unionBracket.classList.add('asked');
+      unionLabel.textContent='P(A∪B) = ?';
+      unionLabel.dataset.shown='P(A∪B) = '+unionStr;
+
+      setRegion(onlyAVal,'unknown','?',onlyAStr);
+      setRegion(onlyBVal,'unknown','?',onlyBStr);
+      setRegion(interVal,'asked','?',interStr);
+      setRegion(outsideVal,'given',outsideStr,outsideStr);
+
+      askPre.classList.remove('show'); askPre.innerHTML='';
+      askList.innerHTML=
+        askRow('P(A∪B) = <span class="ask-blank" data-final="'+unionStr+'">?</span>',
+               '= 1 − P('+ov('A')+'∩'+ov('B')+') = 1 − '+outsideStr+' = '+unionStr) +
+        askRow('P(A∩B) = <span class="ask-blank" data-final="'+interStr+'">?</span>',
+               '= P(A) + P(B) − P(A∪B) = '+Astr+' + '+Bstr+' − '+unionStr+' = '+interStr);
+    }
+
+    if(ex.type===2){
+      const interStr=fmtNum(ex.abNum,ex.D,st);
+      const outsideStr=fmtNum(ex.outside,ex.D,st);
+      const unionStr=fmtNum(ex.union,ex.D,st);
+      const onlyAStr=fmtNum(ex.onlyA,ex.D,st);
+      const onlyBStr=fmtNum(ex.onlyB,ex.D,st);
+
+      statementEl.innerHTML='<span class="lead">Si A y B</span> son dos sucesos tales que: P(A) = '+Astr+'; P(B) = '+Bstr+'; P(A∩B) = '+interStr+', halla P('+ov('A')+'∩'+ov('B')+') y P(A∩'+ov('B')+').';
+
+      unionBracket.hidden=true;
+
+      setRegion(onlyAVal,'asked','?',onlyAStr);
+      setRegion(onlyBVal,'unknown','?',onlyBStr);
+      setRegion(interVal,'given',interStr,interStr);
+      setRegion(outsideVal,'asked','?',outsideStr);
+
+      askPre.classList.remove('show'); askPre.innerHTML='';
+      askList.innerHTML=
+        askRow('P('+ov('A')+'∩'+ov('B')+') = <span class="ask-blank" data-final="'+outsideStr+'">?</span>',
+               '= 1 − (P(A)+P(B)−P(A∩B)) = 1 − ('+Astr+'+'+Bstr+'−'+interStr+') = 1 − '+unionStr+' = '+outsideStr) +
+        askRow('P(A∩'+ov('B')+') = <span class="ask-blank" data-final="'+onlyAStr+'">?</span>',
+               '= P(A) − P(A∩B) = '+Astr+' − '+interStr+' = '+onlyAStr);
+    }
+
+    if(ex.type===3){
+      const compAstr=fmtNum(ex.compA,ex.D,st);
+      const interStr=fmtNum(ex.abNum,ex.D,st);
+      const onlyAStr=fmtNum(ex.onlyA,ex.D,st);
+      const onlyBStr=fmtNum(ex.b-ex.abNum,ex.D,st);
+      const AgivenBStr=fmtNum(ex.abNum,ex.b,st);
+      const BgivenAStr=fmtNum(ex.abNum,ex.a,st);
+      const compAgivenBStr=fmtNum(ex.b-ex.abNum,ex.b,st);
+      const compBgivenAStr=fmtNum(ex.a-ex.abNum,ex.a,st);
+
+      statementEl.innerHTML='<span class="lead">Sean A y B</span> dos sucesos aleatorios tales que P('+ov('A')+') = '+compAstr+'; P(B) = '+Bstr+' y P(A∪B) = 1, calcula estas probabilidades: <br><b>a)</b> P(A∩B) &nbsp; <b>b)</b> P(A/B) &nbsp; <b>c)</b> P(B/A) &nbsp; <b>d)</b> P(A∩'+ov('B')+') &nbsp; <b>e)</b> P('+ov('A')+'/B) &nbsp; <b>f)</b> P('+ov('B')+'/A)';
+
+      unionBracket.hidden=false;
+      unionBracket.classList.remove('asked');
+      unionBracket.classList.add('given');
+      unionLabel.textContent='P(A∪B) = 1';
+      unionLabel.dataset.shown='P(A∪B) = 1';
+
+      setRegion(onlyAVal,'asked','?',onlyAStr);
+      setRegion(onlyBVal,'unknown','?',onlyBStr);
+      setRegion(interVal,'asked','?',interStr);
+      setRegion(outsideVal,'given','0','0');
+
+      askPre.classList.add('show');
+      askPre.innerHTML='Paso previo: P(A) = 1 − P('+ov('A')+') = 1 − '+compAstr+' = '+Astr;
+
+      askList.innerHTML=
+        askRow('<span class="ask-letter">a)</span> P(A∩B) = <span class="ask-blank" data-final="'+interStr+'">?</span>',
+               '= P(A)+P(B)−P(A∪B) = '+Astr+'+'+Bstr+'−1 = '+interStr) +
+        askRow('<span class="ask-letter">b)</span> P(A/B) = <span class="ask-blank" data-final="'+AgivenBStr+'">?</span>',
+               '= P(A∩B)/P(B) = '+interStr+'/'+Bstr+' = '+AgivenBStr) +
+        askRow('<span class="ask-letter">c)</span> P(B/A) = <span class="ask-blank" data-final="'+BgivenAStr+'">?</span>',
+               '= P(A∩B)/P(A) = '+interStr+'/'+Astr+' = '+BgivenAStr) +
+        askRow('<span class="ask-letter">d)</span> P(A∩'+ov('B')+') = <span class="ask-blank" data-final="'+onlyAStr+'">?</span>',
+               '= P(A) − P(A∩B) = '+Astr+' − '+interStr+' = '+onlyAStr) +
+        askRow('<span class="ask-letter">e)</span> P('+ov('A')+'/B) = <span class="ask-blank" data-final="'+compAgivenBStr+'">?</span>',
+               '= 1 − P(A/B) = 1 − '+AgivenBStr+' = '+compAgivenBStr) +
+        askRow('<span class="ask-letter">f)</span> P('+ov('B')+'/A) = <span class="ask-blank" data-final="'+compBgivenAStr+'">?</span>',
+               '= 1 − P(B/A) = 1 − '+BgivenAStr+' = '+compBgivenAStr);
+    }
+  }
+
+  function askRow(formulaHtml,stepsText){
+    return '<div class="ask-row"><div class="ask-formula">'+formulaHtml+'</div><div class="ask-steps" hidden>'+stepsText+'</div></div>';
+  }
+
+  function toggleSolve(){
+    solved=!solved;
+    if(solved){
+      solveBtn.textContent='Ocultar solución';
+      document.querySelectorAll('.ask-blank').forEach(function(b){b.textContent=b.dataset.final;});
+      document.querySelectorAll('.ask-steps').forEach(function(s){s.hidden=false;});
+      [onlyAVal,onlyBVal,interVal,outsideVal].forEach(function(el){
+        if(el.dataset.status!=='given'){
+          el.textContent=el.dataset.shown;
+          el.classList.add('pulse');
+        }
+      });
+      if(!unionBracket.hidden){
+        unionLabel.textContent=unionLabel.dataset.shown;
+        unionLabel.classList.add('pulse');
+      }
+    } else {
+      solveBtn.textContent='Ver solución';
+      document.querySelectorAll('.ask-blank').forEach(function(b){b.textContent='?';});
+      document.querySelectorAll('.ask-steps').forEach(function(s){s.hidden=true;});
+      [onlyAVal,onlyBVal,interVal,outsideVal].forEach(function(el){
+        if(el.dataset.status!=='given'){
+          el.textContent='?';
+          el.classList.remove('pulse');
+        }
+      });
+      if(!unionBracket.hidden && unionBracket.classList.contains('asked')){
+        unionLabel.textContent='P(A∪B) = ?';
+        unionLabel.classList.remove('pulse');
+      }
+    }
+  }
+
+  function generate(){
+    const t = choice([1,2,3]);
+    const style = Math.random()<0.5 ? 'decimal' : 'fraction';
+    let ex;
+    if(t===1) ex=type1Gen(style);
+    else if(t===2) ex=type2Gen(style);
+    else ex=type3Gen(style);
+    render(ex);
+  }
+
+  document.getElementById('newExercise').addEventListener('click',generate);
+  solveBtn.addEventListener('click',toggleSolve);
+
+  generate();
+})();
+</script>
+
+</body></html>

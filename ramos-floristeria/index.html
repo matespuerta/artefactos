@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ramos de la floristería</title>
+<style>
+/* Layout: cabecera ilustrada con dos ramos y una columna de pasos en tarjetas. Flores dibujadas en SVG. */
+:root {
+  --bg: #fbf3ea;
+  --bg2: #f6e3df;
+  --card: #fffdf9;
+  --ink: #2a2321;
+  --muted: #6d605b;
+  --line: #e6d7cb;
+  --rosa: #b3153f;
+  --rosa-soft: #fbdde5;
+  --clavel: #b35a00;
+  --clavel-soft: #ffe8c7;
+  --comun: #1d7a4a;
+  --comun-soft: #d9f0e2;
+  --shadow: 0 6px 18px rgba(120, 60, 50, 0.10);
+  --display: "Bricolage Grotesque", "Trebuchet MS", sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1416; --bg2: #2a1a20; --card: #261c1f; --ink: #f6ebe6; --muted: #bba9a2; --line: #4a393c;
+    --rosa: #ff8fae; --rosa-soft: #4d1f30;
+    --clavel: #ffc069; --clavel-soft: #4d3612;
+    --comun: #75d9a3; --comun-soft: #1c4733;
+    --shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b1416; --bg2: #2a1a20; --card: #261c1f; --ink: #f6ebe6; --muted: #bba9a2; --line: #4a393c;
+  --rosa: #ff8fae; --rosa-soft: #4d1f30;
+  --clavel: #ffc069; --clavel-soft: #4d3612;
+  --comun: #75d9a3; --comun-soft: #1c4733;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0; color: var(--ink); background: linear-gradient(180deg, var(--bg2) 0, var(--bg) 340px) var(--bg);
+  font-family: var(--body); font-size: 18px; line-height: 1.5; font-variant-numeric: tabular-nums;
+}
+main { max-width: 800px; margin: 0 auto; padding: 24px 16px 64px; display: flex; flex-direction: column; gap: 20px; }
+h1, h2 { font-family: var(--display); line-height: 1.12; text-wrap: balance; margin: 0; }
+h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 1.3rem; font-weight: 800; }
+p { margin: 0; }
+svg { display: block; }
+
+/* Cabecera */
+.hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 8px 4px 0; }
+.hero-text { display: flex; flex-direction: column; gap: 8px; flex: 1 1 280px; }
+.hero-text .sub { color: var(--muted); }
+.hero-art { display: flex; gap: 4px; align-items: flex-end; margin: 0 auto; }
+.hero-art figure { margin: 0; width: 150px; text-align: center; }
+.hero-art figcaption { font-weight: 700; font-size: 0.95rem; margin-top: -6px; }
+.hero-art .r figcaption { color: var(--rosa); }
+.hero-art .c figcaption { color: var(--clavel); }
+
+/* Enunciado */
+.enun { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start; }
+.enun .ico-big { flex: none; display: flex; flex-direction: column; gap: 4px; }
+.enun b.r { color: var(--rosa); } .enun b.c { color: var(--clavel); }
+
+/* Pasos */
+.step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.step-head { display: flex; gap: 12px; align-items: center; }
+.num { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--rosa); color: var(--card); display: grid; place-items: center; font-family: var(--display); font-weight: 800; }
+.hint { color: var(--muted); font-size: 0.95rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-width: 46px; padding: 6px 10px; border-radius: 999px; border: 2px solid var(--line); text-align: center; font-weight: 600; color: var(--muted); }
+.chip.common { color: var(--comun); background: var(--comun-soft); border-color: var(--comun); font-weight: 700; }
+.chip.common::after { content: " ✓"; font-size: 0.8em; }
+.tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 3px 12px 3px 6px; border-radius: 999px; font-size: 0.98rem; }
+.tag.r { background: var(--rosa-soft); color: var(--rosa); }
+.tag.c { background: var(--clavel-soft); color: var(--clavel); }
+.tag.k { background: var(--comun-soft); color: var(--comun); padding-left: 12px; }
+.tag svg { width: 24px; height: 24px; }
+.row { display: flex; flex-direction: column; gap: 8px; }
+.wrap-x { overflow-x: auto; }
+.pairs { width: 100%; border-collapse: collapse; }
+.pairs th, .pairs td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.pairs th { font-size: 0.85rem; color: var(--muted); font-weight: 600; vertical-align: bottom; }
+.pairs th:first-child, .pairs td:first-child { text-align: left; }
+.pairs th .ih { display: inline-flex; align-items: center; gap: 4px; }
+.pairs th svg { width: 18px; height: 18px; }
+.pairs tr.best td { background: var(--comun-soft); font-weight: 700; color: var(--comun); }
+.fact { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.fact > div { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.fact .big { font-family: var(--display); font-size: 1.4rem; font-weight: 800; }
+
+/* Solución */
+.result { background: var(--comun-soft); border: 2px solid var(--comun); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.result .big { font-family: var(--display); font-size: 1.6rem; font-weight: 800; color: var(--comun); line-height: 1.15; text-wrap: balance; }
+.groups { display: flex; flex-direction: column; gap: 14px; }
+.group { background: var(--card); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.group > span { font-weight: 700; }
+.group.r > span { color: var(--rosa); } .group.c > span { color: var(--clavel); }
+.minis { display: flex; flex-wrap: wrap; gap: 2px 4px; }
+.minis svg { width: 72px; height: 83px; }
+
+/* Probador */
+.tester { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tester button { width: 46px; height: 46px; border-radius: 12px; border: 2px solid var(--rosa); background: var(--card); color: var(--rosa); font-size: 1.5rem; font-weight: 700; cursor: pointer; }
+.tester button:hover { background: var(--rosa-soft); }
+.tester input { width: 100px; height: 46px; font: inherit; font-size: 1.3rem; font-weight: 700; text-align: center; border: 2px solid var(--rosa); border-radius: 12px; background: var(--card); color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--comun); outline-offset: 2px; }
+.samples { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sample { border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.sample svg.b { width: 100%; max-width: 190px; height: auto; }
+.sample .cap { font-weight: 700; text-align: center; }
+.sample.r .cap { color: var(--rosa); } .sample.c .cap { color: var(--clavel); }
+.left { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; min-height: 26px; }
+.left svg { width: 22px; height: 22px; }
+.verdict { border-radius: 12px; padding: 14px 16px; border: 2px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.verdict.ok { border-color: var(--comun); background: var(--comun-soft); }
+.verdict.no { border-color: var(--rosa); background: var(--rosa-soft); }
+@media (max-width: 520px) {
+  h1 { font-size: 1.9rem; } body { font-size: 17px; }
+  .enun .ico-big { display: none; }
+  .hero-art figure { width: 120px; }
+  .minis svg { width: 60px; height: 69px; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs id="defs"></defs></svg>
+
+<main>
+  <header class="hero">
+    <div class="hero-text">
+      <h1>Ramos de la floristería</h1>
+      <p class="sub">Máximo común divisor, paso a paso con los divisores de cada número.</p>
+    </div>
+    <div class="hero-art" id="heroArt" aria-hidden="true"></div>
+  </header>
+
+  <section class="enun">
+    <div class="ico-big" id="icoBig" aria-hidden="true"></div>
+    <p>Una floristería ha recibido <b class="r">240 rosas</b> y <b class="c">140 claveles</b>. ¿Cuántos ramos con el mismo número de flores se pueden hacer, sin mezclarlas y con el mayor número posible de unidades?</p>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><span class="num">1</span><h2>Qué hay que buscar</h2></div>
+    <p>Cada ramo lleva <i>n</i> flores del mismo tipo. Para que no sobre ninguna, <i>n</i> tiene que dividir a 240 y a 140 a la vez. Y como queremos ramos lo más grandes posible, buscamos el <b>mayor divisor común</b>: el m.c.d.(240, 140).</p>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><span class="num">2</span><h2>Divisores de cada número</h2></div>
+    <div class="row">
+      <div><span class="tag r"><span data-ico="rosa"></span>Divisores de 240</span> <span class="hint" id="n240"></span></div>
+      <div class="chips" id="d240"></div>
+    </div>
+    <div class="row">
+      <div><span class="tag c"><span data-ico="clavel"></span>Divisores de 140</span> <span class="hint" id="n140"></span></div>
+      <div class="chips" id="d140"></div>
+    </div>
+    <p class="hint">Los que aparecen en las dos listas están marcados en verde.</p>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><span class="num">3</span><h2>Divisores comunes</h2></div>
+    <div class="chips" id="dcom"></div>
+    <p>El mayor es <b id="mcd"></b>, así que m.c.d.(240, 140) = <b id="mcd2"></b>.</p>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><span class="num">4</span><h2>Cuántos ramos salen con cada divisor común</h2></div>
+    <div class="wrap-x">
+      <table class="pairs">
+        <thead><tr>
+          <th>Flores por ramo</th>
+          <th><span class="ih"><span data-ico="rosa"></span>Ramos de rosas<br>(240 ÷ n)</span></th>
+          <th><span class="ih"><span data-ico="clavel"></span>Ramos de claveles<br>(140 ÷ n)</span></th>
+          <th>Total de ramos</th>
+        </tr></thead>
+        <tbody id="tabla"></tbody>
+      </table>
+    </div>
+    <p class="hint">Cuantas más flores por ramo, menos ramos salen. Con 20 flores los ramos son lo más grandes posible.</p>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><span class="num">5</span><h2>Comprobación con factores primos</h2></div>
+    <div class="fact">
+      <div><span class="tag r"><span data-ico="rosa"></span>240</span><div class="big">2⁴ · 3 · 5</div></div>
+      <div><span class="tag c"><span data-ico="clavel"></span>140</span><div class="big">2² · 5 · 7</div></div>
+    </div>
+    <p>Factores comunes con el menor exponente: 2² · 5 = 4 · 5 = <b>20</b>. Coincide con el resultado de los divisores.</p>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <span class="tag k" style="align-self:flex-start">Solución</span>
+    <div class="big">Ramos de 20 flores: 12 de rosas y 7 de claveles</div>
+    <p>240 ÷ 20 = 12 y 140 ÷ 20 = 7, así que se pueden hacer <b>19 ramos</b> en total.</p>
+    <div class="groups">
+      <div class="group r"><span>12 ramos de rosas, 20 rosas cada uno</span><div class="minis" id="minisR"></div></div>
+      <div class="group c"><span>7 ramos de claveles, 20 claveles cada uno</span><div class="minis" id="minisC"></div></div>
+    </div>
+  </section>
+
+  <section class="step">
+    <div class="step-head"><span class="num">6</span><h2>Prueba tú otro número</h2></div>
+    <p>Elige cuántas flores lleva cada ramo y mira si sobra alguna.</p>
+    <div class="tester">
+      <button type="button" id="menos" aria-label="Una flor menos por ramo">−</button>
+      <input id="n" type="number" min="1" max="240" value="12" inputmode="numeric" aria-label="Flores por ramo">
+      <button type="button" id="mas" aria-label="Una flor más por ramo">+</button>
+      <span class="hint">flores por ramo</span>
+    </div>
+    <div class="samples">
+      <div class="sample r"><div id="bR"></div><div class="cap" id="capR"></div><div class="left" id="leftR"></div></div>
+      <div class="sample c"><div id="bC"></div><div class="cap" id="capC"></div><div class="left" id="leftC"></div></div>
+    </div>
+    <div class="verdict" id="veredicto"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  var A = 240, B = 140;
+
+  /* ---------- Dibujos ---------- */
+  function circ(cx, cy, r, fill, stroke, sw) {
+    return '<circle cx="' + cx.toFixed(2) + '" cy="' + cy.toFixed(2) + '" r="' + r + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + sw + '"/>';
+  }
+  function ring(n, rad, r, fill, stroke, sw, off) {
+    var s = '';
+    for (var k = 0; k < n; k++) {
+      var a = (360 / n) * k + (off || 0) - 90, t = a * Math.PI / 180;
+      s += circ(rad * Math.cos(t), rad * Math.sin(t), r, fill, stroke, sw);
+    }
+    return s;
+  }
+  // Rosa vista desde arriba: pétalos en capas y espiral central
+  var rosa = circ(0, 0, 22, '#a3123a', '#7a0d2b', 1) +
+    ring(5, 14, 10.5, '#c91f4b', '#7a0d2b', 1, 0) +
+    ring(5, 8, 7.5, '#dc3b64', '#8a1030', 1, 36) +
+    circ(0, 0, 7, '#ea5a80', '#8a1030', 1) +
+    '<path d="M0 0 m-1.5 0 a1.5 1.5 0 1 1 3 0 a3.6 3.6 0 1 1 -6.2 -2.4 a5.8 5.8 0 0 1 8.6 0.4" fill="none" stroke="#8a1030" stroke-width="1" stroke-linecap="round"/>';
+  // Clavel: borde festoneado con capas de pétalos
+  var clavel = ring(13, 17, 6.2, '#f0912a', '#a85408', 0.9, 0) +
+    ring(10, 11.5, 6, '#ffa73f', '#a85408', 0.9, 18) +
+    ring(7, 6, 5, '#ffbf63', '#a85408', 0.9, 0) +
+    circ(0, 0, 3, '#e8821a', '#a85408', 0.9);
+  document.getElementById('defs').innerHTML =
+    '<symbol id="rosa" viewBox="-24 -24 48 48">' + rosa + '</symbol>' +
+    '<symbol id="clavel" viewBox="-24 -24 48 48">' + clavel + '</symbol>';
+
+  function icon(tipo, size) {
+    return '<svg viewBox="-24 -24 48 48" width="' + size + '" height="' + size + '" aria-hidden="true"><use href="#' + tipo + '" x="-24" y="-24" width="48" height="48"/></svg>';
+  }
+
+  // Ramo con n flores colocadas en espiral, hojas y papel de estraza
+  function ramo(tipo, n) {
+    var c = Math.min(28, 62 / Math.sqrt(n)), fr = Math.min(24, c * 0.84);
+    var cx = 100, cy = 80, i, s = '';
+    var hojas = [-160, -135, -110, -70, -45, -20];
+    hojas.forEach(function (d) {
+      var t = d * Math.PI / 180, R = 66;
+      s += '<ellipse cx="' + (cx + R * Math.cos(t)).toFixed(1) + '" cy="' + (cy + 8 + R * 0.85 * Math.sin(t)).toFixed(1) + '" rx="11" ry="30" fill="#2f8f5b" stroke="#1f6b42" stroke-width="1.2" transform="rotate(' + (d + 90) + ' ' + (cx + R * Math.cos(t)).toFixed(1) + ' ' + (cy + 8 + R * 0.85 * Math.sin(t)).toFixed(1) + ')"/>';
+    });
+    for (i = n - 1; i >= 0; i--) {
+      var r = c * Math.sqrt(i + 0.5), th = i * 2.39996;
+      var x = cx + r * Math.cos(th), y = cy + r * 0.92 * Math.sin(th);
+      s += '<use href="#' + tipo + '" x="' + (x - fr).toFixed(1) + '" y="' + (y - fr).toFixed(1) + '" width="' + (2 * fr).toFixed(1) + '" height="' + (2 * fr).toFixed(1) + '"/>';
+    }
+    s += '<path d="M36 148 Q100 134 164 148 L106 224 Q100 230 94 224 Z" fill="#dcbc8c" stroke="#a98450" stroke-width="2" stroke-linejoin="round"/>' +
+         '<path d="M36 148 Q100 134 164 148 L158 158 Q100 146 42 158 Z" fill="#efd7ae" stroke="#a98450" stroke-width="1.5" stroke-linejoin="round"/>' +
+         '<path d="M100 160 L100 226" stroke="#c2a06a" stroke-width="1.5"/>' +
+         '<path d="M100 164 L82 154 Q78 164 82 174 Z M100 164 L118 154 Q122 164 118 174 Z" fill="#fffdf9" stroke="#b9a58a" stroke-width="1.2" stroke-linejoin="round"/>' +
+         '<circle cx="100" cy="164" r="4.5" fill="#fffdf9" stroke="#b9a58a" stroke-width="1.2"/>';
+    return '<svg class="b" viewBox="0 0 200 232" role="img" aria-label="Ramo de ' + n + (tipo === 'rosa' ? ' rosas' : ' claveles') + '">' + s + '</svg>';
+  }
+
+  // Iconos sueltos (etiquetas)
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ico]'), function (el) {
+    el.innerHTML = icon(el.getAttribute('data-ico'), el.closest('th') ? 18 : 24);
+  });
+  document.getElementById('icoBig').innerHTML = icon('rosa', 34) + icon('clavel', 34);
+
+  // Cabecera con dos ramos
+  document.getElementById('heroArt').innerHTML =
+    '<figure class="r">' + ramo('rosa', 9) + '<figcaption>240 rosas</figcaption></figure>' +
+    '<figure class="c">' + ramo('clavel', 9) + '<figcaption>140 claveles</figcaption></figure>';
+
+  /* ---------- Matemáticas ---------- */
+  function divs(x) { var r = []; for (var i = 1; i <= x; i++) if (x % i === 0) r.push(i); return r; }
+  function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+  var dA = divs(A), dB = divs(B);
+  var comunes = dA.filter(function (d) { return B % d === 0; });
+  var mcd = gcd(A, B);
+
+  function chips(id, list, other) {
+    var el = document.getElementById(id);
+    list.forEach(function (d) {
+      var s = document.createElement('span');
+      s.className = 'chip' + (other.indexOf(d) !== -1 ? ' common' : '');
+      s.textContent = d;
+      el.appendChild(s);
+    });
+  }
+  chips('d240', dA, dB);
+  chips('d140', dB, dA);
+  chips('dcom', comunes, comunes);
+  document.getElementById('n240').textContent = '(' + dA.length + ' divisores)';
+  document.getElementById('n140').textContent = '(' + dB.length + ' divisores)';
+  document.getElementById('mcd').textContent = mcd;
+  document.getElementById('mcd2').textContent = mcd;
+
+  var tb = document.getElementById('tabla');
+  comunes.forEach(function (d) {
+    var tr = document.createElement('tr');
+    if (d === mcd) tr.className = 'best';
+    [d, A / d, B / d, A / d + B / d].forEach(function (v) {
+      var td = document.createElement('td'); td.textContent = v; tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+
+  // Ramos de la solución
+  function minis(id, tipo, cuantos) {
+    var h = '';
+    for (var k = 0; k < cuantos; k++) h += ramo(tipo, mcd);
+    document.getElementById(id).innerHTML = h;
+  }
+  minis('minisR', 'rosa', A / mcd);
+  minis('minisC', 'clavel', B / mcd);
+
+  /* ---------- Probador ---------- */
+  var inp = document.getElementById('n'), out = document.getElementById('veredicto');
+  function linea(total, n, etiqueta) {
+    var q = Math.floor(total / n), r = total % n;
+    return '<div>' + etiqueta + ': ' + total + ' ÷ ' + n + ' = ' + q + ', resto <b>' + r + '</b> ' + (r === 0 ? '✓' : '✗') + '</div>';
+  }
+  function sobrantes(tipo, r) {
+    var h = '', k, tope = Math.min(r, 40);
+    for (k = 0; k < tope; k++) h += icon(tipo, 22);
+    if (r > tope) h += '<span class="hint">+' + (r - tope) + '</span>';
+    return h;
+  }
+  function probar() {
+    var n = parseInt(inp.value, 10);
+    if (!(n >= 1 && n <= A)) {
+      out.className = 'verdict';
+      out.innerHTML = '<div>Escribe un número entre 1 y ' + A + '.</div>';
+      return;
+    }
+    var rR = A % n, rC = B % n;
+    document.getElementById('bR').innerHTML = ramo('rosa', n);
+    document.getElementById('bC').innerHTML = ramo('clavel', n);
+    document.getElementById('capR').textContent = 'Ramo de ' + n + (n === 1 ? ' rosa' : ' rosas') + (rR ? ': sobran ' + rR : ': no sobra ninguna');
+    document.getElementById('capC').textContent = 'Ramo de ' + n + (n === 1 ? ' clavel' : ' claveles') + (rC ? ': sobran ' + rC : ': no sobra ninguno');
+    document.getElementById('leftR').innerHTML = sobrantes('rosa', rR);
+    document.getElementById('leftC').innerHTML = sobrantes('clavel', rC);
+    var html = linea(A, n, 'Rosas') + linea(B, n, 'Claveles');
+    if (rR === 0 && rC === 0) {
+      html += '<div><b>Sirve:</b> ' + (A / n) + ' ramos de rosas y ' + (B / n) + ' de claveles, ' + (A / n + B / n) + ' ramos en total.' +
+        (n === mcd ? ' Es el mayor posible.' : ' Pero no es el mayor: con ' + mcd + ' flores los ramos son más grandes.') + '</div>';
+      out.className = 'verdict ok';
+    } else {
+      var quien = (rR && rC) ? 'las rosas y los claveles' : (rR ? 'las rosas' : 'los claveles');
+      html += '<div><b>No sirve:</b> sobran flores en ' + quien + '.</div>';
+      out.className = 'verdict no';
+    }
+    out.innerHTML = html;
+  }
+  function mover(delta) {
+    var n = parseInt(inp.value, 10); if (isNaN(n)) n = 1;
+    inp.value = Math.min(A, Math.max(1, n + delta));
+    probar();
+  }
+  document.getElementById('menos').addEventListener('click', function () { mover(-1); });
+  document.getElementById('mas').addEventListener('click', function () { mover(1); });
+  inp.addEventListener('input', probar);
+  probar();
+})();
+</script>
+</body>
+</html>

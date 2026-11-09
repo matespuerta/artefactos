@@ -1,0 +1,409 @@
+<!doctype html><html lang="es"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Operaciones en Bloque</title><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<style>
+  :root{
+    --paper:#f5f7fc;
+    --paper-line:#dfe4f2;
+    --ink:#1c2541;
+    --ink-soft:#5b6684;
+    --card:#ffffff;
+    --card-border:#dfe3f2;
+    --card-shadow:0 1px 2px rgba(28,37,65,.04), 0 8px 20px -12px rgba(28,37,65,.12);
+    --accent:#1f8a5f;
+    --accent-soft:#e3f5ec;
+    --accent-ink:#0f5c3c;
+    --accent-border:#a9e0c4;
+    --result:#b8720a;
+    --result-soft:#fbf0dc;
+    --ghost:#eceffa;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#10131c;
+      --paper-line:#20263a;
+      --ink:#e9ecf7;
+      --ink-soft:#a4adc9;
+      --card:#161c2b;
+      --card-border:#272f47;
+      --card-shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.6);
+      --accent:#42c08a;
+      --accent-soft:#163526;
+      --accent-ink:#8fecc0;
+      --accent-border:#2c5c45;
+      --result:#e3a73d;
+      --result-soft:#3a2c12;
+      --ghost:#1b2134;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#10131c;
+    --paper-line:#20263a;
+    --ink:#e9ecf7;
+    --ink-soft:#a4adc9;
+    --card:#161c2b;
+    --card-border:#272f47;
+    --card-shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 28px -14px rgba(0,0,0,.6);
+    --accent:#42c08a;
+    --accent-soft:#163526;
+    --accent-ink:#8fecc0;
+    --accent-border:#2c5c45;
+    --result:#e3a73d;
+    --result-soft:#3a2c12;
+    --ghost:#1b2134;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:
+      repeating-linear-gradient(0deg, var(--paper-line) 0 1px, transparent 1px calc(28 / 16 * 1rem)),
+      repeating-linear-gradient(90deg, var(--paper-line) 0 1px, transparent 1px calc(28 / 16 * 1rem)),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Karla',system-ui,sans-serif;
+    padding-inline:20px;
+    padding-block: 28px 56px;
+  }
+
+  .wrap{
+    max-width:1000px;
+    margin-inline:auto;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+
+  header{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:18px;
+    padding-bottom:14px;
+    border-bottom:2px solid var(--card-border);
+  }
+  .title-block h1{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:600;
+    font-size:clamp(26px,4vw,38px);
+    margin:0 0 6px;
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+  }
+  .title-block p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:clamp(14px,1.6vw,16px);
+    max-width:52ch;
+  }
+
+  #reset-btn{
+    font-family:'Karla',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    color:var(--ink-soft);
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    padding:10px 16px;
+    cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, transform .1s ease;
+    white-space:nowrap;
+  }
+  #reset-btn:hover{ color:var(--ink); border-color:var(--ink-soft); }
+  #reset-btn:active{ transform:translateY(1px); }
+  #reset-btn:focus-visible, .chip:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px 22px;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .legend-sample{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .legend-chip{
+    display:inline-flex;
+    align-items:center;
+    font-family:'Space Mono',monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent-ink);
+    background:var(--accent-soft);
+    border:1px solid var(--accent-border);
+    border-radius:8px;
+    padding:3px 9px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(300px,1fr));
+    gap:18px;
+  }
+
+  .card{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:18px;
+    box-shadow:var(--card-shadow);
+    padding:22px 22px 20px;
+    overflow:hidden;
+  }
+  .card-tag{
+    position:absolute;
+    top:6px;
+    right:16px;
+    font-family:'Fraunces',Georgia,serif;
+    font-size:64px;
+    font-weight:600;
+    color:var(--ghost);
+    line-height:1;
+    user-select:none;
+    pointer-events:none;
+  }
+
+  .expr{
+    position:relative;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    font-family:'Space Mono',monospace;
+    font-size:clamp(20px,2.6vw,26px);
+    font-weight:700;
+    z-index:1;
+  }
+  .expr .tok{ white-space:pre; }
+
+  .chip{
+    font:inherit;
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    color:var(--accent-ink);
+    background:var(--accent-soft);
+    border:1.5px solid var(--accent-border);
+    border-radius:10px;
+    padding:5px 12px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:background .15s ease, transform .1s ease, border-color .15s ease;
+  }
+  .chip:hover{ border-color:var(--accent); }
+  .chip:active{ transform:translateY(1px); }
+  .card.expanded .chip{
+    background:var(--accent);
+    color:var(--card);
+    border-color:var(--accent);
+  }
+  .chev{
+    font-size:13px;
+    transition:transform .25s ease;
+    display:inline-block;
+  }
+  .card.expanded .chev{ transform:rotate(180deg); }
+
+  .hint{
+    font-family:'Karla',sans-serif;
+    font-weight:600;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .card.expanded .hint{ visibility:hidden; }
+
+  .reveal{
+    display:grid;
+    grid-template-rows:0fr;
+    transition:grid-template-rows .38s ease;
+  }
+  .card.expanded .reveal{ grid-template-rows:1fr; }
+  .reveal-inner{
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .reveal-content{
+    padding-top:18px;
+    margin-top:16px;
+    border-top:1px dashed var(--card-border);
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    opacity:0;
+    transform:translateY(-4px);
+    transition:opacity .3s ease .08s, transform .3s ease .08s;
+  }
+  .card.expanded .reveal-content{ opacity:1; transform:translateY(0); }
+
+  .step-label{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+  }
+  .chain{
+    font-family:'Space Mono',monospace;
+    font-size:clamp(16px,2vw,19px);
+    line-height:1.5;
+    color:var(--ink);
+    overflow-x:auto;
+  }
+
+  .dots{
+    display:inline-grid;
+    gap:9px 5px;
+  }
+  .dot{
+    width:15px;
+    height:15px;
+    border-radius:4px;
+    background:var(--accent);
+  }
+
+  .final{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .final-eq{
+    font-family:'Space Mono',monospace;
+    font-weight:700;
+    font-size:clamp(19px,2.4vw,23px);
+    color:var(--result);
+    background:var(--result-soft);
+    border-radius:10px;
+    padding:6px 12px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .reveal, .reveal-content, .chev, .chip{ transition:none; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <h1>Operaciones en bloque</h1>
+      <p>Toca la casilla verde de cada ejercicio: verás por qué esa multiplicación o división se calcula primero, como si fuera un único número.</p>
+    </div>
+    <button id="reset-btn" type="button">Reiniciar todo</button>
+  </header>
+
+  <div class="legend">
+    <span class="legend-sample"><span class="legend-chip">7 · 2</span> = se resuelve como un solo bloque</span>
+    <span class="legend-sample">Toca <span aria-hidden="true">▾</span> para desdoblarlo en sumas o restas</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+</div>
+
+<script>
+(function(){
+  var exercises = [
+    { id:'a', before:'4  +', op:'mult', a:7, b:2,  after:'',       final:'4 + 14 = 18' },
+    { id:'d', before:'18  −', op:'div', a:15, b:3, after:'',       final:'18 − 5 = 13' },
+    { id:'b', before:'',      op:'mult', a:3, b:7,  after:'−  8',  final:'21 − 8 = 13' },
+    { id:'e', before:'',      op:'div', a:45, b:9,  after:'+  7',  final:'5 + 7 = 12'  },
+    { id:'c', before:'8  −',  op:'div', a:10, b:2,  after:'',      final:'8 − 5 = 3'   },
+    { id:'f', before:'5  +',  op:'div', a:30, b:6,  after:'',      final:'5 + 5 = 10'  }
+  ];
+
+  function chainAndGrid(ex){
+    if (ex.op === 'mult'){
+      var parts = [];
+      for (var i=0;i<ex.b;i++) parts.push(ex.a);
+      var chain = parts.join(' + ') + ' = ' + (ex.a*ex.b);
+      return { chain: chain, rows: ex.b, cols: ex.a, label: 'Es la suma de ' + ex.a + ', repetida ' + ex.b + ' veces:' };
+    } else {
+      var q = ex.a / ex.b;
+      var subs = [];
+      for (var j=0;j<q;j++) subs.push(ex.b);
+      var chain2 = ex.a + ' − ' + subs.join(' − ') + ' = 0';
+      return { chain: chain2, rows: q, cols: ex.b, label: 'Es repartir ' + ex.a + ' en grupos de ' + ex.b + ':' };
+    }
+  }
+
+  function dotsHTML(rows, cols){
+    var html = '<div class="dots" style="grid-template-columns:repeat(' + cols + ',15px); grid-template-rows:repeat(' + rows + ',15px);" role="img" aria-label="' + (rows*cols) + ' unidades en ' + rows + ' grupos de ' + cols + '">';
+    for (var i=0;i<rows*cols;i++) html += '<span class="dot"></span>';
+    html += '</div>';
+    return html;
+  }
+
+  function cardHTML(ex){
+    var symbol = ex.op === 'mult' ? '·' : ':';
+    var cg = chainAndGrid(ex);
+    return (
+      '<article class="card" id="card-' + ex.id + '" data-id="' + ex.id + '">' +
+        '<span class="card-tag" aria-hidden="true">' + ex.id + ')</span>' +
+        '<div class="expr">' +
+          (ex.before ? '<span class="tok">' + ex.before + '</span>' : '') +
+          '<button class="chip" id="chip-' + ex.id + '" type="button" aria-expanded="false">' +
+            '<span>' + ex.a + ' ' + symbol + ' ' + ex.b + '</span>' +
+            '<span class="chev" aria-hidden="true">▾</span>' +
+          '</button>' +
+          (ex.after ? '<span class="tok">' + ex.after + '</span>' : '') +
+        '</div>' +
+        '<div class="hint">toca la casilla</div>' +
+        '<div class="reveal"><div class="reveal-inner"><div class="reveal-content">' +
+          '<div>' +
+            '<div class="step-label">' + cg.label + '</div>' +
+            '<div class="chain">' + cg.chain + '</div>' +
+          '</div>' +
+          dotsHTML(cg.rows, cg.cols) +
+          '<div class="final">' +
+            '<span class="step-label" style="color:var(--ink-soft)">Expresión completa</span>' +
+            '<span class="final-eq">' + ex.final + '</span>' +
+          '</div>' +
+        '</div></div></div>' +
+      '</article>'
+    );
+  }
+
+  var grid = document.getElementById('grid');
+  grid.innerHTML = exercises.map(cardHTML).join('');
+
+  function setExpanded(card, on){
+    card.classList.toggle('expanded', on);
+    var chip = card.querySelector('.chip');
+    if (chip) chip.setAttribute('aria-expanded', on ? 'true' : 'false');
+  }
+
+  function initCards(){
+    exercises.forEach(function(ex){
+      var card = document.getElementById('card-' + ex.id);
+      var chip = document.getElementById('chip-' + ex.id);
+      chip.addEventListener('click', function(){
+        setExpanded(card, !card.classList.contains('expanded'));
+      });
+    });
+    document.getElementById('reset-btn').addEventListener('click', function(){
+      exercises.forEach(function(ex){
+        setExpanded(document.getElementById('card-' + ex.id), false);
+      });
+    });
+  }
+
+  initCards();
+})();
+</script>
+
+</body></html>
