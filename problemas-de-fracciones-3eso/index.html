@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Problemas de fracciones · 3º ESO</title>
+<style>
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#1f2433;--muted:#626a7c;--line:#e4dfd3;--ok:#1b8a5a;--ok-soft:#dcf3e7;--bad:#c23b22;--bad-soft:#fbe3dc;--warn:#a86a00;--warn-soft:#fff1cf;--c:#2e7d6b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:18px;line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto;padding:24px 18px 60px}
+  h1{font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:700;font-size:clamp(28px,4.5vw,40px);margin:0;line-height:1.1}
+  .sub{color:var(--muted);margin:6px 0 0}
+  .map{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px;margin:22px 0 18px}
+  .blk{border:2px solid var(--line);background:#fff;border-radius:12px;padding:8px 8px 7px;text-align:left;cursor:pointer;font:inherit;color:var(--ink);position:relative;min-height:74px}
+  .blk .n{font:700 15px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--bc)}
+  .blk .t{font-size:12.5px;line-height:1.25;display:block;margin-top:2px}
+  .blk .st{position:absolute;top:6px;right:8px;font-size:14px}
+  .blk.cur{border-color:var(--bc);box-shadow:0 0 0 3px color-mix(in srgb,var(--bc) 25%,transparent)}
+  .blk.done{background:color-mix(in srgb,var(--bc) 12%,#fff)}
+  .blk.lock{opacity:.45;cursor:not-allowed}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin-bottom:14px}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .lvl{font:600 14px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--c)}
+  .head h2{font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;font-size:26px;margin:2px 0 4px}
+  .head p{margin:0;color:var(--muted);font-size:15.5px}
+  .streak{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);white-space:nowrap}
+  .dot{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--c);display:inline-block;transition:.25s}
+  .dot.on{background:var(--c);transform:scale(1.08)}
+  .diff{display:flex;gap:3px;margin-top:6px}.diff i{width:16px;height:5px;border-radius:3px;background:var(--line)}.diff i.on{background:var(--c)}
+  .prompt{font-size:22px;margin:22px 0 18px;line-height:1.7}
+  .prompt .expr{font-size:28px;display:block;text-align:center;margin:10px 0}
+  .fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;line-height:1.15}
+  .fr>span:first-child{border-bottom:2px solid currentColor;padding:0 4px 2px}
+  .fr>span:last-child{padding:2px 4px 0}
+  sup{font-size:.6em}
+  .answer{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;margin:8px 0 6px}
+  .fin{display:inline-flex;flex-direction:column;align-items:center;gap:6px}
+  .fin .bar{width:96px;height:3px;background:var(--ink);border-radius:2px}
+  input.box{width:96px;font:700 24px system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center;padding:8px;border:2px solid var(--line);border-radius:10px;background:#fbfaf6;color:var(--ink)}
+  input.box:focus{outline:none;border-color:var(--c);background:#fff}
+  input.wide{width:150px}
+  .cmp{display:flex;gap:10px}
+  .cmp button{width:64px;height:58px;font:700 28px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;border:2px solid var(--line);background:#fff;border-radius:12px;cursor:pointer;color:var(--ink)}
+  .cmp button.opt{width:auto;min-width:96px;padding:0 18px;font-size:20px}
+  .cmp{flex-wrap:wrap;justify-content:center}
+  .cmp button:hover{border-color:var(--c)}
+  .btn{font:600 18px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;border:none;border-radius:12px;padding:12px 22px;cursor:pointer;background:var(--c);color:#fff}
+  .btn.ghost{background:transparent;color:var(--c);border:2px solid var(--c)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+  .fb{border-radius:12px;padding:12px 16px;margin-top:16px;font-weight:700;text-align:center}
+  .fb.ok{background:var(--ok-soft);color:var(--ok)} .fb.bad{background:var(--bad-soft);color:var(--bad)} .fb.warn{background:var(--warn-soft);color:var(--warn)}
+  .fb.lvlup{background:var(--c);color:#fff;font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:22px;animation:pop .5s ease}
+  @keyframes pop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
+  .steps{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px}
+  .steps h3{font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;font-size:18px;margin:0 0 8px}
+  .steps p{margin:10px 0 4px;font-size:16.5px}
+  .steps .eq{font-size:20px;background:#faf8f3;border-left:4px solid var(--c);padding:8px 14px;border-radius:0 10px 10px 0;margin:6px 0;overflow-x:auto;white-space:nowrap;line-height:2.1}
+  .stats{display:flex;gap:16px;justify-content:center;font-size:14px;color:var(--muted);margin-top:4px}
+  .teacher{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:14px;margin-top:18px}
+  .link{background:none;border:none;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit;font-size:14px}
+  .final{text-align:center}
+  .final h2{font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:32px;margin:6px 0}
+  table.res{margin:16px auto;border-collapse:collapse;font-size:15.5px}
+  table.res td,table.res th{padding:6px 12px;border-bottom:1px solid var(--line);text-align:left}
+  .hint{font-size:14px;color:var(--muted);text-align:center;margin-top:6px}
+
+  .views{display:flex;gap:8px;margin:18px 0 4px;flex-wrap:wrap}
+  .view{border:2px solid var(--ink);background:transparent;color:var(--ink);padding:9px 18px;border-radius:999px;font:600 17px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer}
+  .view[aria-selected="true"]{background:var(--ink);color:#fff}
+  #ficha{--fs:20px;font-size:var(--fs)}
+  .tool{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:16px;font-size:15px}
+  .tool input{width:84px;font:700 17px system-ui,-apple-system,"Segoe UI",sans-serif;padding:6px 8px;border:2px solid var(--line);border-radius:8px;text-align:center}
+  .tool .sb{font:600 15px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;border:1.5px solid var(--ink);background:#fff;border-radius:9px;padding:6px 11px;cursor:pointer;color:var(--ink)}
+  .tool .jump{font:700 14px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;border:none;border-radius:8px;width:32px;height:32px;color:#fff;cursor:pointer}
+  .tool .sep{width:1px;height:26px;background:var(--line)}
+  .fblock{margin:0 0 30px;scroll-margin-top:70px}
+  .fhead{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;border-bottom:3px solid var(--bc);padding-bottom:6px;margin-bottom:12px}
+  .fhead h2{font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:600;font-size:1.35em;margin:0;color:var(--bc)}
+  .fhead p{margin:0;color:var(--muted);font-size:.75em}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,calc(var(--fs)*15)),1fr));gap:12px}
+  .q{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column}
+  .q .lab{font:700 1em "Trebuchet MS",system-ui,sans-serif;color:#fff;background:var(--bc);border-radius:8px;padding:1px 9px;align-self:flex-start;margin-bottom:6px}
+  .q .txt{flex:1;line-height:1.7}
+  .q .txt .expr{display:block;text-align:center;font-size:1.3em;margin:8px 0}
+  .q .qb{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .q .qb button{font:600 .7em "Trebuchet MS",system-ui,sans-serif;border:1.5px solid var(--bc);color:var(--bc);background:#fff;border-radius:8px;padding:4px 10px;cursor:pointer}
+  .q .qb button.on{background:var(--bc);color:#fff}
+  .q .ansbox{margin-top:10px;background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:8px 12px;font-weight:700;text-align:center;font-size:1.05em}
+  .q .steps{font-size:.8em}.q .steps .eq{font-size:1.1em;border-left-color:var(--bc)}
+  .ficha-note{font-size:14px;color:var(--muted);margin:0 0 6px}
+  @media print{.tool,.views,.qb,header .sub{display:none}}
+  @media(max-width:520px){.card{padding:18px}.prompt{font-size:19px}.prompt .expr{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Problemas de fracciones · 3º ESO</h1>
+  <div class="views" role="tablist">
+    <button class="view" id="v-ficha" role="tab">📽️ Ficha para proyectar</button>
+    <button class="view" id="v-prac" role="tab">🧑‍🎓 Práctica individual</button>
+  </div>
+  <div id="ficha" hidden></div>
+  <div id="practice" hidden>
+  <p class="sub">Acierta <b>2 ejercicios seguidos</b> y pasarás automáticamente al bloque siguiente. Si fallas, verás la solución paso a paso.</p>
+  <nav class="map" id="map"></nav>
+  <main id="main"></main>
+  <div class="teacher">
+    <button class="link" id="unlock"></button>
+    <button class="link" id="reset">Reiniciar progreso</button>
+  </div>
+  </div>
+</div>
+
+<script>
+/* ===== utilidades ===== */
+let RND=Math.random;
+function seeded(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const ri=(a,b)=>a+Math.floor(RND()*(b-a+1));
+const pick=a=>a[Math.floor(RND()*a.length)];
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a||1};
+const lcm=(a,b)=>Math.abs(a*b)/gcd(a,b);
+const F=(n,d=1)=>d<0?{n:-n,d:-d}:{n,d};
+const red=f=>{const g=gcd(f.n,f.d);return F(f.n/g,f.d/g)};
+const same=(a,b)=>a.n*b.d===b.n*a.d;
+const num=v=>v<0?"−"+Math.abs(v):String(v);
+const pn=v=>v<0?"("+num(v)+")":String(v);
+const fr=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
+function H(f){ if(f.d===1) return num(f.n); return (f.n<0?"−":"")+fr(Math.abs(f.n),f.d); }
+const P=f=>f.n<0?"("+H(f)+")":H(f);
+const pw=(base,e)=>`${base}<sup>${num(e)}</sup>`;
+function rf(maxD=9,maxN){ // fracción irreducible positiva
+  for(;;){const d=ri(2,maxD), n=ri(1,maxN||d-1); if(gcd(n,d)===1&&n!==d) return F(n,d);}
+}
+const E=html=>({t:"eq",html}), T=html=>({t:"p",html});
+
+/* ===== operaciones con pasos ===== */
+function simp(raw){
+  const g=gcd(raw.n,raw.d), r=red(raw);
+  if(g>1) return {res:r,lines:[E(`${H(raw)} = ${H(r)} &nbsp;<small>(simplificamos dividiendo entre ${g})</small>`)]};
+  return {res:r,lines:[]};
+}
+function opSum(terms){ // [{f, s:±1}]
+  const M=terms.reduce((m,t)=>lcm(m,t.f.d),1);
+  const show=terms.map((t,i)=> i===0 ? (t.s<0?"−"+P(t.f):H(t.f)) : ` ${t.s>0?"+":"−"} ${P(t.f)}`).join("");
+  const X=terms.map(t=>t.f.n*M/t.f.d);
+  const conv=terms.map((t,i)=>{const g=F(X[i],M); return i===0?(t.s<0?"−"+P(g):H(g)):` ${t.s>0?"+":"−"} ${P(g)}`}).join("");
+  const numStr=terms.map((t,i)=> i===0 ? num(t.s*X[i]) : ` ${t.s>0?"+":"−"} ${pn(X[i])}`).join("");
+  const sum=terms.reduce((s,t,i)=>s+t.s*X[i],0), raw=F(sum,M);
+  const lines=[]; const allSame=terms.every(t=>t.f.d===M);
+  if(!allSame){
+    lines.push(T(`Reducimos a común denominador: m.c.m.(${[...new Set(terms.map(t=>t.f.d).filter(d=>d>1))].join(", ")}) = <b>${M}</b>`));
+    lines.push(E(`${show} = ${conv} = ${fr(numStr,M)} = ${H(raw)}`));
+  } else lines.push(E(`${show} = ${fr(numStr,M)} = ${H(raw)}`));
+  const s=simp(raw); return {res:s.res,lines:lines.concat(s.lines)};
+}
+function opMul(x,y){
+  const raw=F(x.n*y.n,x.d*y.d);
+  const lines=[E(`${H(x)} · ${P(y)} = ${fr(pn(x.n)+" · "+pn(y.n), x.d+" · "+y.d)} = ${H(raw)}`)];
+  const s=simp(raw); return {res:s.res,lines:lines.concat(s.lines)};
+}
+function opDiv(x,y){
+  const raw=F(x.n*y.d,x.d*y.n);
+  const lines=[E(`${H(x)} : ${P(y)} = ${fr(pn(x.n)+" · "+y.d, x.d+" · "+pn(y.n))} = ${H(raw)}`)];
+  const s=simp(raw); return {res:s.res,lines:lines.concat(s.lines)};
+}
+function powEval(f,e){ // devuelve {res, lines}
+  const lines=[]; let b=f, k=e;
+  if(k===0){ lines.push(E(`${pw("("+H(f)+")",0)} = 1 &nbsp;<small>(todo número distinto de 0 elevado a 0 es 1)</small>`)); return {res:F(1),lines}; }
+  if(k<0){ b=F(f.d,f.n); k=-k; lines.push(E(`${pw("("+H(f)+")",e)} = ${pw("("+H(b)+")",k)} &nbsp;<small>(exponente negativo: invertimos la fracción)</small>`)); }
+  const r=F(b.n**k,b.d**k);
+  lines.push(E(`${pw("("+H(b)+")",k)} = ${fr(pw(pn(b.n),k),pw(b.d,k))} = ${H(r)}`));
+  return {res:r,lines};
+}
+
+/* ===== generadores por bloque ===== */
+const NAMES=["Ana","Luis","Marta","Pablo","Lucía","Hugo","Sara","Óscar","Irene","Mario","Noa","Adrián"];
+const two=()=>{const a=pick(NAMES);let b;do{b=pick(NAMES)}while(b===a);return [a,b]};
+const coprimeBelow=b=>{let a;do{a=ri(1,b-1)}while(gcd(a,b)>1);return a};
+// "de T": T = R : r  (pasos de problema inverso)
+function inverse(r,R,unit){
+  const k=R/r.n, tot=k*r.d;
+  return {T:tot,lines:[T(`Si ${H(r)} del total son ${R}${unit}, una parte (1/${r.d}) son ${R} : ${r.n} = ${k}${unit}.`),
+    E(`Total = ${k} · ${r.d} = <b>${tot}${unit}</b> &nbsp;&nbsp;<small>(o bien: ${R} : ${H(r)} = ${fr(R+" · "+r.d,r.n)} = ${tot})</small>`)]};
+}
+const BLOCKS=[
+ {name:"Fracción de una cantidad", short:"Fracción de una cantidad", desc:"Calcula la parte que representa una fracción de un total.", color:"#2e8b57", gen(){
+   const b=pick([2,3,4,5,6,8,10]), a=coprimeBelow(b), k=ri(2,b<=4?15:10), N=b*k, ans=a*k, f=F(a,b), n=pick(NAMES);
+   const ctx=pick([
+     ()=>`Un depósito de <b>${N} litros</b> está lleno hasta sus ${H(f)}. ¿Cuántos litros contiene?`,
+     ()=>`${n} ha leído ${H(f)} de un libro de <b>${N} páginas</b>. ¿Cuántas páginas ha leído?`,
+     ()=>`Un móvil cuesta <b>${N} €</b>. Si pagas ${H(f)} de su precio al contado, ¿cuántos euros pagas?`,
+     ()=>`En un instituto hay <b>${N} alumnos</b> y ${H(f)} van andando. ¿Cuántos alumnos van andando?`,
+     ()=>`Una ruta mide <b>${N} km</b>. ${n} ya ha recorrido ${H(f)}. ¿Cuántos km lleva?`,
+     ()=>`Un rollo de tela tiene <b>${N} metros</b> y se han usado ${H(f)}. ¿Cuántos metros se han usado?`]);
+   return {prompt:ctx(), kind:"int", ans,
+     steps:[T(`Hay que calcular ${H(f)} de ${N}: dividimos entre el denominador y multiplicamos por el numerador.`),
+            E(`${N} : ${b} = ${k} &nbsp;&nbsp;→&nbsp;&nbsp; ${k} · ${a} = <b>${ans}</b>`),
+            T("O, de otra forma:"), E(`${H(f)} · ${N} = ${fr(a+" · "+N,b)} = ${fr(a*N,b)} = <b>${ans}</b>`)]};
+ }},
+ {name:"Calcular el total", short:"Calcular el total", desc:"Conocemos lo que vale una parte y buscamos el total (o lo que falta).", color:"#2f8f83", gen(){
+   const b=pick([3,4,5,6,7,8,9,10]), a=coprimeBelow(b), k=ri(2,12), Tt=b*k, part=a*k, f=F(a,b), n=pick(NAMES);
+   const base=[T(`Si ${a} de cada ${b} partes son ${part}, una parte vale ${part} : ${a} = ${k}.`), E(`Total = ${k} · ${b} = <b>${Tt}</b>`)];
+   if(RND()<.35){
+     const prompt=pick([
+       ()=>`${n} ha recorrido <b>${part} km</b>, que son ${H(f)} de una ruta. ¿Cuántos km le faltan?`,
+       ()=>`De una caja de bombones nos hemos comido <b>${part}</b>, que son ${H(f)} de la caja. ¿Cuántos bombones quedan?`])();
+     return {prompt, kind:"int", ans:Tt-part, steps:[T("<b>1º</b> Calculamos el total:"),...base,T("<b>2º</b> Restamos lo que ya se ha hecho:"),E(`${Tt} − ${part} = <b>${Tt-part}</b>`)]};
+   }
+   const prompt=pick([
+     ()=>`Los ${H(f)} de los alumnos de un instituto llevan gafas. Si son <b>${part} alumnos</b>, ¿cuántos alumnos hay en total?`,
+     ()=>`${n} ha leído <b>${part} páginas</b>, que son ${H(f)} del libro. ¿Cuántas páginas tiene el libro?`,
+     ()=>`Un depósito contiene <b>${part} litros</b>, que son ${H(f)} de su capacidad. ¿Cuál es la capacidad del depósito?`,
+     ()=>`${n} ha ahorrado <b>${part} €</b>, que son ${H(f)} del precio de una bici. ¿Cuánto cuesta la bici?`])();
+   return {prompt, kind:"int", ans:Tt, steps:base};
+ }},
+ {name:"¿Qué fracción es? Comparar", short:"Qué fracción es · comparar", desc:"Expresa una parte como fracción irreducible o decide quién tiene más.", color:"#327fa8", gen(){
+   if(RND()<.6){
+     const c=ri(1,4); let p,Tt,prompt;
+     if(c===1){ Tt=60; p=pick([5,10,12,15,20,24,25,30,35,36,40,45,48,50]); prompt=`¿Qué fracción de hora son <b>${p} minutos</b>?`; }
+     else if(c===2){ Tt=1000; p=pick([100,125,200,250,300,375,400,500,600,750,800]); prompt=`¿Qué fracción de kilo son <b>${p} gramos</b>?`; }
+     else if(c===3){ do{Tt=ri(20,32);p=ri(2,Tt-2)}while(gcd(p,Tt)===1); prompt=`En una clase de <b>${Tt} alumnos</b>, <b>${p}</b> practican algún deporte. ¿Qué fracción de la clase practica deporte?`; }
+     else { do{Tt=ri(12,40);p=ri(3,Tt-1)}while(gcd(p,Tt)===1); prompt=`${pick(NAMES)} ha encestado <b>${p}</b> de los <b>${Tt}</b> tiros que ha lanzado. ¿Qué fracción de los tiros ha encestado?`; }
+     const raw=F(p,Tt), s=simp(raw);
+     return {prompt, kind:"frac", ans:s.res, mustReduce:true, steps:[T("La fracción es <b>parte / total</b>:"),E(`${fr(p,Tt)}`),...s.lines]};
+   }
+   const [n1,n2]=two(); let x=rf(10), y;
+   if(RND()<.15){ const k=ri(2,3); y=F(x.n*k,x.d*k); } else { do{y=rf(10)}while(same(x,y)); }
+   const M=lcm(x.d,y.d), X=x.n*M/x.d, Y=y.n*M/y.d, ans=X>Y?n1:X<Y?n2:"Los dos igual";
+   const prompt=pick([
+     ()=>`${n1} ha leído ${H(x)} de un libro y ${n2} ha leído ${H(y)} del mismo libro. ¿Quién ha leído más?`,
+     ()=>`De dos tartas iguales, ${n1} se come ${H(x)} de una y ${n2} ${H(y)} de la otra. ¿Quién ha comido más tarta?`,
+     ()=>`${n1} ha pintado ${H(x)} de una pared y ${n2} ${H(y)} de otra pared igual. ¿Quién ha pintado más?`])();
+   return {prompt, kind:"opt", opts:[n1,n2,"Los dos igual"], ans,
+     steps:[T(`Pasamos a común denominador: m.c.m.(${x.d}, ${y.d}) = <b>${M}</b>`),E(`${n1}: ${H(x)} = ${H(F(X,M))} &nbsp;&nbsp;&nbsp; ${n2}: ${H(y)} = ${H(F(Y,M))}`),
+            T(`Con el mismo denominador, es mayor la de mayor numerador (${X} ${X>Y?">":X<Y?"<":"="} ${Y}).`),E(`Respuesta: <b>${ans}</b>`)]};
+ }},
+ {name:"Sumar y restar en problemas", short:"Sumar y restar", desc:"Juntar partes, quitar partes y calcular lo que queda.", color:"#3d6fb6", gen(){
+   const c=ri(1,4), [n1,n2]=two();
+   if(c===1){ let x,y,s; do{x=rf(8);y=rf(8);s=opSum([{f:x,s:1},{f:y,s:1}])}while(s.res.n>s.res.d||x.d===y.d);
+     return {prompt:`${n1} se come ${H(x)} de una pizza y ${n2} ${H(y)} de la misma pizza. ¿Qué fracción de la pizza se han comido entre los dos?`, kind:"frac", ans:s.res, steps:[T("Juntamos las dos partes, así que sumamos:"),...s.lines]}; }
+   if(c===2){ let x,y,s; do{x=rf(6);y=rf(6);s=opSum([{f:F(1),s:1},{f:x,s:-1},{f:y,s:-1}])}while(s.res.n<=0);
+     const prompt=pick([()=>`En un terreno, ${H(x)} se siembra de trigo, ${H(y)} de maíz y el resto es huerta. ¿Qué fracción del terreno es huerta?`,
+       ()=>`Un ciclista recorre ${H(x)} de una etapa por la mañana y ${H(y)} por la tarde. ¿Qué fracción de la etapa le queda?`,
+       ()=>`${n1} dedica ${H(x)} de su tarde a estudiar y ${H(y)} a hacer deporte. ¿Qué fracción de la tarde le queda libre?`])();
+     return {prompt, kind:"frac", ans:s.res, steps:[T("El total es la unidad, <b>1</b>. Le restamos las partes que ya están ocupadas:"),...s.lines]}; }
+   if(c===3){ let x,y,s; do{x=rf(6,9);y=rf(6);s=opSum([{f:x,s:1},{f:y,s:-1}])}while(s.res.n<=0||x.d===y.d);
+     return {prompt:`Una jarra contiene ${H(x)} litros de zumo. Si se sirven ${H(y)} litros, ¿cuántos litros quedan en la jarra?`, kind:"frac", ans:s.res, steps:[T("Quitamos lo que se sirve, así que restamos:"),...s.lines]}; }
+   let x,y,z,s; do{x=rf(5);y=rf(5);z=rf(5);s=opSum([{f:x,s:1},{f:y,s:1},{f:z,s:-1}])}while(s.res.n<=0||x.n*y.d+y.n*x.d>x.d*y.d);
+   return {prompt:`Un depósito está lleno hasta ${H(x)} de su capacidad. Por la mañana se le añade ${H(y)} de la capacidad y por la tarde se gasta ${H(z)}. ¿Hasta qué fracción está lleno al final del día?`, kind:"frac", ans:s.res,
+     steps:[T("Sumamos lo que entra y restamos lo que sale:"),...s.lines]};
+ }},
+ {name:"Fracción de una fracción", short:"Fracción de fracción", desc:"«La parte de una parte»: se multiplican las fracciones.", color:"#5b62b8", gen(){
+   const c=ri(1,3), f1=rf(6), f2=rf(5);
+   if(c<=2){ const g=opMul(f2,f1);
+     const prompt=c===1?`En una clase, ${H(f1)} de los alumnos son chicas. De ellas, ${H(f2)} llevan gafas. ¿Qué fracción del total de la clase son chicas con gafas?`
+       :`En un terreno, ${H(f1)} es huerta. De la huerta, ${H(f2)} está plantada de tomates. ¿Qué fracción del terreno tiene tomates?`;
+     return {prompt, kind:"frac", ans:g.res, steps:[T(`Hay que calcular ${H(f2)} <u>de</u> ${H(f1)}. «De» significa multiplicar:`),...g.lines]}; }
+   const k=ri(1,Math.max(1,Math.floor(900/(f1.d*f2.d)))), N=f1.d*f2.d*k, X=N/f1.d*f1.n, ans=X/f2.d*f2.n;
+   return {prompt:`En un instituto de <b>${N} alumnos</b>, ${H(f1)} son de ESO. De los alumnos de ESO, ${H(f2)} vienen en bici. ¿Cuántos alumnos vienen en bici?`, kind:"int", ans,
+     steps:[T("<b>1º</b> Alumnos de ESO:"),E(`${H(f1)} de ${N} = ${N} : ${f1.d} · ${f1.n} = ${X}`),T("<b>2º</b> De ellos, los que vienen en bici:"),E(`${H(f2)} de ${X} = ${X} : ${f2.d} · ${f2.n} = <b>${ans}</b>`)]};
+ }},
+ {name:"Fracción del resto", short:"Fracción del resto", desc:"Primero se quita una parte y después una fracción de lo que queda.", color:"#7a58b0", gen(){
+   const f1=rf(5), f2=rf(5), n=pick(NAMES), c=ri(1,4);
+   const r1=opSum([{f:F(1),s:1},{f:f1,s:-1}]), g=opMul(f2,r1.res), rest=opSum([{f:r1.res,s:1},{f:g.res,s:-1}]);
+   const base=[T(`<b>1º</b> Después de la primera parte queda:`),...r1.lines,T(`<b>2º</b> La segunda parte es ${H(f2)} <u>de lo que quedaba</u>:`),...g.lines];
+   if(c===1) return {prompt:`${n} gasta ${H(f1)} de su paga en el cine y ${H(f2)} de lo que le queda en un libro. ¿Qué fracción de la paga le queda?`, kind:"frac", ans:rest.res, steps:[...base,T("<b>3º</b> Lo que queda:"),...rest.lines]};
+   if(c===2) return {prompt:`Un excursionista recorre el primer día ${H(f1)} de una ruta y el segundo día ${H(f2)} de lo que le faltaba. ¿Qué fracción de la ruta recorrió el segundo día?`, kind:"frac", ans:g.res, steps:base};
+   if(c===3) return {prompt:`De un depósito se saca ${H(f1)} del agua y después ${H(f2)} de la que queda. ¿Qué fracción del agua queda en el depósito?`, kind:"frac", ans:rest.res, steps:[...base,T("<b>3º</b> Lo que queda:"),...rest.lines]};
+   const L=f1.d*f2.d*ri(1,4)*5, money=rest.res.n*L/rest.res.d; if(!Number.isInteger(money)) return null;
+   return {prompt:`${n} tenía <b>${L} €</b>. Gastó ${H(f1)} en ropa y ${H(f2)} de lo que le quedaba en un regalo. ¿Cuántos euros le quedan?`, kind:"int", ans:money,
+     steps:[...base,T("<b>3º</b> Fracción que le queda:"),...rest.lines,T("<b>4º</b> Calculamos esa fracción del dinero:"),E(`${H(rest.res)} de ${L} = ${fr(rest.res.n+" · "+L,rest.res.d)} = <b>${money} €</b>`)]};
+ }},
+ {name:"Repartos y divisiones", short:"Repartos", desc:"¿Cuántas veces cabe? ¿Cuánto toca a cada uno? ¿Cuánto hace falta?", color:"#9a4f9f", gen(){
+   const c=ri(1,4);
+   if(c===1||c===3){ const [a,b]=pick([[1,2],[1,3],[2,3],[1,4],[3,4],[2,5],[3,5],[1,5],[3,8]]); const f=F(a,b), k=ri(2,12), N=a*k, ans=b*k;
+     const prompt=c===1?`¿Cuántas botellas de ${H(f)} de litro se pueden llenar con <b>${N} litros</b> de aceite?`:`Cada paso de ${pick(NAMES)} mide ${H(f)} de metro. ¿Cuántos pasos necesita para recorrer <b>${N} metros</b>?`;
+     const d=opDiv(F(N),f); return {prompt, kind:"int", ans, steps:[T(`Buscamos cuántas veces cabe ${H(f)} en ${N}, así que dividimos:`),...d.lines]}; }
+   if(c===2){ const f=rf(8), m=ri(2,6), d=opDiv(f,F(m));
+     return {prompt:`Se reparten ${H(f)} kg de queso a partes iguales entre <b>${m} amigos</b>. ¿Qué fracción de kg recibe cada uno?`, kind:"frac", ans:d.res, steps:[T(`Repartir entre ${m} es dividir entre ${m}:`),...d.lines]}; }
+   const f=rf(5), m=ri(2,8), p=opMul(F(m),f);
+   return {prompt:`Para hacer un bizcocho se necesitan ${H(f)} kg de harina. ¿Cuántos kg de harina hacen falta para <b>${m} bizcochos</b>?`, kind:"frac", ans:p.res, steps:[T(`Necesitamos ${m} veces esa cantidad, así que multiplicamos:`),...p.lines]};
+ }},
+ {name:"Problemas inversos", short:"Problemas inversos", desc:"Conocemos lo que queda al final y buscamos la cantidad inicial.", color:"#b0476a", gen(){
+   const c=ri(1,3), n=pick(NAMES);
+   if(c===1){ const f1=rf(5), f2=rf(5); const r1=opSum([{f:F(1),s:1},{f:f1,s:-1}]), g=opMul(f2,r1.res), rest=opSum([{f:r1.res,s:1},{f:g.res,s:-1}]);
+     const r=rest.res, k=ri(2,Math.max(2,Math.floor(600/r.d))), R=r.n*k; const inv=inverse(r,R," €");
+     return {prompt:`${n} gastó ${H(f1)} de su dinero en un videojuego y después ${H(f2)} de lo que le quedaba en un libro. Si aún le quedan <b>${R} €</b>, ¿cuánto dinero tenía al principio?`, kind:"int", ans:inv.T,
+       steps:[T("<b>1º</b> Tras el videojuego le queda:"),...r1.lines,T(`<b>2º</b> En el libro gasta ${H(f2)} de lo que quedaba:`),...g.lines,T("<b>3º</b> Fracción que le queda:"),...rest.lines,T("<b>4º</b> Esa fracción son "+R+" €:"),...inv.lines]}; }
+   if(c===2){ let f1,f2,d; do{f1=rf(6);f2=rf(6);d=opSum([{f:f2,s:1},{f:f1,s:-1}])}while(d.res.n<=0||f1.d===f2.d);
+     const r=d.res, k=ri(2,Math.max(2,Math.floor(900/r.d))), N=r.n*k, inv=inverse(r,N," L");
+     return {prompt:`Un depósito está lleno hasta sus ${H(f1)}. Si se añaden <b>${N} litros</b>, queda lleno hasta sus ${H(f2)}. ¿Cuál es la capacidad del depósito?`, kind:"int", ans:inv.T,
+       steps:[T("<b>1º</b> Fracción de la capacidad que ocupan los litros añadidos:"),...d.lines,T(`<b>2º</b> Esa fracción son ${N} litros:`),...inv.lines]}; }
+   const f=rf(8), r1=opSum([{f:F(1),s:1},{f:f,s:-1}]), r=r1.res, k=ri(3,Math.max(3,Math.floor(800/r.d))), R=r.n*k, inv=inverse(r,R,"");
+   return {prompt:`Ya se han vendido ${H(f)} de las entradas de un concierto y todavía quedan <b>${R} entradas</b>. ¿Cuántas entradas había en total?`, kind:"int", ans:inv.T,
+     steps:[T("<b>1º</b> Fracción de entradas que quedan:"),...r1.lines,T(`<b>2º</b> Esa fracción son ${R} entradas:`),...inv.lines]};
+ }}
+];
+
+/* ===== estado ===== */
+const KEY="problemasfrac3eso-v1";
+let S={cur:0, done:[], unlockAll:false, stats:BLOCKS.map(()=>({ok:0,tot:0}))};
+try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.stats&&s.stats.length===BLOCKS.length) S=s; }catch(e){}
+const save=()=>{ try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){} };
+let streak=0, prob=null, answered=false, lastPrompt="", finished=false, resetArm=false;
+
+function newProblem(){
+  let p; do{ p=BLOCKS[S.cur].gen(); }while(!p||p.prompt===lastPrompt);
+  lastPrompt=p.prompt; prob=p; answered=false;
+}
+const unlocked=i=> S.unlockAll || i<=Math.max(S.cur, ...S.done.map(d=>d+1), 0);
+
+function renderMap(){
+  document.getElementById("map").innerHTML=BLOCKS.map((b,i)=>{
+    const cls=[i===S.cur&&!finished?"cur":"", S.done.includes(i)?"done":"", unlocked(i)?"":"lock"].join(" ");
+    const st=S.done.includes(i)?"✓":unlocked(i)?"":"🔒";
+    return `<button class="blk ${cls}" style="--bc:${b.color}" data-i="${i}"><span class="n">Bloque ${i+1}</span><span class="st">${st}</span><span class="t">${b.short}</span></button>`;
+  }).join("");
+  document.querySelectorAll(".blk").forEach(el=>el.onclick=()=>{ const i=+el.dataset.i; if(!unlocked(i)) return; S.cur=i; finished=false; streak=0; save(); newProblem(); render(); });
+  document.getElementById("unlock").textContent=S.unlockAll?"Modo profesor activado (todos los bloques abiertos) · desactivar":"Modo profesor: desbloquear todos los bloques";
+}
+
+function inputHTML(){
+  if(prob.kind==="opt") return `<div class="cmp">${prob.opts.map(s=>`<button class="opt" data-s="${s}">${s}</button>`).join("")}</div>`;
+  if(prob.kind==="int") return `<input class="box wide" id="a1" inputmode="numeric" autocomplete="off" placeholder="?">`;
+  return `<div class="fin"><input class="box" id="a1" inputmode="numeric" autocomplete="off" placeholder="num."><div class="bar"></div><input class="box" id="a2" inputmode="numeric" autocomplete="off" placeholder="den."></div>`;
+}
+
+function render(){
+  renderMap();
+  const main=document.getElementById("main");
+  if(finished){ renderFinal(); return; }
+  const b=BLOCKS[S.cur], st=S.stats[S.cur];
+  document.documentElement.style.setProperty("--c",b.color);
+  main.innerHTML=`<section class="card">
+    <div class="head"><div><div class="lvl">Bloque ${S.cur+1} de ${BLOCKS.length}</div><h2>${b.name}</h2><p>${b.desc}</p>
+      <div class="diff">${BLOCKS.map((_,i)=>`<i class="${i<=S.cur?"on":""}"></i>`).join("")}</div></div>
+      <div class="streak">Racha <span class="dot ${streak>=1?"on":""}"></span><span class="dot ${streak>=2?"on":""}"></span></div></div>
+    <div class="prompt">${prob.prompt}</div>
+    <div class="answer">${inputHTML()}</div>
+    ${prob.kind==="frac"?`<div class="hint">Si el resultado es un número entero, deja el denominador vacío. Para negativos, pon el signo − en el numerador.</div>`:""}
+    <div class="actions" id="acts">${prob.kind!=="opt"?`<button class="btn" id="check">Comprobar</button>`:""}</div>
+    <div id="fb"></div>
+    <div class="stats">Aciertos en este bloque: ${st.ok} de ${st.tot}</div>
+  </section>`;
+  const a1=document.getElementById("a1"); if(a1) setTimeout(()=>a1.focus(),30);
+  const chk=document.getElementById("check"); if(chk) chk.onclick=check;
+  main.querySelectorAll("input.box").forEach(inp=>inp.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); if(answered) next(); else if(inp.id==="a1"&&document.getElementById("a2")&&!document.getElementById("a2").value) document.getElementById("a2").focus(); else check(); } }));
+  main.querySelectorAll(".cmp button").forEach(btn=>btn.onclick=()=>{ if(!answered) check(btn.dataset.s); });
+}
+
+const parseInt2=s=>{ s=String(s||"").trim().replace("−","-").replace(/\s/g,""); if(s==="") return null; if(!/^[+-]?\d+$/.test(s)) return NaN; return parseInt(s,10); };
+
+function check(cmpVal){
+  if(answered) return;
+  const fb=document.getElementById("fb"); let ok=false, warn=null, given="";
+  if(prob.kind==="opt"){ ok=cmpVal===prob.ans; given=cmpVal; }
+  else if(prob.kind==="int"){ const v=parseInt2(document.getElementById("a1").value); if(v===null||isNaN(v)){ fb.innerHTML=`<div class="fb warn">Escribe un número entero.</div>`; return; } ok=v===prob.ans; }
+  else {
+    const n=parseInt2(document.getElementById("a1").value); let d=parseInt2(document.getElementById("a2").value);
+    if(n===null||isNaN(n)){ fb.innerHTML=`<div class="fb warn">Escribe al menos el numerador.</div>`; return; }
+    if(d===null) d=1; if(isNaN(d)||d===0){ fb.innerHTML=`<div class="fb warn">El denominador debe ser un número entero distinto de 0.</div>`; return; }
+    const u=F(n,d);
+    if(same(u,prob.ans)){ const r=red(u); if(r.n===u.n&&r.d===u.d) ok=true; else warn=`¡Casi! ${H(u)} es equivalente, pero tienes que <u>simplificarla</u> hasta la fracción irreducible. Inténtalo otra vez.`; }
+  }
+  if(warn){ fb.innerHTML=`<div class="fb warn">${warn}</div>`; return; }
+  answered=true; const st=S.stats[S.cur]; st.tot++;
+  document.querySelectorAll("input.box,.cmp button").forEach(el=>el.disabled=true);
+  if(prob.kind==="opt") document.querySelectorAll(".cmp button").forEach(b=>{ if(b.dataset.s===prob.ans) b.style.cssText="background:var(--ok-soft);border-color:var(--ok)"; else if(b.dataset.s===given) b.style.cssText="background:var(--bad-soft);border-color:var(--bad)"; });
+  const ansHTML= prob.kind==="opt"?`<b>${prob.ans}</b>`: prob.kind==="int"?`<b>${prob.ans}</b>`:H(prob.ans);
+  const stepsHTML=`<div class="steps"><h3>Solución paso a paso</h3>${prob.steps.map(l=>l.t==="eq"?`<div class="eq">${l.html}</div>`:`<p>${l.html}</p>`).join("")}</div>`;
+  if(ok){
+    st.ok++; streak++;
+    if(streak>=2){
+      if(!S.done.includes(S.cur)) S.done.push(S.cur);
+      const last=S.cur===BLOCKS.length-1; save(); updateDots();
+      fb.innerHTML=`<div class="fb lvlup">${last?"🏆 ¡Has superado todos los bloques!":"🎉 ¡Bloque superado! Pasas al bloque "+(S.cur+2)+"…"}</div>`;
+      document.getElementById("acts").innerHTML="";
+      setTimeout(()=>{ streak=0; if(last){ finished=true; } else { S.cur++; newProblem(); } save(); render(); },2200);
+      return;
+    }
+    save(); updateDots();
+    fb.innerHTML=`<div class="fb ok">✔ ¡Correcto! Uno más y pasas de bloque.</div><div class="actions"><button class="link" id="showsol">Ver solución</button></div><div id="sol"></div>`;
+    document.getElementById("showsol").onclick=()=>{ document.getElementById("sol").innerHTML=stepsHTML; document.getElementById("showsol").remove(); };
+  } else {
+    streak=0; save(); updateDots();
+    fb.innerHTML=`<div class="fb bad">✘ No es correcto. La respuesta es ${ansHTML}. La racha vuelve a empezar.</div>${stepsHTML}`;
+  }
+  document.getElementById("acts").innerHTML=`<button class="btn" id="next">Siguiente ejercicio →</button>`;
+  const nb=document.getElementById("next"); nb.onclick=next; nb.focus();
+}
+function updateDots(){ document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("on",streak>i)); }
+function next(){ newProblem(); render(); }
+
+function renderFinal(){
+  document.documentElement.style.setProperty("--c","#b0476a");
+  const tot=S.stats.reduce((a,s)=>a+s.tot,0), ok=S.stats.reduce((a,s)=>a+s.ok,0);
+  document.getElementById("main").innerHTML=`<section class="card final"><div style="font-size:54px">🏆</div><h2>¡Enhorabuena!</h2>
+    <p>Has completado los ${BLOCKS.length} bloques de fracciones.</p>
+    <table class="res"><tr><th>Bloque</th><th>Aciertos</th></tr>${BLOCKS.map((b,i)=>`<tr><td>${i+1}. ${b.name}</td><td>${S.stats[i].ok} / ${S.stats[i].tot}</td></tr>`).join("")}
+    <tr><th>Total</th><th>${ok} / ${tot}</th></tr></table>
+    <p class="hint">Puedes pulsar cualquier bloque de arriba para seguir practicando.</p></section>`;
+}
+
+document.getElementById("unlock").onclick=()=>{ S.unlockAll=!S.unlockAll; save(); renderMap(); };
+document.getElementById("reset").onclick=e=>{
+  if(!resetArm){ resetArm=true; e.target.textContent="¿Seguro? Pulsa otra vez para borrar el progreso"; setTimeout(()=>{resetArm=false;e.target.textContent="Reiniciar progreso"},4000); return; }
+  resetArm=false; e.target.textContent="Reiniciar progreso";
+  S={cur:0,done:[],unlockAll:false,stats:BLOCKS.map(()=>({ok:0,tot:0}))}; streak=0; finished=false; save(); newProblem(); render();
+};
+
+/* ===== ficha para proyectar ===== */
+const PER=6; let FICHA=[], seed;
+try{ seed=parseInt(localStorage.getItem(KEY+"-seed"))||0; }catch(e){ seed=0; }
+if(!seed) seed=ri(1000,9999);
+const stepsOf=p=>`<div class="steps">${p.steps.map(l=>l.t==="eq"?`<div class="eq">${l.html}</div>`:`<p>${l.html}</p>`).join("")}</div>`;
+function ansOf(p){
+  if(p.kind==="opt") return p.ans;
+  return p.kind==="int"?String(p.ans):H(p.ans);
+}
+function buildFicha(){
+  RND=seeded(seed*7919);
+  FICHA=BLOCKS.map(b=>{ const list=[], seen=new Set(); let guard=0;
+    while(list.length<PER&&guard++<500){ const p=b.gen(); if(p&&!seen.has(p.prompt)){ seen.add(p.prompt); list.push(p); } }
+    return list; });
+  RND=Math.random;
+  try{ localStorage.setItem(KEY+"-seed",seed); }catch(e){}
+}
+function renderFicha(){
+  const el=document.getElementById("ficha");
+  el.innerHTML=`<div class="tool">
+      <span>Ficha nº</span><input id="seed" inputmode="numeric" value="${seed}"><button class="sb" id="go">Cargar</button><button class="sb" id="newf">🎲 Nueva ficha</button>
+      <span class="sep"></span><button class="sb" id="fs-">A−</button><button class="sb" id="fs+">A+</button>
+      <span class="sep"></span>${BLOCKS.map((b,i)=>`<button class="jump" style="background:${b.color}" data-j="${i}" title="${b.name}">${i+1}</button>`).join("")}
+      <span class="sep"></span><button class="sb" id="hideall">Ocultar soluciones</button>
+    </div>
+    <p class="ficha-note">Apunta el número de ficha: con el mismo número salen exactamente los mismos ejercicios. Las soluciones están ocultas hasta que pulses sus botones.</p>
+    ${BLOCKS.map((b,i)=>`<section class="fblock" id="fb${i}" style="--bc:${b.color}">
+      <div class="fhead"><div><h2>Bloque ${i+1} · ${b.name}</h2><p>${b.desc}</p></div>
+        <div class="qb"><button class="q-allres" data-b="${i}" style="font:600 14px "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;border:1.5px solid ${b.color};color:${b.color};background:#fff;border-radius:8px;padding:4px 10px;cursor:pointer">Ver todos los resultados</button></div></div>
+      <div class="fgrid">${FICHA[i].map((p,k)=>`<article class="q" data-b="${i}" data-k="${k}">
+        <span class="lab">${i+1}.${k+1}</span><div class="txt">${p.prompt}</div>
+        <div class="qb"><button data-a="res">Resultado</button><button data-a="steps">Paso a paso</button></div>
+        <div class="reveal"></div></article>`).join("")}</div></section>`).join("")}`;
+  const fsz=d=>{ const cur=parseFloat(getComputedStyle(el).getPropertyValue("--fs"))||20; const v=Math.min(34,Math.max(14,cur+d)); el.style.setProperty("--fs",v+"px"); try{localStorage.setItem(KEY+"-fs",v)}catch(e){} };
+  try{ const v=localStorage.getItem(KEY+"-fs"); if(v) el.style.setProperty("--fs",v+"px"); }catch(e){}
+  document.getElementById("fs-").onclick=()=>fsz(-2); document.getElementById("fs+").onclick=()=>fsz(2);
+  document.getElementById("go").onclick=()=>{ const v=parseInt(document.getElementById("seed").value); if(v>0){ seed=v; buildFicha(); renderFicha(); } };
+  document.getElementById("seed").onkeydown=e=>{ if(e.key==="Enter") document.getElementById("go").click(); };
+  document.getElementById("newf").onclick=()=>{ seed=ri(1000,9999); buildFicha(); renderFicha(); window.scrollTo(0,0); };
+  document.getElementById("hideall").onclick=()=>el.querySelectorAll(".q").forEach(q=>show(q,null));
+  el.querySelectorAll(".jump").forEach(b=>b.onclick=()=>document.getElementById("fb"+b.dataset.j).scrollIntoView({behavior:"smooth"}));
+  el.querySelectorAll(".q .qb button").forEach(btn=>btn.onclick=()=>{ const q=btn.closest(".q"); show(q, btn.classList.contains("on")?null:btn.dataset.a); });
+  el.querySelectorAll(".q-allres").forEach(btn=>btn.onclick=()=>{ const qs=el.querySelectorAll(`.q[data-b="${btn.dataset.b}"]`); const anyHidden=[...qs].some(q=>!q.dataset.open); qs.forEach(q=>show(q,anyHidden?"res":null)); btn.textContent=anyHidden?"Ocultar resultados":"Ver todos los resultados"; });
+}
+function show(q,what){
+  const p=FICHA[q.dataset.b][q.dataset.k], r=q.querySelector(".reveal");
+  q.querySelectorAll(".qb button").forEach(b=>b.classList.toggle("on",b.dataset.a===what));
+  q.dataset.open=what||""; if(!what) delete q.dataset.open;
+  r.innerHTML= !what?"" : `<div class="ansbox">${ansOf(p)}</div>`+(what==="steps"?stepsOf(p):"");
+}
+let VIEW="ficha"; try{ if(localStorage.getItem(KEY+"-view")==="prac") VIEW="prac"; }catch(e){}
+function setView(v){
+  VIEW=v; try{localStorage.setItem(KEY+"-view",v)}catch(e){}
+  document.getElementById("v-ficha").setAttribute("aria-selected",v==="ficha");
+  document.getElementById("v-prac").setAttribute("aria-selected",v==="prac");
+  document.getElementById("ficha").hidden=v!=="ficha"; document.getElementById("practice").hidden=v!=="prac";
+  if(v==="prac") render();
+}
+document.getElementById("v-ficha").onclick=()=>setView("ficha");
+document.getElementById("v-prac").onclick=()=>setView("prac");
+buildFicha(); renderFicha();
+newProblem(); setView(VIEW);
+</script>
+</body>
+</html>
