@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejemplo de Intervalos de confianza paso a paso</title>
+<style>
+  :root{
+    --paper:#f7f5f0; --card:#ffffff; --ink:#1c2333; --muted:#5d6577; --line:#e3dfd6;
+    --accent:#1f5f8b; --accent-soft:#e3eef6; --tail:#c2410c; --tail-soft:#fbe7dc;
+    --hit:#ffd84d; --path:#fff6cc; --ok:#1d7a4f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.55}
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 60px}
+  header .kicker{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(28px,4vw,40px);margin:4px 0 6px;line-height:1.15}
+  header p{margin:0;color:var(--muted)}
+  .tabs{display:flex;gap:8px;margin:26px 0 18px;flex-wrap:wrap}
+  .tab{border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:10px 18px;border-radius:999px;font:600 16px system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--ink);color:#fff}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:16px}
+  .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px 20px}
+  label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+  label .sym{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-weight:500;color:var(--accent)}
+  input[type=text]{width:100%;font:500 19px ui-monospace,"SF Mono",Menlo,Consolas,monospace;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fcfbf8;color:var(--ink)}
+  input[type=text]:focus{outline:none;border-color:var(--accent);background:#fff}
+  .chips{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .chip{border:1px solid var(--line);background:#fff;padding:4px 10px;border-radius:8px;font:500 14px ui-monospace,Menlo,Consolas,monospace;cursor:pointer;color:var(--ink)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .hint{font-size:13px;color:var(--muted);margin-top:6px}
+  .err{color:var(--tail);font-weight:600;margin-top:12px}
+  .step{display:grid;grid-template-columns:44px 1fr;gap:14px}
+  .num{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font:700 17px Georgia,serif}
+  .step h2{font-family:Georgia,"Times New Roman",serif;font-size:21px;margin:4px 0 10px}
+  .m{font-family:Georgia,"Times New Roman",serif;font-style:italic}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .eq{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:18px;background:#faf9f5;border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:8px 0;overflow-x:auto;white-space:nowrap;display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+  .eq .v{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:20px}
+  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px}
+  .frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 4px 1px}
+  .frac>span:last-child{padding:1px 4px 0}
+  .sqrt{display:inline-flex;align-items:stretch;vertical-align:middle}
+  .sqrt::before{content:"√";font-size:1.25em;line-height:1;margin-right:1px;align-self:center}
+  .sqrt>span{border-top:1.5px solid currentColor;padding:2px 3px 0}
+  .res{background:var(--accent-soft);color:var(--accent);font-weight:600;padding:2px 8px;border-radius:6px}
+  ul.data{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}
+  ul.data li{background:#faf9f5;border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+  ul.data b{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:600}
+  .curves{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:12px 0}
+  .curves figure{margin:0;background:#faf9f5;border:1px solid var(--line);border-radius:10px;padding:10px}
+  .curves figcaption{font-size:14px;color:var(--muted);text-align:center;margin-top:4px}
+  svg text{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px}
+  .search{background:#fffaf0;border:1px solid #f0e2b8;border-radius:10px;padding:12px 14px;margin:10px 0}
+  .tablewrap{max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px;position:relative}
+  table.z{border-collapse:collapse;font:13.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;width:100%}
+  table.z th,table.z td{padding:4px 7px;text-align:right;border-bottom:1px solid #f0ede6}
+  table.z thead th{position:sticky;top:0;background:var(--ink);color:#fff;z-index:2}
+  table.z tbody th{position:sticky;left:0;background:#efece5;z-index:1}
+  table.z thead th:first-child{left:0;z-index:3}
+  table.z .path{background:var(--path)}
+  table.z .hit{background:var(--hit);font-weight:600;outline:2px solid #c99a00;outline-offset:-2px}
+  table.z th.hdrhit{background:var(--hit)!important;color:var(--ink)!important}
+  .final{background:var(--ink);color:#fff;border-radius:14px;padding:22px 24px;margin-top:8px}
+  .final h2{font-family:Georgia,"Times New Roman",serif;margin:0 0 8px;font-size:22px}
+  .final .ic{font:600 clamp(22px,3.6vw,32px) ui-monospace,Menlo,Consolas,monospace;margin:6px 0 10px}
+  .final p{margin:0;color:#d6dbe6}
+  .note{font-size:14px;color:var(--muted);margin-top:8px}
+  .warn{font-size:14px;color:var(--tail);margin-top:8px}
+  .toggle{background:none;border:none;color:var(--accent);font:600 14px system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;padding:0;text-decoration:underline}
+  @media (max-width:560px){.step{grid-template-columns:1fr}.num{margin-bottom:-4px}.card{padding:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Matemáticas Aplicadas a las CCSS II · Inferencia</div>
+    <h1>Intervalos de confianza paso a paso</h1>
+    <p>Introduce los datos y verás toda la resolución, incluida la búsqueda de <span class="m">z</span><sub>α/2</sub> en la tabla N(0,1).</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-media" aria-selected="true">Media muestral</button>
+    <button class="tab" role="tab" id="tab-prop" aria-selected="false">Proporción muestral</button>
+  </div>
+
+  <section class="card" id="inputs"></section>
+  <div id="out"></div>
+</div>
+
+<script>
+/* ---------- utilidades numéricas ---------- */
+function erf(x){ // serie de términos positivos, estable para |x|<~6
+  const s = x<0?-1:1; x=Math.abs(x);
+  if(x>6) return s;
+  let term=x, sum=x, n=0;
+  while(Math.abs(term)>1e-17*sum && n<500){ n++; term*=2*x*x/(2*n+1); sum+=term; }
+  return s*2/Math.sqrt(Math.PI)*Math.exp(-x*x)*sum;
+}
+const Phi = z => 0.5*(1+erf(z/Math.SQRT2));
+function invPhi(p){ let lo=-10,hi=10; for(let i=0;i<200;i++){const m=(lo+hi)/2; if(Phi(m)<p) lo=m; else hi=m;} return (lo+hi)/2; }
+const r4 = x => Math.round(x*1e4)/1e4;
+
+// Tabla N(0,1): z = 0,00 ... 3,99
+const TABLE = []; for(let k=0;k<400;k++) TABLE.push(r4(Phi(k/100)));
+
+function fmt(x,d){ if(!isFinite(x)) return "—"; return x.toFixed(d).replace(".",","); }
+function fmtT(x,maxd=6){ // decimales recortados
+  if(!isFinite(x)) return "—";
+  let s=x.toFixed(maxd); if(s.includes(".")) s=s.replace(/0+$/,"").replace(/\.$/,"");
+  return s.replace(".",",");
+}
+function parseNum(s){ if(s==null) return NaN; s=String(s).trim().replace(/\s/g,"").replace(",","."); if(s==="") return NaN; return Number(s); }
+const frac=(a,b)=>`<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+const sqrt=a=>`<span class="sqrt"><span>${a}</span></span>`;
+
+/* ---------- búsqueda en tabla ---------- */
+function searchTable(target){
+  const t=r4(target);
+  if(t>TABLE[399]) return {type:"out", z:invPhi(target), t};
+  let first=TABLE.findIndex(v=>Math.abs(v-t)<1e-9);
+  if(first>=0) return {type:"exact", cells:[first], z:first/100, t};
+  let up=TABLE.findIndex(v=>v>t), lo=up-1;
+  const dLo=r4(t-TABLE[lo]), dUp=r4(TABLE[up]-t);
+  if(Math.abs(dLo-dUp)<1e-9) return {type:"mid", cells:[lo,up], z:(lo+up)/200, t, dLo, dUp};
+  const k = dLo<dUp?lo:up;
+  return {type:"near", cells:[lo,up], chosen:k, z:k/100, t, dLo, dUp};
+}
+const zStr = k => fmt(k/100,2);
+const rowStr = k => fmt(Math.floor(k/10)/10,1);
+const colStr = k => "0,0"+(k%10);
+
+function tableHTML(res){
+  const cells=res.cells||[]; const hitSet=new Set(res.type==="near"?[res.chosen]:cells);
+  const showSet=new Set(cells);
+  const hitRows=new Set([...showSet].map(k=>Math.floor(k/10))), hitCols=new Set([...showSet].map(k=>k%10));
+  let h='<table class="z"><thead><tr><th>z</th>';
+  for(let c=0;c<10;c++) h+=`<th class="${hitCols.has(c)?'hdrhit':''}">0,0${c}</th>`;
+  h+='</tr></thead><tbody>';
+  for(let r=0;r<40;r++){
+    h+=`<tr data-r="${r}"><th class="${hitRows.has(r)?'hdrhit':''}">${fmt(r/10,1)}</th>`;
+    for(let c=0;c<10;c++){
+      const k=r*10+c; let cls="";
+      if(hitSet.has(k)) cls="hit";
+      else if(showSet.has(k)) cls="hit";
+      else { for(const s of showSet){ const sr=Math.floor(s/10), sc=s%10; if((r===sr&&c<sc)||(c===sc&&r<sr)) cls="path"; } }
+      h+=`<td class="${cls}">${fmt(TABLE[k],4)}</td>`;
+    }
+    h+='</tr>';
+  }
+  return h+'</tbody></table>';
+}
+
+function searchText(res){
+  const T=fmt(res.t,4);
+  if(res.type==="exact"){
+    const k=res.cells[0];
+    return `Buscamos <b class="mono">${T}</b> <u>dentro</u> de la tabla (no en los bordes). Aparece en la <b>fila ${rowStr(k)}</b> y en la <b>columna ${colStr(k)}</b>. Sumamos fila y columna: <span class="m">z</span><sub>α/2</sub> = ${rowStr(k)} + ${colStr(k)} = <span class="res">${zStr(k)}</span>`;
+  }
+  if(res.type==="mid"){
+    const [a,b]=res.cells;
+    return `El valor <b class="mono">${T}</b> no aparece exactamente. Está entre <b class="mono">${fmt(TABLE[a],4)}</b> (z = ${zStr(a)}) y <b class="mono">${fmt(TABLE[b],4)}</b> (z = ${zStr(b)}), y a la <b>misma distancia</b> de ambos (${fmt(res.dLo,4)}). Por eso tomamos el punto medio: <span class="m">z</span><sub>α/2</sub> = ${frac(zStr(a)+" + "+zStr(b),"2")} = <span class="res">${fmt(res.z,3)}</span>`;
+  }
+  if(res.type==="near"){
+    const [a,b]=res.cells; const k=res.chosen;
+    return `El valor <b class="mono">${T}</b> no aparece exactamente. Los más próximos son <b class="mono">${fmt(TABLE[a],4)}</b> (z = ${zStr(a)}, a ${fmt(res.dLo,4)}) y <b class="mono">${fmt(TABLE[b],4)}</b> (z = ${zStr(b)}, a ${fmt(res.dUp,4)}). Tomamos el más cercano, ${fmt(TABLE[k],4)} → fila ${rowStr(k)}, columna ${colStr(k)}: <span class="m">z</span><sub>α/2</sub> ≈ <span class="res">${zStr(k)}</span>`;
+  }
+  return `El valor <b class="mono">${T}</b> es mayor que el último de la tabla (z = 3,99). Usamos el valor obtenido con calculadora: <span class="m">z</span><sub>α/2</sub> ≈ <span class="res">${fmt(res.z,3)}</span>`;
+}
+
+/* ---------- curvas ---------- */
+function curveSVG(z, mode){
+  const W=320,H=150,x0=20,x1=300,yb=118,top=14, X=v=>x0+(v+4)/8*(x1-x0), pdf=v=>Math.exp(-v*v/2)/Math.sqrt(2*Math.PI), Y=v=>yb-pdf(v)/0.4*(yb-top);
+  const zc=Math.min(z,3.9);
+  const area=(a,b,col)=>{ let d=`M${X(a)},${yb}`; for(let v=a;v<=b+1e-9;v+=0.04) d+=` L${X(v)},${Y(v)}`; d+=` L${X(b)},${Y(b)} L${X(b)},${yb} Z`; return `<path d="${d}" fill="${col}"/>`; };
+  let curve=""; for(let v=-4;v<=4.001;v+=0.04) curve+=(curve?" L":"M")+X(v)+","+Y(v);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">`;
+  if(mode==="central"){
+    s+=area(-4,-zc,"#f4c3a6")+area(zc,4,"#f4c3a6")+area(-zc,zc,"#bcd6ea");
+  } else {
+    s+=area(-4,zc,"#bcd6ea")+area(zc,4,"#f4c3a6");
+  }
+  s+=`<path d="${curve}" fill="none" stroke="#1c2333" stroke-width="1.8"/>`;
+  s+=`<line x1="${x0}" y1="${yb}" x2="${x1}" y2="${yb}" stroke="#1c2333"/>`;
+  const tick=(v,l)=>`<line x1="${X(v)}" y1="${yb}" x2="${X(v)}" y2="${yb+5}" stroke="#1c2333"/><text x="${X(v)}" y="${yb+20}" text-anchor="middle">${l}</text>`;
+  s+=tick(zc,fmt(z,z*100%1?3:2));
+  if(mode==="central"){
+    s+=tick(-zc,"−"+fmt(z,z*100%1?3:2));
+    s+=`<text x="${X(0)}" y="${Y(0)+42}" text-anchor="middle" font-weight="600" fill="#1f5f8b">1−α</text>`;
+    s+=`<text x="${X(-zc)-22}" y="${yb-10}" text-anchor="middle" fill="#c2410c" font-weight="600">α/2</text>`;
+    s+=`<text x="${X(zc)+22}" y="${yb-10}" text-anchor="middle" fill="#c2410c" font-weight="600">α/2</text>`;
+  } else {
+    s+=tick(0,"0");
+    s+=`<text x="${X(-0.6)}" y="${Y(0)+42}" text-anchor="middle" font-weight="600" fill="#1f5f8b">1−α/2</text>`;
+    s+=`<text x="${X(zc)+22}" y="${yb-10}" text-anchor="middle" fill="#c2410c" font-weight="600">α/2</text>`;
+  }
+  return s+"</svg>";
+}
+
+/* ---------- estado e inputs ---------- */
+const state={ mode:"media",
+  media:{nivel:"95", xbar:"50", sigma:"4", n:"100"},
+  prop:{nivel:"95", p:"0,35", n:"200"} };
+
+function renderInputs(){
+  const box=document.getElementById("inputs"); const d=state[state.mode];
+  const nivelField=`<div><label>Nivel de confianza <span class="sym">1 − α</span> (%)</label>
+    <input type="text" inputmode="decimal" id="f-nivel" value="${d.nivel}">
+    <div class="chips">${["90","95","99","98","99,5"].map(v=>`<button class="chip ${d.nivel===v?'on':''}" data-n="${v}">${v} %</button>`).join("")}</div></div>`;
+  if(state.mode==="media"){
+    box.innerHTML=`<div class="inputs">${nivelField}
+      <div><label>Media muestral <span class="sym">x̄</span></label><input type="text" inputmode="decimal" id="f-xbar" value="${d.xbar}"></div>
+      <div><label>Desviación típica <span class="sym">σ</span></label><input type="text" inputmode="decimal" id="f-sigma" value="${d.sigma}">
+        <div class="hint">Si σ es desconocida y n es grande, se usa la de la muestra.</div></div>
+      <div><label>Tamaño de la muestra <span class="sym">n</span></label><input type="text" inputmode="numeric" id="f-n" value="${d.n}"></div>
+    </div><div class="err" id="err"></div>`;
+  } else {
+    box.innerHTML=`<div class="inputs">${nivelField}
+      <div><label>Proporción muestral <span class="sym">p̂</span></label><input type="text" inputmode="decimal" id="f-p" value="${d.p}">
+        <div class="hint">Entre 0 y 1 (p. ej. 0,35) o en % (35%). La <span class="m">q̂</span> se calcula sola.</div></div>
+      <div><label>Tamaño de la muestra <span class="sym">n</span></label><input type="text" inputmode="numeric" id="f-n" value="${d.n}"></div>
+    </div><div class="err" id="err"></div>`;
+  }
+  box.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",()=>{ d[inp.id.slice(2)]=inp.value; box.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c.dataset.n===d.nivel)); compute(); }));
+  box.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{ d.nivel=c.dataset.n; renderInputs(); compute(); }));
+}
+
+function step(n,title,body){ return `<section class="card step"><div class="num">${n}</div><div><h2>${title}</h2>${body}</div></section>`; }
+
+function alphaStep(nv){
+  const c=nv/100, a=1-c;
+  return `<p>El nivel de confianza es el ${fmtT(nv)} %, es decir:</p>
+   <div class="eq"><span class="v">1 − α</span> = ${fmtT(c)} &nbsp;⟹&nbsp; <span class="v">α</span> = 1 − ${fmtT(c)} = ${fmtT(a)} &nbsp;⟹&nbsp; ${frac('<span class="v">α</span>','2')} = ${fmtT(a/2)}</div>
+   <p>En la tabla N(0,1) se busca el área que queda <b>a la izquierda</b> de <span class="m">z</span><sub>α/2</sub>:</p>
+   <div class="eq"><span class="v">P</span>(Z ≤ <span class="v">z</span><sub>α/2</sub>) = 1 − ${frac('<span class="v">α</span>','2')} = 1 − ${fmtT(a/2)} = <span class="res">${fmtT(1-a/2)}</span></div>`;
+}
+
+function zStep(nv){
+  const a=1-nv/100, target=1-a/2, res=searchTable(target);
+  const exact=invPhi(target);
+  const body=`<div class="curves">
+      <figure>${curveSVG(res.z,"central")}<figcaption>El ${fmtT(nv)} % central queda entre −z<sub>α/2</sub> y z<sub>α/2</sub></figcaption></figure>
+      <figure>${curveSVG(res.z,"left")}<figcaption>La tabla da el área a la izquierda: ${fmt(res.t,4)}</figcaption></figure>
+    </div>
+    <div class="search">${searchText(res)}</div>
+    ${res.type!=="out"&&(res.type!=="exact"||Math.abs(exact-res.z)>0.005)?`<div class="note">Con calculadora (valor exacto): z<sub>α/2</sub> = ${fmt(exact,4)}. Seguimos con el valor de la tabla.</div>`:""}
+    <div class="tablewrap" id="tw">${tableHTML(res)}</div>
+    <div class="note">Tabla de la N(0,1): cada casilla es P(Z ≤ z), con z = fila + columna. Las casillas en amarillo claro marcan el camino hasta el valor.</div>`;
+  return {res, html: step(3,"Valor crítico z<sub>α/2</sub> en la tabla N(0,1)",body)};
+}
+
+function compute(){
+  const out=document.getElementById("out"), err=document.getElementById("err"); const d=state[state.mode];
+  const nv=parseNum(d.nivel), n=parseNum(d.n);
+  const errs=[];
+  if(!(nv>0&&nv<100)) errs.push("El nivel de confianza debe estar entre 0 y 100 %.");
+  if(!(Number.isInteger(n)&&n>=1)) errs.push("n debe ser un número entero positivo.");
+  let xbar,sigma,p;
+  if(state.mode==="media"){
+    xbar=parseNum(d.xbar); sigma=parseNum(d.sigma);
+    if(!isFinite(xbar)) errs.push("Introduce la media muestral.");
+    if(!(sigma>0)) errs.push("La desviación típica debe ser positiva.");
+  } else {
+    let s=String(d.p).trim(); const pct=s.endsWith("%"); p=parseNum(s.replace("%","")); if(pct) p/=100;
+    if(!(p>0&&p<1)) errs.push("La proporción debe estar entre 0 y 1 (o entre 0 % y 100 %).");
+  }
+  err.textContent=errs.join(" ");
+  if(errs.length){ out.innerHTML=""; return; }
+
+  const zs=zStep(nv); const z=zs.res.z; const zTxt=fmt(z, Math.round(z*1000)%10?3:2);
+  let html="";
+  if(state.mode==="media"){
+    const sn=Math.sqrt(n), q=sigma/sn, E=z*q, L=xbar-E, U=xbar+E;
+    const snTxt=Number.isInteger(sn)?String(sn):fmt(sn,4);
+    html+=step(1,"Datos del problema",`<ul class="data">
+      <li>Nivel de confianza: <b>${fmtT(nv)} %</b></li><li>Media muestral: <span class="m">x̄</span> = <b>${fmtT(xbar)}</b></li>
+      <li>Desviación típica: <span class="m">σ</span> = <b>${fmtT(sigma)}</b></li><li>Tamaño muestral: <span class="m">n</span> = <b>${n}</b></li></ul>
+      <p class="note">Fórmula del intervalo: <span class="m">IC</span> = ( x̄ − z<sub>α/2</sub>·σ/√n ; x̄ + z<sub>α/2</sub>·σ/√n )</p>`);
+    html+=step(2,"Calculamos α y α/2",alphaStep(nv));
+    html+=zs.html;
+    html+=step(4,"Error máximo admisible E",`
+      <div class="eq"><span class="v">E</span> = <span class="v">z</span><sub>α/2</sub> · ${frac('<span class="v">σ</span>',sqrt('<span class="v">n</span>'))}
+        = ${zTxt} · ${frac(fmtT(sigma),sqrt(n))} = ${zTxt} · ${frac(fmtT(sigma),snTxt)} = ${zTxt} · ${fmt(q,4)} = <span class="res">${fmt(E,4)}</span></div>
+      <p class="note">El error depende de z<sub>α/2</sub>, de σ y de n, pero no de x̄.</p>`);
+    html+=step(5,"Intervalo de confianza",`
+      <div class="eq">( <span class="v">x̄</span> − <span class="v">E</span> ; <span class="v">x̄</span> + <span class="v">E</span> ) = ( ${fmtT(xbar)} − ${fmt(E,4)} ; ${fmtT(xbar)} + ${fmt(E,4)} ) = <span class="res">( ${fmt(L,4)} ; ${fmt(U,4)} )</span></div>`);
+    html+=`<div class="final"><h2>Solución</h2><div class="ic">IC<sub>${fmtT(nv)} %</sub>(μ) = ( ${fmt(L,4)} ; ${fmt(U,4)} )</div>
+      <p>Error máximo: E = ${fmt(E,4)}. Con una confianza del ${fmtT(nv)} %, la media poblacional μ está entre ${fmt(L,4)} y ${fmt(U,4)}.</p></div>`;
+  } else {
+    const q=1-p, pq=p*q, pqn=pq/n, r=Math.sqrt(pqn), E=z*r, L=p-E, U=p+E;
+    html+=step(1,"Datos del problema",`<ul class="data">
+      <li>Nivel de confianza: <b>${fmtT(nv)} %</b></li><li>Proporción muestral: <span class="m">p̂</span> = <b>${fmtT(p)}</b></li>
+      <li><span class="m">q̂</span> = 1 − p̂ = 1 − ${fmtT(p)} = <b>${fmtT(q)}</b></li><li>Tamaño muestral: <span class="m">n</span> = <b>${n}</b></li></ul>
+      <p class="note">Fórmula del intervalo: <span class="m">IC</span> = ( p̂ − z<sub>α/2</sub>·√(p̂·q̂/n) ; p̂ + z<sub>α/2</sub>·√(p̂·q̂/n) )</p>
+      ${(n*p<5||n*q<5)?`<p class="warn">Atención: n·p̂ = ${fmtT(n*p,2)} y n·q̂ = ${fmtT(n*q,2)}. Para usar la aproximación normal conviene que ambos sean ≥ 5.</p>`:`<p class="note">Comprobación: n·p̂ = ${fmtT(n*p,2)} ≥ 5 y n·q̂ = ${fmtT(n*q,2)} ≥ 5, así que podemos aproximar por la normal.</p>`}`);
+    html+=step(2,"Calculamos α y α/2",alphaStep(nv));
+    html+=zs.html;
+    html+=step(4,"Error máximo admisible E",`
+      <div class="eq"><span class="v">E</span> = <span class="v">z</span><sub>α/2</sub> · ${sqrt(frac('<span class="v">p̂</span> · <span class="v">q̂</span>','<span class="v">n</span>'))}
+        = ${zTxt} · ${sqrt(frac(fmtT(p)+" · "+fmtT(q),n))} = ${zTxt} · ${sqrt(frac(fmtT(pq),n))}</div>
+      <div class="eq">= ${zTxt} · ${sqrt(fmtT(pqn,7))} = ${zTxt} · ${fmt(r,4)} = <span class="res">${fmt(E,4)}</span></div>`);
+    html+=step(5,"Intervalo de confianza",`
+      <div class="eq">( <span class="v">p̂</span> − <span class="v">E</span> ; <span class="v">p̂</span> + <span class="v">E</span> ) = ( ${fmtT(p)} − ${fmt(E,4)} ; ${fmtT(p)} + ${fmt(E,4)} ) = <span class="res">( ${fmt(L,4)} ; ${fmt(U,4)} )</span></div>
+      ${(L<0||U>1)?`<p class="warn">El intervalo se sale de [0, 1]; en la práctica se recorta a ( ${fmt(Math.max(0,L),4)} ; ${fmt(Math.min(1,U),4)} ).</p>`:""}`);
+    html+=`<div class="final"><h2>Solución</h2><div class="ic">IC<sub>${fmtT(nv)} %</sub>(p) = ( ${fmt(L,4)} ; ${fmt(U,4)} )</div>
+      <p>Error máximo: E = ${fmt(E,4)}. Con una confianza del ${fmtT(nv)} %, la proporción poblacional está entre el ${fmt(L*100,2)} % y el ${fmt(U*100,2)} %.</p></div>`;
+  }
+  out.innerHTML=html;
+  const tw=document.getElementById("tw"), hit=tw&&tw.querySelector(".hit");
+  if(hit){ const row=hit.closest("tr"); tw.scrollTop=Math.max(0,row.offsetTop-tw.clientHeight/2); }
+}
+
+function setMode(m){
+  state.mode=m;
+  document.getElementById("tab-media").setAttribute("aria-selected",m==="media");
+  document.getElementById("tab-prop").setAttribute("aria-selected",m==="prop");
+  try{ localStorage.setItem("ic-mode",m); }catch(e){}
+  renderInputs(); compute();
+}
+document.getElementById("tab-media").onclick=()=>setMode("media");
+document.getElementById("tab-prop").onclick=()=>setMode("prop");
+let startMode="media"; try{ const s=localStorage.getItem("ic-mode"); if(s==="prop") startMode="prop"; }catch(e){}
+setMode(startMode);
+</script>
+</body>
+</html>
