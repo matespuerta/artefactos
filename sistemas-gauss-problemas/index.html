@@ -115,7 +115,7 @@ function genShop(){
     const b=A.map(r=>dot(r,price)),who=shuffle(PEOPLE).slice(0,3);
     const phr=(r,i)=>{const parts=r.map((q,j)=>q>0?`${q} ${q===1?S.it[j][0]:S.it[j][1]}`:null).filter(Boolean);
       return `${who[i]} compra ${join(parts)} y paga ${b[i]} €.`;};
-    return{A,b,kind:'SCD',ctx:{
+    return{A,b,sol:price,ctx:{
       intro:'Tres amigos hacen las siguientes compras en la misma tienda:',
       body:A.map((r,i)=>phr(r,i)).join(' '),
       question:'¿Cuál es el precio de cada artículo?',
@@ -133,13 +133,125 @@ function genCinema(){
     const A=[[1,1,1],[pa,pb,pc],row];
     if(det3(A)===0)continue;
     const sol=[x,y,z],b=[x+y+z,dot(A[1],sol),rb];
-    return{A,b,kind:'SCD',ctx:{
+    return{A,b,sol,ctx:{
       intro:`En un teatro hay tres tipos de entrada: adulto (${pa} €), joven (${pb} €) y niño (${pc} €).`,
       body:`Una tarde asistieron ${b[0]} personas y se recaudaron ${b[1]} €. Además, ${txt}.`,
       question:'¿Cuántas entradas de cada tipo se vendieron?',
       defs:['x = número de entradas de adulto','y = número de entradas de joven','z = número de entradas de niño'],
       answer:s=>`Se vendieron <b>${s[0]}</b> entradas de adulto, <b>${s[1]}</b> de joven y <b>${s[2]}</b> de niño.`}};
   }
+}
+
+
+// ---------- Más familias de problemas ----------
+function makeRel(pre,pre2,unit,labels,lo,hi){
+  const t=pick(['k','m','eq']);let sol,row,rb,txt;
+  if(t==='k'){const k=pick([2,3]);const z=rnd(lo,Math.max(lo,Math.floor(hi/k)));sol=[k*z,rnd(lo,hi),z];row=[1,0,-k];rb=0;
+    txt=`${pre} ${labels[0]} es ${k===2?'el doble':'el triple'} que ${pre2} ${labels[2]}`;}
+  else if(t==='m'){const m=rnd(2,Math.max(3,Math.floor(hi/3)));const x=rnd(lo,hi);sol=[x,x+m,rnd(lo,hi)];row=[-1,1,0];rb=m;
+    txt=`${pre} ${labels[1]} supera en ${m} ${unit} a ${pre2} ${labels[0]}`;}
+  else{const v=rnd(lo,hi);sol=[rnd(lo,hi),v,v];row=[0,1,-1];rb=0;
+    txt=`${pre} ${labels[1]} es igual que ${pre2} ${labels[2]}`;}
+  return{sol,row,rb,txt:txt.replace(' a el ',' al ')};
+}
+const eur=n=>n.toLocaleString('es-ES');
+
+function genInvest(){
+  for(;;){
+    const r=[rnd(3,5),rnd(6,8),rnd(9,12)],lab=['el fondo A','el fondo B','el fondo C'];
+    const R=makeRel('la cantidad invertida en','la invertida en','mil euros',lab,2,15);
+    const A=[[1,1,1],r,R.row];if(det3(A)===0)continue;
+    const s=R.sol,b=A.map((row,i)=>i<2?dot(row,s):R.rb);
+    return{A,b,sol:s,ctx:{
+      intro:`Una persona reparte sus ahorros en tres fondos de inversión: el fondo A rinde un ${r[0]} % anual, el B un ${r[1]} % y el C un ${r[2]} %.`,
+      body:`Ha invertido ${eur(b[0]*1000)} € en total y al cabo de un año ha obtenido ${eur(b[1]*10)} € de intereses. Además, ${R.txt}.`,
+      question:'¿Cuánto dinero ha invertido en cada fondo?',
+      defs:['x = miles de euros invertidos en el fondo A','y = miles de euros invertidos en el fondo B','z = miles de euros invertidos en el fondo C'],
+      note:`Los intereses, en miles de euros, son ${(r[0]/100).toString().replace('.',',')}x + ${(r[1]/100).toString().replace('.',',')}y + ${(r[2]/100).toString().replace('.',',')}z = ${(b[1]/100).toString().replace('.',',')}. Multiplicando por 100 queda ${lin(r)} = ${b[1]}.`,
+      answer:v=>`Ha invertido <b>${eur(v[0]*1000)} €</b> en el fondo A, <b>${eur(v[1]*1000)} €</b> en el B y <b>${eur(v[2]*1000)} €</b> en el C.`}};
+  }
+}
+function genAges(){
+  for(;;){
+    const n=rnd(2,5),p=pick([2,3,4]),past=Math.random()<.5,d=rnd(1,6);
+    const z=rnd(6,15),x=past?n+p*(z-n):p*(z+n)-n,y=x-d;
+    if(past&&z<=n+1)continue;
+    if(x>58||x-z<20||y-z<18)continue;
+    const row=past?[1,0,-p]:[1,0,-p],rb=past?-n*(p-1):n*(p-1);
+    const A=[[1,1,1],row,[1,-1,0]],b=[x+y+z,rb,d];
+    if(det3(A)===0)continue;
+    return{A,b,sol:[x,y,z],ctx:{
+      intro:'La suma de las edades de un padre, una madre y su hijo es '+b[0]+' años.',
+      body:`${past?`Hace ${n} años`:`Dentro de ${n} años`}, la edad del padre ${past?'era':'será'} ${p===2?'el doble':p===3?'el triple':'el cuádruple'} de la del hijo. Además, la madre tiene ${d} ${d===1?'año':'años'} menos que el padre.`,
+      question:'¿Qué edad tiene cada uno actualmente?',
+      defs:['x = edad actual del padre','y = edad actual de la madre','z = edad actual del hijo'],
+      note:past?`Hace ${n} años las edades eran x − ${n} y z − ${n}: x − ${n} = ${p}(z − ${n}) ⇒ ${lin(row)} = ${fi(rb)}.`:`Dentro de ${n} años las edades serán x + ${n} y z + ${n}: x + ${n} = ${p}(z + ${n}) ⇒ ${lin(row)} = ${fi(rb)}.`,
+      answer:v=>`El padre tiene <b>${v[0]}</b> años, la madre <b>${v[1]}</b> y el hijo <b>${v[2]}</b>.`}};
+  }
+}
+const MIX=[["almendras","nueces","avellanas","frutos secos"],["café de Colombia","café de Brasil","café de Etiopía","café"],["harina de trigo","harina de maíz","harina de centeno","harina"]];
+function genMix(){
+  for(;;){
+    const S=pick(MIX),pr=[rnd(5,15),rnd(5,15),rnd(5,15)];
+    const R=makeRel('la cantidad de','la de','kg',S.slice(0,3),2,15);
+    const A=[[1,1,1],pr,R.row];if(det3(A)===0||new Set(pr).size<3)continue;
+    const s=R.sol,b=A.map((row,i)=>i<2?dot(row,s):R.rb);
+    return{A,b,sol:s,ctx:{
+      intro:`Un comerciante prepara una mezcla con ${S[0]}, ${S[1]} y ${S[2]}, que cuestan ${pr[0]} €/kg, ${pr[1]} €/kg y ${pr[2]} €/kg, respectivamente.`,
+      body:`La mezcla pesa ${b[0]} kg y cuesta ${b[1]} € en total. Además, ${R.txt}.`,
+      question:'¿Cuántos kilos de cada tipo lleva la mezcla?',
+      defs:S.slice(0,3).map((n,j)=>`${NAMES[j]} = kg de ${n}`),
+      answer:v=>`La mezcla lleva <b>${v[0]} kg</b> de ${S[0]}, <b>${v[1]} kg</b> de ${S[1]} y <b>${v[2]} kg</b> de ${S[2]}.`}};
+  }
+}
+const CASH=[[5,10,20],[10,20,50],[5,20,50],[5,10,50]];
+function genCash(){
+  for(;;){
+    const d=pick(CASH),lab=d.map(v=>`billetes de ${v} €`);
+    const R=makeRel('el número de','el de','billetes',lab,2,15);
+    const A=[[1,1,1],d,R.row];if(det3(A)===0)continue;
+    const s=R.sol,b=A.map((row,i)=>i<2?dot(row,s):R.rb);
+    return{A,b,sol:s,ctx:{
+      intro:`En una caja hay billetes de ${d[0]} €, de ${d[1]} € y de ${d[2]} €.`,
+      body:`En total hay ${b[0]} billetes y ${b[1]} €. Además, ${R.txt}.`,
+      question:'¿Cuántos billetes hay de cada valor?',
+      defs:d.map((v,j)=>`${NAMES[j]} = número de billetes de ${v} €`),
+      answer:v=>`Hay <b>${v[0]}</b> billetes de ${d[0]} €, <b>${v[1]}</b> de ${d[1]} € y <b>${v[2]}</b> de ${d[2]} €.`}};
+  }
+}
+const RES=[
+  {intro:'Un taller de carpintería fabrica sillas, mesas y estanterías.',prod:["silla","mesa","estantería"],plur:["sillas","mesas","estanterías"],res:["corte","montaje","barnizado"],sc:1,lo:3,hi:20,
+   each:(p,parts)=>`Cada ${p} necesita ${join(parts)}.`,part:(q,r)=>`${q} h de ${r}`,tot:(b,r)=>`${b} h de ${r}`,totIntro:'A la semana el taller dispone de ',
+   q:'¿Cuántas unidades de cada mueble se fabrican si se aprovecha todo el tiempo disponible?',unk:(p,pl)=>`número de ${pl}`,ans:(p,pl,v)=>`${v} ${v===1?p:pl}`},
+  {intro:'Un nutricionista diseña una dieta con pan, queso y legumbres.',prod:["pan","queso","legumbres"],plur:["pan","queso","legumbres"],res:["proteínas","grasas","hidratos"],sc:5,lo:1,hi:6,
+   each:(p,parts)=>`Una ración de ${p} aporta ${join(parts)}.`,part:(q,r)=>`${q} g de ${r}`,tot:(b,r)=>`${b} g de ${r}`,totIntro:'La dieta del día debe aportar exactamente ',
+   q:'¿Cuántas raciones de cada alimento debe tomar?',unk:(p)=>`raciones de ${p}`,ans:(p,pl,v)=>`${v} ${v===1?'ración':'raciones'} de ${p}`},
+  {intro:'Un agricultor mezcla tres abonos (A, B y C) para su huerto.',prod:["abono A","abono B","abono C"],plur:["abono A","abono B","abono C"],res:["nitrógeno","fósforo","potasio"],sc:2,lo:2,hi:15,
+   each:(p,parts)=>`Cada saco de ${p} contiene ${join(parts)}.`,part:(q,r)=>`${q} kg de ${r}`,tot:(b,r)=>`${b} kg de ${r}`,totIntro:'El terreno necesita en total ',
+   q:'¿Cuántos sacos de cada abono debe comprar?',unk:(p)=>`sacos de ${p}`,ans:(p,pl,v)=>`${v} ${v===1?'saco':'sacos'} de ${p}`}
+];
+function genRes(){
+  const S=pick(RES);
+  for(;;){
+    const U=[0,1,2].map(()=>[rnd(0,4),rnd(0,4),rnd(0,4)]);
+    if(U.some(r=>zeros(r)>1))continue;
+    if([0,1,2].some(j=>zeros(U.map(r=>r[j]))>1))continue;
+    const d=det3(U);if(d===0||Math.abs(d)>50)continue;
+    const A=U.map(r=>r.map(v=>v*S.sc)),s=[rnd(S.lo,S.hi),rnd(S.lo,S.hi),rnd(S.lo,S.hi)],b=A.map(r=>dot(r,s));
+    const each=[0,1,2].map(j=>S.each(S.prod[j],A.map((r,i)=>r[j]>0?S.part(r[j],S.res[i]):null).filter(Boolean)));
+    return{A,b,sol:s,ctx:{
+      intro:S.intro,
+      body:each.join(' ')+' '+S.totIntro+join(b.map((v,i)=>S.tot(v,S.res[i])))+'.',
+      question:S.q,
+      defs:S.prod.map((p,j)=>`${NAMES[j]} = ${S.unk(p,S.plur[j])}`),
+      answer:v=>join(v.map((q,j)=>`<b>${S.ans(S.prod[j],S.plur[j],q)}</b>`))+'.'}};
+  }
+}
+const FAMS=[genShop,genCinema,genInvest,genAges,genMix,genRes,genCash];
+let bag=[],lastFam=null;
+function nextProblem(){
+  if(!bag.length){bag=shuffle(FAMS);if(bag[bag.length-1]===lastFam)[bag[0],bag[bag.length-1]]=[bag[bag.length-1],bag[0]]}
+  lastFam=bag.pop();return lastFam();
 }
 
 // ---------- Gauss ----------
@@ -177,7 +289,7 @@ const eqRow=r=>r.slice(0,3).every(v=>v===0)?`0 = ${fi(r[3])}`:`${lin(r.slice(0,3
 
 function buildSteps(P){
   const G=gauss(P.A,P.b),S=[],{A,b}=P;
-  S.push(`<h3>1. Planteamiento</h3><div class="line">Definimos las incógnitas:</div>${P.ctx.defs.map(d=>`<div class="line math">${d}</div>`).join('')}<div class="line">y escribimos el sistema (E1, E2, E3 son sus ecuaciones):</div>${sysHTML(A,b)}`);
+  S.push(`<h3>1. Planteamiento</h3><div class="line">Definimos las incógnitas:</div>${P.ctx.defs.map(d=>`<div class="line math">${d}</div>`).join('')}<div class="line">y escribimos el sistema (E1, E2, E3 son sus ecuaciones):</div>${sysHTML(A,b)}${P.ctx.note?`<div class="hint">${P.ctx.note}</div>`:''}`);
   const n=G.stages.length;
   G.stages.forEach((st,i)=>{
     const lastOne=i===n-1;
@@ -220,7 +332,7 @@ function render(){
   const last=$('steps').lastElementChild;if(last&&shown>0)last.scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 function newProblem(){
-  P=Math.random()<.5?genShop():genCinema();
+  P=nextProblem();
   STEPS=buildSteps(P);shown=0;
   $('stmt').innerHTML=`<span class="tag">Problema contextualizado</span><p>${P.ctx.intro}</p><p>${P.ctx.body}</p><p><b>${P.ctx.question}</b> Plantea el sistema y resuélvelo por el método de Gauss.</p>`;
   render();
