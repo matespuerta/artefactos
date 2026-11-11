@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generador de sistemas de ecuaciones · Método de Gauss</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1d2330;--mut:#5d6677;--line:#dfe3ea;--acc:#2554c7;--accbg:#e8eefc;--ok:#157a43;--okbg:#e5f5ec;--bad:#b3261e;--badbg:#fdeceb;--op:#8a4b00;--opbg:#fff3e0}
+@media (prefers-color-scheme:dark){:root{--bg:#14171d;--card:#1c2029;--ink:#e8ebf1;--mut:#9aa3b5;--line:#2e3442;--acc:#7da2ff;--accbg:#22304f;--ok:#5fd18f;--okbg:#17301f;--bad:#ff8a80;--badbg:#3a1e1c;--op:#ffc27a;--opbg:#3a2a12}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.45rem;margin:0 0 2px}
+.sub{color:var(--mut);margin:0 0 16px;font-size:.92rem}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+select,button{font:inherit;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 12px;cursor:pointer}
+button.p{background:var(--acc);border-color:var(--acc);color:#fff}
+@media (prefers-color-scheme:dark){button.p{color:#0c1020}}
+button:disabled{opacity:.45;cursor:default}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.tag{display:inline-block;font-size:.75rem;padding:2px 9px;border-radius:99px;background:var(--accbg);color:var(--acc);margin-bottom:8px}
+.stmt p{margin:.3rem 0 .6rem}
+.sys{display:flex;align-items:center;gap:6px;font-size:1.15rem;font-family:"Cambria Math",Cambria,"Times New Roman",serif;margin:6px 0}
+.brace{font-size:4.4rem;font-weight:100;line-height:1;transform:scaleX(.7)}
+.sys .eqs div{padding:2px 0;white-space:nowrap}
+.step h3{margin:0 0 8px;font-size:1rem;color:var(--acc)}
+.ops{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.op{background:var(--opbg);color:var(--op);border-radius:6px;padding:2px 9px;font-size:.92rem;font-family:"Cambria Math",Cambria,serif}
+table.mat{border-collapse:collapse;margin:6px 0;font-family:"Cambria Math",Cambria,"Times New Roman",serif;font-size:1.15rem;border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:6px}
+table.mat td{padding:3px 12px;text-align:right;min-width:2.2em}
+table.mat td.rhs{border-left:1.5px dashed var(--mut)}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;line-height:1.1;margin:0 2px}
+.fr span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.math{font-family:"Cambria Math",Cambria,"Times New Roman",serif;font-size:1.08rem}
+.line{margin:4px 0}
+.res{background:var(--okbg);border:1px solid var(--ok);color:var(--ink);border-radius:10px;padding:10px 14px;margin-top:8px}
+.res b{color:var(--ok)}
+.res.bad{background:var(--badbg);border-color:var(--bad)}.res.bad b{color:var(--bad)}
+.hint{color:var(--mut);font-size:.88rem}
+.chk{color:var(--ok)}
+.foot{color:var(--mut);font-size:.82rem;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sistemas de ecuaciones · Método de Gauss</h1>
+  <p class="sub">Problemas contextualizados estilo PAU, resueltos paso a paso por el método de Gauss con sistemas de ecuaciones.</p>
+
+  <div class="bar">
+    <button class="p" id="new">Nuevo problema</button>
+    <button id="next">Siguiente paso</button>
+    <button id="all">Ver todo</button>
+    <button id="hide">Ocultar solución</button>
+  </div>
+
+  <div id="stmt" class="card stmt"></div>
+  <div id="steps"></div>
+  <p class="foot">Los coeficientes se generan al azar a partir de una solución conocida, de modo que cada problema tiene siempre solución verificable. Operaciones entre ecuaciones con enteros (sin fracciones intermedias) y simplificación de ecuaciones cuando es posible.</p>
+</div>
+
+<script>
+// ---------- Utilidades ----------
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[rnd(0,a.length-1)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const fi=n=>n<0?'−'+(-n):''+n;
+const F=(n,d=1)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}};
+const add=(a,b)=>F(a.n*b.d+b.n*a.d,a.d*b.d), sub=(a,b)=>F(a.n*b.d-b.n*a.d,a.d*b.d);
+const mul=(a,b)=>F(a.n*b.n,a.d*b.d), div=(a,b)=>F(a.n*b.d,a.d*b.n);
+const fz=a=>a.n===0;
+const fs=a=>a.d===1?fi(a.n):(a.n<0?'−':'')+`<span class="fr"><span>${Math.abs(a.n)}</span><span>${a.d}</span></span>`;
+const NAMES=['x','y','z'];
+function lin(c,names=NAMES){
+  let s='';
+  c.forEach((v,i)=>{if(v===0)return;const a=Math.abs(v),t=(a===1?'':a)+names[i];
+    s+= s===''?((v<0?'−':'')+t):(v<0?' − ':' + ')+t;});
+  return s||'0';
+}
+const det3=A=>A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1])-A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0])+A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
+const zeros=r=>r.filter(v=>v===0).length;
+const dot=(r,s)=>r.reduce((t,v,i)=>t+v*s[i],0);
+const join=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+' y '+a[a.length-1];
+
+// ---------- Valor lineal en λ: {a, b} = a + bλ ----------
+const L=(a,b=F(0))=>({a,b});
+const Lsub=(u,v)=>L(sub(u.a,v.a),sub(u.b,v.b));
+const Lmul=(k,u)=>L(mul(k,u.a),mul(k,u.b));
+const Ldiv=(u,k)=>L(div(u.a,k),div(u.b,k));
+function Ls(u){
+  const parts=[];
+  if(!fz(u.a))parts.push(fs(u.a));
+  if(!fz(u.b)){
+    const neg=u.b.n<0,abs=F(Math.abs(u.b.n),u.b.d);
+    const t=(abs.n===1&&abs.d===1?'':fs(abs))+'λ';
+    if(parts.length)parts.push((neg?' − ':' + ')+t);else parts.push((neg?'−':'')+t);
+  }
+  return parts.length?parts.join(''):'0';
+}
+
+// ---------- Generadores ----------
+const PEOPLE=["Ana","Luis","Marta","Pablo","Elena","Carlos","Lucía","Diego","Irene","Sergio"];
+const ITEMS=[
+  {it:[["bolígrafo","bolígrafos"],["cuaderno","cuadernos"],["carpeta","carpetas"]],pr:[1,5]},
+  {it:[["lápiz","lápices"],["goma","gomas"],["regla","reglas"]],pr:[1,4]},
+  {it:[["bocadillo","bocadillos"],["refresco","refrescos"],["café","cafés"]],pr:[1,5]},
+  {it:[["camiseta","camisetas"],["pantalón","pantalones"],["gorra","gorras"]],pr:[5,25]}
+];
+function genShop(){
+  for(;;){
+    const S=pick(ITEMS),price=[0,1,2].map(()=>rnd(S.pr[0],S.pr[1]));
+    const A=[0,1,2].map(()=>[rnd(0,4),rnd(0,4),rnd(0,4)]);
+    if(A.some(r=>zeros(r)>1)||A[0][0]===0)continue;
+    const d=det3(A);if(d===0||Math.abs(d)>60)continue;
+    const b=A.map(r=>dot(r,price)),who=shuffle(PEOPLE).slice(0,3);
+    const phr=(r,i)=>{const parts=r.map((q,j)=>q>0?`${q} ${q===1?S.it[j][0]:S.it[j][1]}`:null).filter(Boolean);
+      return `${who[i]} compra ${join(parts)} y paga ${b[i]} €.`;};
+    return{A,b,kind:'SCD',ctx:{
+      intro:'Tres amigos hacen las siguientes compras en la misma tienda:',
+      body:A.map((r,i)=>phr(r,i)).join(' '),
+      question:'¿Cuál es el precio de cada artículo?',
+      defs:S.it.map((t,j)=>`${NAMES[j]} = precio de un ${t[0]} (en €)`),
+      answer:s=>S.it.map((t,j)=>`1 ${t[0]} cuesta <b>${s[j]} €</b>`).join('; ')+'.'}};
+  }
+}
+function genCinema(){
+  for(;;){
+    const pa=rnd(10,16),pb=rnd(6,9),pc=rnd(3,5),rel=rnd(0,2);
+    let x,y,z,row,rb,txt;
+    if(rel===0){const k=pick([2,3]);z=rnd(3,15);x=k*z;y=rnd(5,40);row=[1,0,-k];rb=0;txt=`el número de adultos es ${k===2?'el doble':'el triple'} que el de niños`;}
+    else if(rel===1){const m=rnd(3,12);x=rnd(5,25);y=x+m;z=rnd(3,20);row=[-1,1,0];rb=m;txt=`hay ${m} jóvenes más que adultos`;}
+    else{y=z=rnd(4,25);x=rnd(5,30);row=[0,1,-1];rb=0;txt='hay el mismo número de jóvenes que de niños';}
+    const A=[[1,1,1],[pa,pb,pc],row];
+    if(det3(A)===0)continue;
+    const sol=[x,y,z],b=[x+y+z,dot(A[1],sol),rb];
+    return{A,b,kind:'SCD',ctx:{
+      intro:`En un teatro hay tres tipos de entrada: adulto (${pa} €), joven (${pb} €) y niño (${pc} €).`,
+      body:`Una tarde asistieron ${b[0]} personas y se recaudaron ${b[1]} €. Además, ${txt}.`,
+      question:'¿Cuántas entradas de cada tipo se vendieron?',
+      defs:['x = número de entradas de adulto','y = número de entradas de joven','z = número de entradas de niño'],
+      answer:s=>`Se vendieron <b>${s[0]}</b> entradas de adulto, <b>${s[1]}</b> de joven y <b>${s[2]}</b> de niño.`}};
+  }
+}
+
+// ---------- Gauss ----------
+function gauss(A,b){
+  const M=A.map((r,i)=>[...r,b[i]]),init=M.map(r=>[...r]),stages=[];
+  let pr=0;const piv=[];
+  for(let c=0;c<3&&pr<3;c++){
+    let p=-1;for(let r=pr;r<3;r++)if(M[r][c]!==0){p=r;break}
+    if(p<0)continue;
+    const ops=[];
+    if(p!==pr){[M[p],M[pr]]=[M[pr],M[p]];ops.push(`E${pr+1} ↔ E${p+1}`)}
+    for(let r=pr+1;r<3;r++){
+      const a=M[r][c];if(a===0)continue;
+      const pv=M[pr][c],g=gcd(pv,a);let m=pv/g,k=a/g;
+      if(m<0){m=-m;k=-k}
+      M[r]=M[r].map((v,j)=>m*v-k*M[pr][j]);
+      let lab=`E${r+1} → ${m===1?'':m+'·'}E${r+1} ${k>=0?'−':'+'} ${Math.abs(k)===1?'':Math.abs(k)+'·'}E${pr+1}`;
+      const g2=M[r].reduce((t,v)=>gcd(t,v),0);
+      if(g2>1){M[r]=M[r].map(v=>v/g2);lab+=`  y  E${r+1} → E${r+1} ÷ ${g2}`}
+      ops.push(lab);
+    }
+    if(ops.length)stages.push({col:c,ops,M:M.map(r=>[...r])});
+    piv.push(c);pr++;
+  }
+  const rank=pr;
+  let bad=null;
+  for(let r=rank;r<3;r++)if(M[r][3]!==0)bad=M[r][3];
+  return{init,M,stages,piv,rank,bad};
+}
+
+// ---------- Presentación ----------
+const matHTML=M=>`<table class="mat">${M.map(r=>`<tr>${r.map((v,j)=>`<td class="${j===3?'rhs':''}">${fi(v)}</td>`).join('')}</tr>`).join('')}</table>`;
+const sysHTML=(A,b)=>`<div class="sys"><span class="brace">{</span><div class="eqs">${A.map((r,i)=>`<div>${lin(r)} = ${fi(b[i])}</div>`).join('')}</div></div>`;
+const eqRow=r=>r.slice(0,3).every(v=>v===0)?`0 = ${fi(r[3])}`:`${lin(r.slice(0,3))} = ${fi(r[3])}`;
+
+function buildSteps(P){
+  const G=gauss(P.A,P.b),S=[],{A,b}=P;
+  S.push(`<h3>1. Planteamiento</h3><div class="line">Definimos las incógnitas:</div>${P.ctx.defs.map(d=>`<div class="line math">${d}</div>`).join('')}<div class="line">y escribimos el sistema (E1, E2, E3 son sus ecuaciones):</div>${sysHTML(A,b)}`);
+  const n=G.stages.length;
+  G.stages.forEach((st,i)=>{
+    const lastOne=i===n-1;
+    S.push(`<h3>${i+2}. Eliminamos la incógnita ${NAMES[st.col]} de las ecuaciones inferiores</h3><div class="ops">${st.ops.map(o=>`<span class="op">${o}</span>`).join('')}</div>${lastOne?'<div class="hint">Sistema escalonado equivalente:</div>':''}${sysHTML(st.M.map(r=>r.slice(0,3)),st.M.map(r=>r[3]))}`);
+  });
+  const k=n+2;
+  const val=[null,null,null];
+  const lines=[];
+  for(let i=2;i>=0;i--){
+    const row=G.M[i],pc=G.piv[i];
+    let rhs=F(row[3]);const subs=[];
+    for(let j=pc+1;j<3;j++){
+      if(row[j]===0)continue;
+      rhs=sub(rhs,mul(F(row[j]),val[j]));
+      subs.push(`${row[j]<0?'−':''}${Math.abs(row[j])===1?'':Math.abs(row[j])+'·'}${val[j].n<0?'('+fs(val[j])+')':fs(val[j])}`);
+    }
+    val[pc]=div(rhs,F(row[pc]));
+    const coef=row[pc],cstr=Math.abs(coef)===1?'':Math.abs(coef);
+    let left=(coef<0?'−':'')+cstr+NAMES[pc];
+    subs.forEach(s=>{left+=s.startsWith('−')?' − '+s.slice(1):' + '+s});
+    lines.push(`<span class="math">${i===2?'De E3: ':'En E'+(i+1)+': '}${left} = ${fi(row[3])} ⇒ ${NAMES[pc]} = ${fs(val[pc])}</span>`);
+  }
+  S.push(`<h3>${k}. Sustitución hacia atrás</h3>${lines.map(l=>`<div class="line">${l}</div>`).join('')}`);
+  const s=val.map(v=>v.n/v.d);
+  const chk=A.map((r,i)=>{
+    const t=r.map((c,j)=>c===0?null:`${c<0?(c===-1?'−':'−'+Math.abs(c)+'·'):(c===1?'':c+'·')}${s[j]<0?'('+fi(s[j])+')':s[j]}`).filter(Boolean);
+    let str='';t.forEach((u,q)=>{str+=q===0?u:(u.startsWith('−')?' − '+u.slice(1):' + '+u)});
+    return `<div class="line math">E${i+1}: ${str} = ${fi(dot(r,s))} <span class="chk">✓</span></div>`}).join('');
+  S.push(`<h3>${k+1}. Solución y comprobación</h3><div class="res"><b>Solución:</b> <span class="math">x = ${fs(val[0])}, y = ${fs(val[1])}, z = ${fs(val[2])}</span> (sistema compatible determinado)<div class="line">${P.ctx.answer(s)}</div></div><div class="hint" style="margin-top:8px">Comprobación en el sistema original:</div>${chk}`);
+  return S;
+}
+
+// ---------- Estado e interfaz ----------
+let P,STEPS=[],shown=0;
+const $=id=>document.getElementById(id);
+function render(){
+  $('steps').innerHTML=STEPS.slice(0,shown).map(h=>`<div class="card step">${h}</div>`).join('');
+  $('next').disabled=shown>=STEPS.length;$('all').disabled=shown>=STEPS.length;$('hide').disabled=shown===0;
+  $('next').textContent=shown===0?'Empezar a resolver':'Siguiente paso';
+  const last=$('steps').lastElementChild;if(last&&shown>0)last.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function newProblem(){
+  P=Math.random()<.5?genShop():genCinema();
+  STEPS=buildSteps(P);shown=0;
+  $('stmt').innerHTML=`<span class="tag">Problema contextualizado</span><p>${P.ctx.intro}</p><p>${P.ctx.body}</p><p><b>${P.ctx.question}</b> Plantea el sistema y resuélvelo por el método de Gauss.</p>`;
+  render();
+}
+$('new').onclick=newProblem;
+$('next').onclick=()=>{if(shown<STEPS.length){shown++;render()}};
+$('all').onclick=()=>{shown=STEPS.length;render()};
+$('hide').onclick=()=>{shown=0;render()};
+newProblem();
+</script>
+</body>
+</html>
