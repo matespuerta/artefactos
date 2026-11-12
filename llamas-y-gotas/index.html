@@ -1,5 +1,6 @@
-<!doctype html><html lang="es"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><title>Llamas y Gotas</title><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<!doctype html><html lang="es"><head><meta charset=utf8><title>Llamas y Gotas</title><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <style>
+
   :root{
     --bg:#FAF6F0;
     --bg-panel:#FFFFFF;
@@ -14,13 +15,11 @@
     --flame-2:#FF8A3D;
     --flame-3:#D9451E;
     --flame-soft:#FFF1DE;
-    --flame-ring: 214,69,30;
 
     --water-1:#CDEFFB;
     --water-2:#4FB3DA;
     --water-3:#1C6FA8;
     --water-soft:#E6F7FC;
-    --water-ring: 28,111,168;
 
     --shadow: 0 10px 24px -12px rgba(43,36,32,0.35);
   }
@@ -76,16 +75,16 @@
   body{
     background:var(--bg);
     color:var(--ink);
-    font-family:'Nunito', system-ui, sans-serif;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
     padding: clamp(16px, 4vw, 40px);
   }
-  h1,h2,h3{ font-family:'Baloo 2', system-ui, sans-serif; margin:0; text-wrap:balance; }
+  h1,h2,h3{ font-family:"Trebuchet MS",system-ui,sans-serif; margin:0; text-wrap:balance; }
 
-  .page{ max-width: 980px; margin: 0 auto; display:flex; flex-direction:column; gap:28px; }
+  .page{ max-width: 1040px; margin: 0 auto; display:flex; flex-direction:column; gap:24px; }
 
   header{ display:flex; flex-direction:column; gap:8px; }
   .eyebrow{
-    font-family:'Baloo 2', sans-serif;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
     font-weight:700;
     font-size:0.78rem;
     letter-spacing:0.14em;
@@ -93,51 +92,135 @@
     color:var(--accent);
   }
   h1{ font-size: clamp(1.6rem, 3.4vw, 2.35rem); font-weight:800; color:var(--ink); }
-  .subtitle{ color:var(--ink-soft); font-size:1rem; max-width:62ch; line-height:1.55; }
+  .subtitle{ color:var(--ink-soft); font-size:1rem; max-width:68ch; line-height:1.55; }
 
-  .instructions{
-    display:flex; gap:14px; flex-wrap:wrap;
+  .mode-switch{
+    display:flex; gap:6px;
+    background:var(--bg-sunken);
+    padding:5px;
+    border-radius:999px;
+    width:fit-content;
+  }
+  .mode-switch button{
+    all:unset; cursor:pointer;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.92rem;
+    padding:9px 20px;
+    border-radius:999px;
+    color:var(--ink-soft);
+    transition: background .15s ease, color .15s ease;
+  }
+  .mode-switch button[aria-selected="true"]{
     background:var(--bg-panel);
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:14px 18px;
+    color:var(--accent-ink);
     box-shadow: var(--shadow);
   }
-  .instructions .step{
-    display:flex; align-items:center; gap:9px;
-    font-size:0.92rem; color:var(--ink-soft);
-  }
-  .instructions .step b{ color:var(--ink); font-weight:700; }
-  .step-num{
-    font-family:'Baloo 2', sans-serif;
-    font-weight:800;
-    width:22px; height:22px;
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:var(--bg-sunken);
-    color:var(--accent-ink);
-    font-size:0.78rem;
-    flex:none;
-  }
+  .mode-switch button:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
 
-  section.row-block{ display:flex; flex-direction:column; gap:10px; }
-  .row-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-  .row-title{
-    font-family:'Baloo 2', sans-serif;
-    font-weight:700;
-    font-size:1.05rem;
-    display:flex; align-items:center; gap:8px;
+  .wizard-panel{ display:flex; flex-direction:column; gap:18px; }
+  .wizard-panel[hidden]{ display:none; }
+
+  .wizard-step{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding: clamp(18px,3.4vw,28px);
+    box-shadow: var(--shadow);
+    display:flex; flex-direction:column; gap:16px;
   }
-  .row-title .dot{ width:11px; height:11px; border-radius:50%; flex:none; }
-  .row-title.flame .dot{ background: linear-gradient(135deg,var(--flame-1),var(--flame-3)); }
-  .row-title.water .dot{ background: linear-gradient(135deg,var(--water-1),var(--water-3)); }
-  .row-hint{ font-size:0.82rem; color:var(--ink-soft); }
+  .step-title{ font-size:1.1rem; font-weight:700; }
+  .step-desc{ color:var(--ink-soft); font-size:0.9rem; margin-top:-8px; }
+
+  .choice-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .choice-btn{
+    all:unset; cursor:pointer;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:1rem;
+    padding:14px 22px;
+    border-radius:16px;
+    background:var(--bg-sunken);
+    border:2px solid var(--line);
+    color:var(--ink);
+    display:flex; align-items:center; gap:8px;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .choice-btn:hover{ transform:translateY(-2px); }
+  .choice-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+  .choice-btn.n-btn{ min-width:52px; justify-content:center; font-size:1.2rem; padding:12px 18px; }
+  .choice-btn.op-plus{ border-color: var(--water-3); }
+  .choice-btn.op-minus{ border-color: var(--flame-3); }
+
+  .summary-bar{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    font-size:0.95rem; color:var(--ink-soft);
+  }
+  .summary-bar b{ color:var(--ink); }
+  .link-btn{
+    all:unset; cursor:pointer;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.85rem;
+    color:var(--accent);
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .link-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .sign-rows{ display:flex; flex-direction:column; gap:10px; }
+  .sign-row{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--bg-sunken);
+    border-radius:14px;
+    padding:10px 14px;
+  }
+  .sign-row span{ font-size:0.92rem; color:var(--ink); }
+  .sign-toggle{
+    all:unset; cursor:pointer;
+    width:44px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:800; font-size:1.2rem;
+    border-radius:10px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    color:var(--accent-ink);
+    transition: transform .15s ease;
+  }
+  .sign-toggle:hover{ transform:translateY(-1px); }
+  .sign-toggle:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .continue-btn{
+    all:unset; cursor:pointer;
+    align-self:flex-start;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.98rem;
+    padding:10px 24px;
+    border-radius:999px;
+    background:var(--accent);
+    color:#fff;
+    transition: transform .15s ease;
+  }
+  .continue-btn:hover{ transform:translateY(-2px); }
+  .continue-btn:focus-visible{ outline:3px solid var(--ink); outline-offset:2px; }
+
+  .pick-prompt{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    color:var(--accent-ink);
+    font-size:1rem;
+    margin:0;
+  }
+  .picker-rows{ display:flex; flex-direction:column; gap:14px; }
+  .picker-label{ font-size:0.78rem; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 6px; font-weight:700; }
 
   .card-row{
     display:flex;
     gap:10px;
     overflow-x:auto;
-    padding: 6px 4px 14px;
+    padding: 6px 4px 12px;
     scroll-padding-inline:4px;
   }
   .card-row::-webkit-scrollbar{ height:8px; }
@@ -152,65 +235,119 @@
     justify-content:center;
     -webkit-tap-highlight-color: transparent;
   }
-  .num-card svg{ display:block; transition: transform .18s ease, filter .18s ease; }
+  .num-card svg{ display:block; transition: transform .18s ease, filter .18s ease, opacity .15s ease; }
   .num-card:hover svg{ transform: translateY(-4px); }
   .num-card:focus-visible svg{ outline: 3px solid var(--accent); outline-offset:3px; border-radius:12px; }
-  .num-card[aria-pressed="true"] svg{ transform: translateY(-8px) scale(1.03); filter: drop-shadow(0 12px 16px rgba(0,0,0,0.28)); }
-  .num-card[aria-pressed="true"] .card-frame{ stroke-width:3.5; }
+  .num-card:disabled{ cursor:default; }
+  .num-card:disabled svg{ opacity:.3; }
 
-  .equation-zone{
+  .expr-scroll{
+    width:100%;
     display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:16px;
-    background:var(--bg-panel);
-    border:1px solid var(--line);
-    border-radius:22px;
-    padding: clamp(20px,4vw,34px);
-    box-shadow: var(--shadow);
+    align-items:flex-end;
+    justify-content:flex-start;
+    gap: clamp(8px, 1.6vw, 14px);
+    overflow-x:auto;
+    padding: 10px 6px 16px;
+    min-height: 150px;
+  }
+  .expr-scroll::-webkit-scrollbar{ height:8px; }
+  .expr-scroll::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px; }
+
+  .term-pill{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    flex:none;
+    animation: popIn .18s ease;
+  }
+  @keyframes popIn{ from{ opacity:0; transform:translateY(6px) scale(.94);} to{ opacity:1; transform:none; } }
+
+  .card-slot{ position:relative; display:inline-block; perspective:700px; }
+
+  .term-card-btn{
+    all:unset;
+    display:block;
+    transform-style: preserve-3d;
+    transition: transform .16s ease-in;
+  }
+  .term-card-btn.flippable{ cursor:pointer; }
+  .term-card-btn.flippable:hover{ transform: translateY(-3px); }
+  .term-card-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:3px; border-radius:12px; }
+  .term-card-btn svg{ display:block; }
+
+  .flip-hint{
+    position:absolute; top:-8px; right:-8px;
+    width:22px; height:22px; border-radius:50%;
+    background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700;
+    box-shadow:0 2px 6px rgba(0,0,0,0.3);
+    pointer-events:none;
   }
 
-  .equation-row{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap: clamp(10px, 2.4vw, 22px);
-    flex-wrap:wrap;
+  .clear-btn{
+    all:unset; position:absolute; top:-8px; left:-8px;
+    width:20px; height:20px; border-radius:50%;
+    background:var(--ink-soft); color:var(--bg-panel);
+    font-size:11px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition: background .15s ease;
   }
-  .eq-slot{ display:flex; flex-direction:column; align-items:center; gap:8px; }
-  .eq-label{ font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); font-weight:700; }
-  .eq-card-wrap{ width:104px; height:151px; display:flex; align-items:center; justify-content:center; }
-  .eq-card-wrap.empty{
+  .clear-btn:hover{ background:var(--accent); }
+  .clear-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+
+  .slot-placeholder{
+    width:92px; height:133px;
     border:2px dashed var(--line);
-    border-radius:14px;
-    color:var(--ink-soft);
-    font-size:0.78rem;
-    text-align:center;
-    padding:8px;
+    border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700; color:var(--ink-soft); font-size:1.3rem;
   }
-  .eq-symbol{
-    font-family:'Baloo 2', sans-serif;
-    font-weight:800;
-    font-size:clamp(1.6rem, 4vw, 2.2rem);
-    color:var(--accent);
-    align-self:center;
-    margin-top:18px;
+  .slot-placeholder.active{
+    border-color:var(--accent);
+    color:var(--accent-ink);
+    background:var(--flame-soft);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(196,121,31,0.35); }
+    50%{ box-shadow:0 0 0 8px rgba(196,121,31,0); }
   }
 
-  .result-zone{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-  .result-title{ font-size:0.85rem; color:var(--ink-soft); font-weight:700; letter-spacing:0.04em; }
-  .result-equation{
-    font-family:'Baloo 2', sans-serif;
+  .term-paren{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
     font-weight:700;
-    font-size:1.2rem;
+    font-size:0.92rem;
+    font-variant-numeric: tabular-nums;
+    color:var(--ink-soft);
+  }
+  .result-pill .term-paren{ font-size:1.1rem; color:var(--ink); }
+
+  .op-static-sign{
+    flex:none;
+    align-self:center;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:800;
+    font-size:1.3rem;
+    color:var(--ink);
+    margin-bottom:46px;
+  }
+  .op-static-sign.eq-sign{ font-size:1.5rem; color:var(--accent-ink); }
+
+  .result-equation{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:1.1rem;
     font-variant-numeric: tabular-nums;
     color:var(--ink);
+    text-align:center;
+    text-wrap: balance;
   }
-  .result-note{ font-size:0.85rem; color:var(--ink-soft); max-width:44ch; text-align:center; line-height:1.5; min-height:1.3em; }
+  .result-note{ font-size:0.85rem; color:var(--ink-soft); max-width:52ch; text-align:center; line-height:1.5; margin: 0 auto; }
 
-  .toolbar{ display:flex; justify-content:center; }
+  .toolbar{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
   button.reset{
-    font-family:'Nunito', sans-serif;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
     font-weight:700;
     font-size:0.92rem;
     background:var(--bg-sunken);
@@ -227,76 +364,46 @@
   footer{ text-align:center; font-size:0.78rem; color:var(--ink-soft); padding-top:4px; }
 
   @media (prefers-reduced-motion: reduce){
-    .num-card svg, button.reset{ transition:none; }
+    .num-card svg, button.reset, .term-card-btn, .choice-btn, .continue-btn, .sign-toggle{ transition:none; }
+    .term-pill{ animation:none; }
+    .slot-placeholder.active{ animation:none; }
   }
 </style>
 
 <div class="page">
   <header>
     <span class="eyebrow">Maths4everything &middot; enteros</span>
-    <h1>Llamas y gotas: sumar enteros</h1>
-    <p class="subtitle">Cada llama vale un número negativo y cada gota vale un número positivo. Elige una de cada fila para ver su suma &mdash; si se cancelan del todo, forman un <strong>par nulo</strong> y la carta resultado sale en blanco.</p>
+    <h1>Llamas y gotas: sumar y restar enteros</h1>
+    <p class="subtitle">Cada llama vale un número negativo y cada gota vale un número positivo. Elige <b>Dos cartas</b> para una suma o resta sencilla, o <b>Varias cartas</b> para construir expresiones más largas: primero decides la operación o los signos, y luego vas completando cada hueco con una carta.</p>
   </header>
 
-  <div class="instructions">
-    <div class="step"><span class="step-num">1</span><span>Toca <b>una llama</b> (del &minus;10 al &minus;1).</span></div>
-    <div class="step"><span class="step-num">2</span><span>Toca <b>una gota</b> (del 1 al 10).</span></div>
-    <div class="step"><span class="step-num">3</span><span>Lee el resultado en la carta grande.</span></div>
+  <div class="mode-switch" role="tablist" aria-label="Modo de la actividad">
+    <button type="button" role="tab" id="tabBasic" aria-selected="true">Dos cartas</button>
+    <button type="button" role="tab" id="tabAdvanced" aria-selected="false">Varias cartas</button>
   </div>
 
-  <section class="row-block">
-    <div class="row-head">
-      <div class="row-title flame"><span class="dot"></span>Negativos &minus;10 &rarr; &minus;1</div>
-      <div class="row-hint">Llamas naranjas</div>
-    </div>
-    <div class="card-row" id="rowNeg" role="group" aria-label="Cartas de números negativos"></div>
+  <section class="wizard-panel" id="panelBasic" role="tabpanel" aria-labelledby="tabBasic">
+    <div id="basicBody"></div>
   </section>
 
-  <section class="row-block">
-    <div class="row-head">
-      <div class="row-title water"><span class="dot"></span>Positivos 1 &rarr; 10</div>
-      <div class="row-hint">Gotas azules</div>
-    </div>
-    <div class="card-row" id="rowPos" role="group" aria-label="Cartas de números positivos"></div>
+  <section class="wizard-panel" id="panelAdvanced" role="tabpanel" aria-labelledby="tabAdvanced" hidden>
+    <div id="advancedBody"></div>
   </section>
 
-  <div class="equation-zone">
-    <div class="equation-row">
-      <div class="eq-slot">
-        <span class="eq-label">Llama</span>
-        <div class="eq-card-wrap" id="eqNeg"><span class="eq-card-wrap empty" style="display:flex;align-items:center;">Sin elegir</span></div>
-      </div>
-      <span class="eq-symbol">+</span>
-      <div class="eq-slot">
-        <span class="eq-label">Gota</span>
-        <div class="eq-card-wrap" id="eqPos"><span class="eq-card-wrap empty" style="display:flex;align-items:center;">Sin elegir</span></div>
-      </div>
-      <span class="eq-symbol">=</span>
-      <div class="eq-slot">
-        <span class="eq-label">Resultado</span>
-        <div class="eq-card-wrap" id="eqResult"><span class="eq-card-wrap empty" style="display:flex;align-items:center;">&#63;</span></div>
-      </div>
-    </div>
-    <div class="result-zone">
-      <div class="result-equation" id="resultEquation">Elige una llama y una gota</div>
-      <div class="result-note" id="resultNote"></div>
-    </div>
-    <div class="toolbar">
-      <button class="reset" id="resetBtn" type="button">Borrar selección</button>
-    </div>
-  </div>
-
-  <footer>Modelo de pares nulos para la suma de enteros &middot; Maths4everything</footer>
+  <footer>Modelo de pares nulos y "suma del opuesto" para enteros &middot; Maths4everything</footer>
 </div>
 
 <script>
 (function(){
   "use strict";
 
+  var NEG_VALUES = []; for(var i=-10;i<=-1;i++){ NEG_VALUES.push(i); }
+  var POS_VALUES = []; for(var j=1;j<=10;j++){ POS_VALUES.push(j); }
+
   function svgCardMarkup(kind, n, size){
     // kind: 'flame' | 'water' | 'blank'
     var w = size.w, h = size.h;
-    var id = kind + '-' + n + '-' + Math.round(w);
+    var id = kind + '-' + n + '-' + Math.round(w) + '-' + Math.round(Math.random()*1e6);
     var isFlame = kind === 'flame';
     var isWater = kind === 'water';
     var label = n === 0 ? '' : (isFlame ? '−' + Math.abs(n) : '+' + n);
@@ -368,12 +475,12 @@
         '<g class="badge" transform="translate(76,16)">' +
           '<circle r="13" fill="#fff"></circle>' +
           '<circle r="10.5" fill="' + badgeFill + '"></circle>' +
-          '<text x="0" y="4.5" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="12" fill="#241407">' + label + '</text>' +
+          '<text x="0" y="4.5" text-anchor="middle" font-family="Trebuchet MS, sans-serif" font-weight="800" font-size="12" fill="#241407">' + label + '</text>' +
         '</g>' +
         '<g class="badge" transform="translate(10,90)">' +
           '<circle r="13" fill="#fff"></circle>' +
           '<circle r="10.5" fill="' + badgeFill + '"></circle>' +
-          '<text x="0" y="4.5" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="12" fill="#241407">' + label + '</text>' +
+          '<text x="0" y="4.5" text-anchor="middle" font-family="Trebuchet MS, sans-serif" font-weight="800" font-size="12" fill="#241407">' + label + '</text>' +
         '</g>';
     }
 
@@ -393,95 +500,517 @@
     );
   }
 
-  function buildRow(container, kind, values){
+  function fmtParenSigned(v){
+    if(v === 0) return '(0)';
+    return '(' + (v > 0 ? '+' : '−') + Math.abs(v) + ')';
+  }
+
+  function nextEmptyIndex(terms){
+    for(var i=0;i<terms.length;i++){ if(terms[i] === null) return i; }
+    return null;
+  }
+
+  function usedSetFromTerms(terms){
+    var set = new Set();
+    terms.forEach(function(t){ if(t) set.add(t.rowKind + ':' + t.rowValue); });
+    return set;
+  }
+
+  function computeTotal(terms, ops){
+    var running = terms[0].value;
+    for(var k=1;k<terms.length;k++){
+      running = ops[k-1] === '+' ? running + terms[k].value : running - terms[k].value;
+    }
+    return running;
+  }
+
+  function equationText(terms, ops, includeResult){
+    if(includeResult === undefined){ includeResult = true; }
+    var parts = [fmtParenSigned(terms[0].value)];
+    for(var m=1;m<terms.length;m++){
+      parts.push(ops[m-1] === '+' ? '+' : '−');
+      parts.push(fmtParenSigned(terms[m].value));
+    }
+    parts.push('=');
+    if(includeResult){
+      parts.push(fmtParenSigned(computeTotal(terms, ops)));
+    }
+    return parts.join(' ');
+  }
+
+  function resultNoteText(terms, ops){
+    var running = computeTotal(terms, ops);
+    var hasPendingMinus = ops.some(function(o){ return o === '-'; });
+    var parts = [];
+    if(running === 0){
+      parts.push('¡Par nulo! Todo se cancela y la carta sale en blanco.');
+    } else if(running < 0){
+      var an = Math.abs(running);
+      parts.push('Quedan ' + an + ' llama' + (an === 1 ? '' : 's') + ' sin pareja.');
+    } else {
+      parts.push('Quedan ' + running + ' gota' + (running === 1 ? '' : 's') + ' sin pareja.');
+    }
+    if(hasPendingMinus){
+      parts.push('Toca la carta que tiene un "−" delante para convertir esa resta en suma.');
+    }
+    return parts.join(' ');
+  }
+
+  function buildCardRow(container, kind, values, usedSet, onPick){
     values.forEach(function(n){
+      var used = usedSet.has(kind + ':' + n);
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'num-card';
-      btn.setAttribute('aria-pressed', 'false');
-      btn.dataset.kind = kind;
-      btn.dataset.value = n;
+      btn.disabled = used;
       btn.innerHTML = svgCardMarkup(kind, n, {w:82, h:118});
+      if(!used){
+        btn.addEventListener('click', function(){ onPick(kind, n); });
+      }
       container.appendChild(btn);
     });
   }
 
-  var rowNeg = document.getElementById('rowNeg');
-  var rowPos = document.getElementById('rowPos');
-  var negVals = []; for(var i=-10;i<=-1;i++){ negVals.push(i); }
-  var posVals = []; for(var j=1;j<=10;j++){ posVals.push(j); }
-  buildRow(rowNeg, 'flame', negVals);
-  buildRow(rowPos, 'water', posVals);
-
-  var state = { neg:null, pos:null };
-
-  var eqNeg = document.getElementById('eqNeg');
-  var eqPos = document.getElementById('eqPos');
-  var eqResult = document.getElementById('eqResult');
-  var resultEquation = document.getElementById('resultEquation');
-  var resultNote = document.getElementById('resultNote');
-
-  function emptySlot(text){
-    return '<span class="eq-card-wrap empty" style="display:flex;align-items:center;">' + text + '</span>';
+  function doFlip(index, cardEl, terms, ops, rerender){
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduceMotion){
+      terms[index].value = -terms[index].value;
+      ops[index-1] = '+';
+      rerender();
+      return;
+    }
+    cardEl.style.transform = 'rotateY(90deg)';
+    setTimeout(function(){
+      terms[index].value = -terms[index].value;
+      ops[index-1] = '+';
+      rerender();
+    }, 150);
   }
 
-  function render(){
-    eqNeg.innerHTML = state.neg !== null ? svgCardMarkup('flame', state.neg, {w:104,h:151}) : emptySlot('Sin elegir');
-    eqPos.innerHTML = state.pos !== null ? svgCardMarkup('water', state.pos, {w:104,h:151}) : emptySlot('Sin elegir');
+  function renderExpressionPreview(container, terms, ops, activeSlot, callbacks, showResult){
+    container.innerHTML = '';
+    terms.forEach(function(term, i){
+      if(i > 0){
+        var opSpan = document.createElement('span');
+        opSpan.className = 'op-static-sign';
+        opSpan.textContent = ops[i-1] === '+' ? '+' : '−';
+        container.appendChild(opSpan);
+      }
 
-    Array.prototype.forEach.call(rowNeg.children, function(btn){
-      var pressed = state.neg === Number(btn.dataset.value);
-      btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
-    });
-    Array.prototype.forEach.call(rowPos.children, function(btn){
-      var pressed = state.pos === Number(btn.dataset.value);
-      btn.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+      var pill = document.createElement('div');
+      pill.className = 'term-pill';
+
+      if(term === null){
+        var slot = document.createElement('div');
+        slot.className = 'slot-placeholder' + (i === activeSlot ? ' active' : '');
+        slot.textContent = String(i + 1);
+        pill.appendChild(slot);
+        var lbl = document.createElement('span');
+        lbl.className = 'term-paren';
+        lbl.textContent = i === activeSlot ? 'Elige' : '—';
+        pill.appendChild(lbl);
+      } else {
+        var kind = term.value < 0 ? 'flame' : 'water';
+        var slotWrap = document.createElement('div');
+        slotWrap.className = 'card-slot';
+
+        var flippable = i > 0 && ops[i-1] === '-';
+        var cardEl;
+        if(flippable){
+          cardEl = document.createElement('button');
+          cardEl.type = 'button';
+          cardEl.className = 'term-card-btn flippable';
+          cardEl.setAttribute('aria-label', 'Resta ' + fmtParenSigned(term.value) + '. Toca para convertirla en suma dando la vuelta a la carta.');
+          cardEl.addEventListener('click', (function(idx, el){ return function(){ callbacks.onFlip(idx, el); }; })(i, cardEl));
+        } else {
+          cardEl = document.createElement('div');
+          cardEl.className = 'term-card-btn';
+          cardEl.setAttribute('role', 'img');
+          cardEl.setAttribute('aria-label', fmtParenSigned(term.value));
+        }
+        cardEl.innerHTML = svgCardMarkup(kind, term.value, {w:92, h:133});
+        slotWrap.appendChild(cardEl);
+
+        if(flippable){
+          var hint = document.createElement('span');
+          hint.className = 'flip-hint';
+          hint.setAttribute('aria-hidden', 'true');
+          hint.textContent = '↻';
+          slotWrap.appendChild(hint);
+        }
+
+        var clearBtn = document.createElement('button');
+        clearBtn.type = 'button';
+        clearBtn.className = 'clear-btn';
+        clearBtn.setAttribute('aria-label', 'Quitar esta carta');
+        clearBtn.textContent = '✕';
+        clearBtn.addEventListener('click', (function(idx){ return function(ev){ ev.stopPropagation(); callbacks.onClear(idx); }; })(i));
+        slotWrap.appendChild(clearBtn);
+
+        pill.appendChild(slotWrap);
+        var paren = document.createElement('span');
+        paren.className = 'term-paren';
+        paren.textContent = fmtParenSigned(term.value);
+        pill.appendChild(paren);
+      }
+
+      container.appendChild(pill);
     });
 
-    if(state.neg === null || state.pos === null){
-      eqResult.innerHTML = emptySlot('?');
-      resultEquation.textContent = 'Elige una llama y una gota';
-      resultNote.textContent = '';
+    if(showResult){
+      var eq = document.createElement('span');
+      eq.className = 'op-static-sign eq-sign';
+      eq.setAttribute('aria-hidden', 'true');
+      eq.textContent = '=';
+      container.appendChild(eq);
+
+      var running = computeTotal(terms, ops);
+      var rKind = running === 0 ? 'blank' : (running < 0 ? 'flame' : 'water');
+      var rPill = document.createElement('div');
+      rPill.className = 'term-pill result-pill';
+      rPill.setAttribute('role', 'group');
+      rPill.setAttribute('aria-label', 'Resultado ' + fmtParenSigned(running));
+
+      var rCard = document.createElement('div');
+      rCard.className = 'term-card-btn';
+      rCard.innerHTML = svgCardMarkup(rKind, running, {w:128, h:185});
+
+      var rParen = document.createElement('span');
+      rParen.className = 'term-paren';
+      rParen.textContent = fmtParenSigned(running);
+
+      rPill.appendChild(rCard);
+      rPill.appendChild(rParen);
+      container.appendChild(rPill);
+    }
+  }
+
+  function renderFillAndResult(body, state, rerender){
+    var terms = state.terms, ops = state.ops;
+    var allFilled = state.activeSlot === null;
+    var hasPendingMinus = ops.some(function(o){ return o === '-'; });
+    var showResult = allFilled && !hasPendingMinus && state.revealed;
+
+    var exprWrap = document.createElement('div');
+    exprWrap.className = 'expr-scroll';
+    renderExpressionPreview(exprWrap, terms, ops, state.activeSlot, {
+      onClear: function(i){ terms[i] = null; state.activeSlot = i; state.revealed = false; rerender(); },
+      onFlip: function(i, el){ state.revealed = false; doFlip(i, el, terms, ops, rerender); }
+    }, showResult);
+    body.appendChild(exprWrap);
+
+    if(!allFilled){
+      var prompt = document.createElement('p');
+      prompt.className = 'pick-prompt';
+      prompt.textContent = 'Elige la carta para el hueco ' + (state.activeSlot + 1) + ' de ' + terms.length + '.';
+      body.appendChild(prompt);
+
+      var usedSet = usedSetFromTerms(terms);
+      var rowsWrap = document.createElement('div');
+      rowsWrap.className = 'picker-rows';
+
+      var negLabel = document.createElement('p'); negLabel.className = 'picker-label'; negLabel.textContent = 'Llamas (negativos)';
+      var rn = document.createElement('div'); rn.className = 'card-row';
+      buildCardRow(rn, 'flame', NEG_VALUES, usedSet, function(kind, v){
+        terms[state.activeSlot] = { rowKind: kind, rowValue: v, value: v };
+        state.activeSlot = nextEmptyIndex(terms);
+        rerender();
+      });
+
+      var posLabel = document.createElement('p'); posLabel.className = 'picker-label'; posLabel.textContent = 'Gotas (positivos)';
+      var rp = document.createElement('div'); rp.className = 'card-row';
+      buildCardRow(rp, 'water', POS_VALUES, usedSet, function(kind, v){
+        terms[state.activeSlot] = { rowKind: kind, rowValue: v, value: v };
+        state.activeSlot = nextEmptyIndex(terms);
+        rerender();
+      });
+
+      rowsWrap.appendChild(negLabel); rowsWrap.appendChild(rn);
+      rowsWrap.appendChild(posLabel); rowsWrap.appendChild(rp);
+      body.appendChild(rowsWrap);
+    } else if(hasPendingMinus){
+      var eqLinePending = document.createElement('div');
+      eqLinePending.className = 'result-equation';
+      eqLinePending.textContent = equationText(terms, ops, false);
+      body.appendChild(eqLinePending);
+
+      var holdNote = document.createElement('div');
+      holdNote.className = 'result-note';
+      holdNote.textContent = 'Todavía no se ve el resultado: toca la carta que tiene un "−" delante para convertir esa resta en suma y descubrirlo.';
+      body.appendChild(holdNote);
+
+      var toolbarHold = document.createElement('div');
+      toolbarHold.className = 'toolbar';
+      var againHold = document.createElement('button');
+      againHold.type = 'button';
+      againHold.className = 'reset';
+      againHold.textContent = 'Empezar de nuevo';
+      againHold.addEventListener('click', function(){ state.reset(); rerender(); });
+      toolbarHold.appendChild(againHold);
+      body.appendChild(toolbarHold);
+    } else if(!state.revealed){
+      var eqLineCheck = document.createElement('div');
+      eqLineCheck.className = 'result-equation';
+      eqLineCheck.textContent = equationText(terms, ops, false);
+      body.appendChild(eqLineCheck);
+
+      var checkNote = document.createElement('div');
+      checkNote.className = 'result-note';
+      checkNote.textContent = 'Piensa el resultado y pulsa el botón para comprobarlo.';
+      body.appendChild(checkNote);
+
+      var toolbarCheck = document.createElement('div');
+      toolbarCheck.className = 'toolbar';
+      var checkBtn = document.createElement('button');
+      checkBtn.type = 'button';
+      checkBtn.className = 'continue-btn';
+      checkBtn.textContent = 'Comprobar resultado';
+      checkBtn.addEventListener('click', function(){ state.revealed = true; rerender(); });
+      var againCheck = document.createElement('button');
+      againCheck.type = 'button';
+      againCheck.className = 'reset';
+      againCheck.textContent = 'Empezar de nuevo';
+      againCheck.addEventListener('click', function(){ state.reset(); rerender(); });
+      toolbarCheck.appendChild(checkBtn);
+      toolbarCheck.appendChild(againCheck);
+      body.appendChild(toolbarCheck);
+    } else {
+      var eqText = document.createElement('div');
+      eqText.className = 'result-equation';
+      eqText.textContent = equationText(terms, ops);
+      body.appendChild(eqText);
+
+      var note = document.createElement('div');
+      note.className = 'result-note';
+      note.textContent = resultNoteText(terms, ops);
+      body.appendChild(note);
+
+      var toolbar = document.createElement('div');
+      toolbar.className = 'toolbar';
+      var again = document.createElement('button');
+      again.type = 'button';
+      again.className = 'reset';
+      again.textContent = 'Empezar de nuevo';
+      again.addEventListener('click', function(){ state.reset(); rerender(); });
+      toolbar.appendChild(again);
+      body.appendChild(toolbar);
+    }
+  }
+
+  // ---------- Modo: dos cartas ----------
+  var basic = {
+    op: '-',
+    ops: ['-'],
+    terms: [
+      { rowKind:'flame', rowValue:-4, value:-4 },
+      { rowKind:'flame', rowValue:-3, value:-3 }
+    ],
+    activeSlot: null,
+    revealed: false,
+    reset: function(){
+      basic.op = null; basic.ops = []; basic.terms = [null, null]; basic.activeSlot = null; basic.revealed = false;
+    }
+  };
+
+  function renderBasic(){
+    var body = document.getElementById('basicBody');
+    body.innerHTML = '';
+
+    if(basic.op === null){
+      var step = document.createElement('div');
+      step.className = 'wizard-step';
+      var title = document.createElement('p');
+      title.className = 'step-title';
+      title.textContent = '1. ¿Suma o resta?';
+      var row = document.createElement('div');
+      row.className = 'choice-row';
+
+      var plus = document.createElement('button');
+      plus.type = 'button'; plus.className = 'choice-btn op-plus';
+      plus.innerHTML = '➕ Suma';
+      plus.addEventListener('click', function(){
+        basic.op = '+'; basic.ops = ['+']; basic.terms = [null, null]; basic.activeSlot = 0;
+        renderBasic();
+      });
+
+      var minus = document.createElement('button');
+      minus.type = 'button'; minus.className = 'choice-btn op-minus';
+      minus.innerHTML = '➖ Resta';
+      minus.addEventListener('click', function(){
+        basic.op = '-'; basic.ops = ['-']; basic.terms = [null, null]; basic.activeSlot = 0;
+        renderBasic();
+      });
+
+      row.appendChild(plus); row.appendChild(minus);
+      step.appendChild(title); step.appendChild(row);
+      body.appendChild(step);
       return;
     }
 
-    var sum = state.neg + state.pos;
-    var kindResult = sum === 0 ? 'blank' : (sum < 0 ? 'flame' : 'water');
-    eqResult.innerHTML = svgCardMarkup(kindResult, sum, {w:104,h:151});
-
-    var negLabel = '(' + state.neg + ')';
-    var posLabel = '(+' + state.pos + ')';
-    resultEquation.textContent = negLabel + ' + ' + posLabel + ' = ' + sum;
-
-    if(sum === 0){
-      resultNote.textContent = 'La llama y la gota forman un par nulo: se cancelan y la carta sale en blanco.';
-    } else if(sum < 0){
-      resultNote.textContent = 'Quedan ' + Math.abs(sum) + ' llama' + (Math.abs(sum)===1?'':'s') + ' sin pareja: el resultado es negativo.';
-    } else {
-      resultNote.textContent = 'Quedan ' + sum + ' gota' + (sum===1?'':'s') + ' sin pareja: el resultado es positivo.';
-    }
+    var step2 = document.createElement('div');
+    step2.className = 'wizard-step';
+    var summary = document.createElement('div');
+    summary.className = 'summary-bar';
+    summary.innerHTML = 'Operación: <b>' + (basic.op === '+' ? 'Suma (+)' : 'Resta (−)') + '</b>';
+    var change = document.createElement('button');
+    change.type = 'button'; change.className = 'link-btn'; change.textContent = 'cambiar';
+    change.addEventListener('click', function(){ basic.reset(); renderBasic(); });
+    summary.appendChild(change);
+    step2.appendChild(summary);
+    renderFillAndResult(step2, basic, renderBasic);
+    body.appendChild(step2);
   }
 
-  rowNeg.addEventListener('click', function(e){
-    var btn = e.target.closest('.num-card');
-    if(!btn) return;
-    var v = Number(btn.dataset.value);
-    state.neg = state.neg === v ? null : v;
-    render();
+  // ---------- Modo: varias cartas ----------
+  var adv = {
+    n: null,
+    ops: [],
+    opsConfirmed: false,
+    terms: [],
+    activeSlot: null,
+    revealed: false,
+    reset: function(){
+      adv.n = null; adv.ops = []; adv.opsConfirmed = false; adv.terms = []; adv.activeSlot = null; adv.revealed = false;
+    }
+  };
+
+  function renderAdvanced(){
+    var body = document.getElementById('advancedBody');
+    body.innerHTML = '';
+
+    if(adv.n === null){
+      var step1 = document.createElement('div');
+      step1.className = 'wizard-step';
+      var t1 = document.createElement('p');
+      t1.className = 'step-title';
+      t1.textContent = '1. ¿Cuántas cartas tendrá tu operación?';
+      var row1 = document.createElement('div');
+      row1.className = 'choice-row';
+      [2,3,4,5,6].forEach(function(n){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'choice-btn n-btn';
+        b.textContent = String(n);
+        b.setAttribute('aria-label', n + ' cartas');
+        b.addEventListener('click', function(){
+          adv.n = n;
+          adv.ops = new Array(n - 1).fill('+');
+          adv.opsConfirmed = false;
+          adv.terms = [];
+          adv.activeSlot = null;
+          renderAdvanced();
+        });
+        row1.appendChild(b);
+      });
+      step1.appendChild(t1); step1.appendChild(row1);
+      body.appendChild(step1);
+      return;
+    }
+
+    if(!adv.opsConfirmed){
+      var step2 = document.createElement('div');
+      step2.className = 'wizard-step';
+
+      var sum1 = document.createElement('div');
+      sum1.className = 'summary-bar';
+      sum1.innerHTML = 'Cartas: <b>' + adv.n + '</b>';
+      var ch1 = document.createElement('button');
+      ch1.type = 'button'; ch1.className = 'link-btn'; ch1.textContent = 'cambiar';
+      ch1.addEventListener('click', function(){ adv.reset(); renderAdvanced(); });
+      sum1.appendChild(ch1);
+      step2.appendChild(sum1);
+
+      var t2 = document.createElement('p');
+      t2.className = 'step-title';
+      t2.textContent = '2. Elige el signo entre cada pareja de cartas';
+      step2.appendChild(t2);
+
+      var signRows = document.createElement('div');
+      signRows.className = 'sign-rows';
+      for(var g = 0; g < adv.n - 1; g++){
+        (function(gapIndex){
+          var sr = document.createElement('div');
+          sr.className = 'sign-row';
+          var lbl = document.createElement('span');
+          lbl.textContent = 'Entre la carta ' + (gapIndex + 1) + ' y la ' + (gapIndex + 2);
+          var tg = document.createElement('button');
+          tg.type = 'button'; tg.className = 'sign-toggle';
+          tg.textContent = adv.ops[gapIndex] === '+' ? '+' : '−';
+          tg.setAttribute('aria-label', 'Signo ' + (adv.ops[gapIndex] === '+' ? 'suma' : 'resta') + '. Toca para cambiar.');
+          tg.addEventListener('click', function(){
+            adv.ops[gapIndex] = adv.ops[gapIndex] === '+' ? '-' : '+';
+            renderAdvanced();
+          });
+          sr.appendChild(lbl); sr.appendChild(tg);
+          signRows.appendChild(sr);
+        })(g);
+      }
+      step2.appendChild(signRows);
+
+      var cont = document.createElement('button');
+      cont.type = 'button'; cont.className = 'continue-btn';
+      cont.textContent = 'Continuar ▸';
+      cont.addEventListener('click', function(){
+        adv.opsConfirmed = true;
+        adv.terms = new Array(adv.n).fill(null);
+        adv.activeSlot = 0;
+        adv.revealed = false;
+        renderAdvanced();
+      });
+      step2.appendChild(cont);
+
+      body.appendChild(step2);
+      return;
+    }
+
+    var step3 = document.createElement('div');
+    step3.className = 'wizard-step';
+
+    var sumA = document.createElement('div');
+    sumA.className = 'summary-bar';
+    sumA.innerHTML = 'Cartas: <b>' + adv.n + '</b>';
+    var chA = document.createElement('button');
+    chA.type = 'button'; chA.className = 'link-btn'; chA.textContent = 'cambiar';
+    chA.addEventListener('click', function(){ adv.reset(); renderAdvanced(); });
+    sumA.appendChild(chA);
+    step3.appendChild(sumA);
+
+    var sumB = document.createElement('div');
+    sumB.className = 'summary-bar';
+    sumB.innerHTML = 'Signos: <b>' + adv.ops.map(function(o){ return o === '+' ? '+' : '−'; }).join(' , ') + '</b>';
+    var chB = document.createElement('button');
+    chB.type = 'button'; chB.className = 'link-btn'; chB.textContent = 'cambiar signos';
+    chB.addEventListener('click', function(){
+      adv.opsConfirmed = false; adv.terms = []; adv.activeSlot = null; adv.revealed = false;
+      renderAdvanced();
+    });
+    sumB.appendChild(chB);
+    step3.appendChild(sumB);
+
+    renderFillAndResult(step3, adv, renderAdvanced);
+    body.appendChild(step3);
+  }
+
+  // ---------- Pestañas ----------
+  var tabBasic = document.getElementById('tabBasic');
+  var tabAdvanced = document.getElementById('tabAdvanced');
+  var panelBasic = document.getElementById('panelBasic');
+  var panelAdvanced = document.getElementById('panelAdvanced');
+
+  tabBasic.addEventListener('click', function(){
+    tabBasic.setAttribute('aria-selected', 'true');
+    tabAdvanced.setAttribute('aria-selected', 'false');
+    panelBasic.hidden = false;
+    panelAdvanced.hidden = true;
   });
-  rowPos.addEventListener('click', function(e){
-    var btn = e.target.closest('.num-card');
-    if(!btn) return;
-    var v = Number(btn.dataset.value);
-    state.pos = state.pos === v ? null : v;
-    render();
+  tabAdvanced.addEventListener('click', function(){
+    tabAdvanced.setAttribute('aria-selected', 'true');
+    tabBasic.setAttribute('aria-selected', 'false');
+    panelAdvanced.hidden = false;
+    panelBasic.hidden = true;
   });
 
-  document.getElementById('resetBtn').addEventListener('click', function(){
-    state.neg = null; state.pos = null; render();
-  });
-
-  render();
+  renderBasic();
+  renderAdvanced();
 })();
 </script>
 
