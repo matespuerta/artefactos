@@ -40,8 +40,20 @@ table.mat td.rhs{border-left:1.5px dashed var(--mut)}
 .chk{color:var(--ok)}
 .foot{color:var(--mut);font-size:.82rem;margin-top:18px}
 </style>
+<style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
+</style>
 </head>
 <body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
+
 <div class="wrap">
   <h1>Sistemas de ecuaciones · Método de Gauss</h1>
   <p class="sub">Problemas contextualizados estilo PAU, resueltos paso a paso por el método de Gauss con sistemas de ecuaciones.</p>

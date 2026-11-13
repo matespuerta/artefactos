@@ -26,10 +26,19 @@ a.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .card span{color:var(--soft);font-size:.92rem}
 .card .tag{align-self:flex-start;font-size:.75rem;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:999px;padding:2px 9px}
 footer{margin-top:36px;color:var(--soft);font-size:.85rem}
+main{position:relative}
+.logo-centro{position:absolute;top:2px;right:0;display:block;line-height:0;transition:transform .2s ease}
+.logo-centro:hover{transform:scale(1.04)}
+.logo-centro img{width:112px;height:auto;display:block}
+h1{padding-right:130px}
+.lede{padding-right:130px}
+@media(max-width:560px){.logo-centro img{width:64px}h1{padding-right:76px}.lede{padding-right:0}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:6px;border-radius:12px}}
 </style>
 </head>
 <body>
 <main>
+  <a class="logo-centro" href="./" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
   <h1>Artefactos manipulables</h1>
   <p class="lede">Herramientas interactivas de Matemáticas para practicar y explorar en clase. Funcionan en el navegador, sin registrarse y sin guardar ningún dato.</p>
 
