@@ -95,6 +95,40 @@ body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
   .page{ max-width: 1040px; margin: 0 auto; display:flex; flex-direction:column; gap:24px; }
 
   header{ display:flex; flex-direction:column; gap:8px; }
+
+  header{ display:grid; grid-template-columns:minmax(0,1fr) minmax(220px,340px); gap:8px 32px; align-items:end; }
+  .hero-text{ display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .comic-thumb{
+    all:unset; cursor:zoom-in; position:relative; display:block; align-self:end;
+    background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    box-shadow:var(--shadow); transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .comic-thumb:hover{ transform:translateY(-2px) rotate(-.4deg); }
+  .comic-thumb:focus-visible{ outline:3px solid var(--accent); outline-offset:3px; }
+  .comic-thumb img{ display:block; width:100%; height:auto; }
+  .comic-zoom{
+    position:absolute; right:8px; bottom:8px; font:700 .74rem "Trebuchet MS",system-ui,sans-serif;
+    background:rgba(43,36,32,.82); color:#fff; padding:3px 9px; border-radius:999px; pointer-events:none;
+  }
+  dialog.comic-modal{
+    border:none; padding:0; margin:0; max-width:none; max-height:none;
+    width:100vw; height:100vh; height:100dvh; background:rgba(20,14,8,.94);
+    display:none; align-items:center; justify-content:center; cursor:zoom-out;
+  }
+  dialog.comic-modal[open]{ display:flex; }
+  dialog.comic-modal::backdrop{ background:transparent; }
+  dialog.comic-modal img{ max-width:96vw; max-height:92vh; max-height:92dvh; object-fit:contain; background:#fff; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+  .comic-close{
+    all:unset; position:absolute; top:14px; right:16px; width:42px; height:42px; border-radius:50%;
+    background:#fff; color:#2B2420; font:800 1.3rem "Trebuchet MS",system-ui,sans-serif;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.4);
+  }
+  .comic-close:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+  @media (max-width:760px){
+    header{ grid-template-columns:1fr; }
+    .comic-thumb{ max-width:380px; }
+  }
+  @media print{ .comic-thumb{ display:none; } }
   .eyebrow{
     font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
     font-weight:700;
@@ -384,9 +418,12 @@ body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
 
 <div class="page">
   <header>
+    <div class="hero-text">
     <span class="eyebrow">Maths4everything &middot; enteros</span>
     <h1>Llamas y gotas: sumar y restar enteros</h1>
     <p class="subtitle">Cada llama vale un número negativo y cada gota vale un número positivo. Elige <b>Dos cartas</b> para una suma o resta sencilla, o <b>Varias cartas</b> para construir expresiones más largas: primero decides la operación o los signos, y luego vas completando cada hueco con una carta.</p>
+    </div>
+    <button type="button" class="comic-thumb" id="comicOpen" aria-label="Ampliar el cómic de Mathland a pantalla completa"><img src="comic.webp" alt="Cómic de Mathland: una gota y dos llamas; la gota y una llama se anulan en una nube de humo y queda una llama." width="1800" height="869" loading="lazy"><span class="comic-zoom" aria-hidden="true">⤢ Ampliar</span></button>
   </header>
 
   <div class="mode-switch" role="tablist" aria-label="Modo de la actividad">
@@ -1048,4 +1085,19 @@ body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
 })();
 </script>
 
+
+<dialog class="comic-modal" id="comicModal" aria-label="Cómic de Mathland ampliado">
+  <button type="button" class="comic-close" id="comicClose" aria-label="Cerrar">✕</button>
+  <img src="comic.webp" alt="Cómic de Mathland ampliado: una gota y dos llamas; la gota y una llama se anulan en una nube de humo y queda una llama.">
+</dialog>
+<script>
+(function(){
+  var dlg=document.getElementById('comicModal'), open=document.getElementById('comicOpen'), close=document.getElementById('comicClose');
+  if(!dlg||!open) return;
+  open.addEventListener('click',function(){ if(dlg.showModal) dlg.showModal(); else dlg.setAttribute('open',''); });
+  function shut(){ if(dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+  dlg.addEventListener('click',shut);
+  close.addEventListener('click',function(e){ e.stopPropagation(); shut(); });
+})();
+</script>
 </body></html>
