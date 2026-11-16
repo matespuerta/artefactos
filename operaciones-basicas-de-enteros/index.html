@@ -1,0 +1,582 @@
+<!doctype html><html lang="es"><head><meta charset=utf8><title>Operaciones básicas de enteros</title><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
+</style>
+</head><body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
+
+<style>
+
+  :root{
+    --bg:#FAF6F0;
+    --bg-panel:#FFFFFF;
+    --bg-sunken:#F1EAE0;
+    --ink:#2B2420;
+    --ink-soft:#7A6C5C;
+    --line:#E7DDCE;
+    --accent:#C4791F;
+    --accent-ink:#5A3B12;
+
+    --neg:#FF8A3D;
+    --neg-soft:#FFF1DE;
+    --pos:#1C6FA8;
+    --pos-soft:#E6F7FC;
+
+    --good:#2F9E59;
+    --good-soft:#E6F6EC;
+    --bad:#C0392B;
+    --bad-soft:#FBEAE7;
+
+    --shadow: 0 10px 24px -12px rgba(43,36,32,0.35);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#201810;
+      --bg-panel:#2B2119;
+      --bg-sunken:#241B14;
+      --ink:#F4ECE0;
+      --ink-soft:#C4B4A0;
+      --line:#42342A;
+      --accent:#E8A947;
+      --accent-ink:#FFE7BC;
+
+      --neg:#FF9A52;
+      --neg-soft:#3A2A1E;
+      --pos:#6AC3E6;
+      --pos-soft:#1C2E36;
+
+      --good:#59C98A;
+      --good-soft:#1B3024;
+      --bad:#F0796B;
+      --bad-soft:#3A2220;
+
+      --shadow: 0 10px 26px -10px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#201810;
+    --bg-panel:#2B2119;
+    --bg-sunken:#241B14;
+    --ink:#F4ECE0;
+    --ink-soft:#C4B4A0;
+    --line:#42342A;
+    --accent:#E8A947;
+    --accent-ink:#FFE7BC;
+
+    --neg:#FF9A52;
+    --neg-soft:#3A2A1E;
+    --pos:#6AC3E6;
+    --pos-soft:#1C2E36;
+
+    --good:#59C98A;
+    --good-soft:#1B3024;
+    --bad:#F0796B;
+    --bad-soft:#3A2220;
+
+    --shadow: 0 10px 26px -10px rgba(0,0,0,0.55);
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    padding: clamp(16px, 4vw, 40px);
+  }
+  h1,h2,h3{ font-family:"Trebuchet MS",system-ui,sans-serif; margin:0; text-wrap:balance; }
+
+  .page{ max-width: 720px; margin: 0 auto; display:flex; flex-direction:column; gap:20px; }
+
+  header{ display:flex; flex-direction:column; gap:8px; text-align:center; }
+  .eyebrow{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  h1{ font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight:800; }
+  .subtitle{ color:var(--ink-soft); font-size:0.98rem; max-width:56ch; line-height:1.55; margin:0 auto; }
+
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow: var(--shadow);
+    padding: clamp(16px,3.4vw,26px);
+  }
+
+  .controls-card{ display:flex; flex-direction:column; gap:16px; }
+  .control-group{ display:flex; flex-direction:column; gap:8px; }
+  .control-label{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.82rem;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  .segmented{
+    display:flex; gap:4px;
+    background:var(--bg-sunken);
+    padding:4px;
+    border-radius:999px;
+  }
+  .seg-btn{
+    all:unset; cursor:pointer; flex:1; text-align:center;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.92rem;
+    padding:9px 10px;
+    border-radius:999px;
+    color:var(--ink-soft);
+    transition: background .15s ease, color .15s ease;
+  }
+  .seg-btn[aria-selected="true"]{
+    background:var(--bg-panel);
+    color:var(--accent-ink);
+    box-shadow:var(--shadow);
+  }
+  .seg-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .choice-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .n-btn{
+    all:unset; cursor:pointer;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    width:42px; height:42px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:12px;
+    background:var(--bg-sunken);
+    border:2px solid var(--line);
+    color:var(--ink);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .n-btn:hover{ transform:translateY(-2px); }
+  .n-btn[aria-selected="true"]{ border-color:var(--accent); background:var(--neg-soft); color:var(--accent-ink); }
+  .n-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .stage-card{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+
+  .equation-display{
+    all:unset;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap: clamp(6px, 1.6vw, 12px);
+    width:100%;
+    padding: clamp(10px,2vw,18px) 4px;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:800;
+    font-size: clamp(1.5rem, 5vw, 2.3rem);
+    font-variant-numeric: tabular-nums;
+  }
+  .equation-display.pulse{ animation: fadeShift .28s ease; }
+  @keyframes fadeShift{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
+
+  .eq-num{ white-space:nowrap; }
+  .eq-num.neg{ color:var(--neg); }
+  .eq-num.pos{ color:var(--pos); }
+  .eq-op{ color:var(--ink-soft); }
+  .eq-equals{ color:var(--accent); }
+
+  .answer-input{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:800;
+    font-size: clamp(1.5rem, 5vw, 2.3rem);
+    width: 2.6em;
+    text-align:center;
+    background:var(--bg-sunken);
+    color:var(--ink);
+    border:none;
+    border-bottom:4px solid var(--accent);
+    border-radius:10px 10px 0 0;
+    padding:2px 4px;
+    -moz-appearance:textfield;
+  }
+  .answer-input::-webkit-outer-spin-button, .answer-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .answer-input:focus{ outline:none; background:var(--neg-soft); }
+  .answer-input.shake{ animation: shake .32s ease; }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-6px); }
+    75%{ transform:translateX(6px); }
+  }
+
+  .answer-token{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:800;
+    font-size: clamp(1.5rem, 5vw, 2.3rem);
+    padding:2px 10px;
+    border-radius:10px;
+  }
+  .answer-token.good{ color:var(--good); background:var(--good-soft); }
+  .answer-token.shown{ color:var(--accent-ink); background:var(--bg-sunken); }
+
+  .feedback{
+    min-height:1.4em;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.98rem;
+    text-align:center;
+  }
+  .feedback.good{ color:var(--good); }
+  .feedback.bad{ color:var(--bad); }
+  .feedback.neutral{ color:var(--ink-soft); }
+
+  .stage-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center; }
+  .check-btn{
+    all:unset; cursor:pointer;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.98rem;
+    padding:10px 26px;
+    border-radius:999px;
+    background:var(--accent);
+    color:#fff;
+    transition: transform .15s ease;
+  }
+  .check-btn:hover{ transform:translateY(-2px); }
+  .check-btn:focus-visible{ outline:3px solid var(--ink); outline-offset:2px; }
+  .check-btn:disabled{ opacity:0.45; cursor:default; transform:none; }
+
+  .ghost-btn{
+    all:unset; cursor:pointer;
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.94rem;
+    padding:9px 20px;
+    border-radius:999px;
+    background:var(--bg-sunken);
+    border:1px solid var(--line);
+    color:var(--ink);
+    transition: transform .15s ease;
+  }
+  .ghost-btn:hover{ transform:translateY(-2px); }
+  .ghost-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .link-btn{
+    all:unset; cursor:pointer;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:700;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+  .link-btn:hover{ color:var(--accent); }
+  .link-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .stats-card{
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    text-align:center;
+  }
+  .stat{ display:flex; flex-direction:column; gap:2px; flex:1; }
+  .stat + .stat{ border-left:1px solid var(--line); }
+  .stat-value{
+    font-family:"Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-weight:800;
+    font-size:1.5rem;
+    color:var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label{ font-size:0.76rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; }
+
+  .history-row{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; min-height:14px; }
+  .dot{ width:11px; height:11px; border-radius:50%; flex:none; animation: popDot .2s ease; }
+  @keyframes popDot{ from{ transform:scale(0.3); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .dot.ok{ background:var(--good); }
+  .dot.bad{ background:var(--bad); }
+  .dot.shown{ background:var(--line); }
+
+  footer{ text-align:center; font-size:0.78rem; color:var(--ink-soft); padding-top:4px; }
+
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .equation-display.pulse, .answer-input.shake, .dot, .n-btn, .check-btn, .ghost-btn{ animation:none; transition:none; }
+  }
+</style>
+
+<div class="page">
+  <header>
+    <span class="eyebrow">Práctica interactiva</span>
+    <h1>Operaciones básicas de enteros</h1>
+    <p class="subtitle">Elige cómo quieres practicar y te iremos generando ejercicios sin parar: sumas, restas o una mezcla, con tantos números como quieras.</p>
+  </header>
+
+  <div class="panel controls-card">
+    <div class="control-group">
+      <span class="control-label">Operación</span>
+      <div class="segmented" role="tablist" aria-label="Tipo de operación" id="opSegmented">
+        <button type="button" class="seg-btn" data-op="+" role="tab">Suma</button>
+        <button type="button" class="seg-btn" data-op="-" role="tab">Resta</button>
+        <button type="button" class="seg-btn" data-op="mix" role="tab">Suma y resta</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <span class="control-label">Números en la operación</span>
+      <div class="choice-row" id="nButtons" role="group" aria-label="Cantidad de números"></div>
+    </div>
+  </div>
+
+  <div class="panel stage-card">
+    <form class="equation-display" id="answerForm"></form>
+    <div class="feedback neutral" id="feedback"></div>
+    <div class="stage-actions">
+      <button type="submit" form="answerForm" class="check-btn" id="checkBtn">Comprobar</button>
+      <button type="button" class="ghost-btn" id="nextBtn">Nuevo ejercicio &#9656;</button>
+    </div>
+    <button type="button" class="link-btn" id="showAnswerBtn">Ver la respuesta</button>
+  </div>
+
+  <div class="panel stats-card">
+    <div class="stat"><span class="stat-value" id="scoreValue">0 / 0</span><span class="stat-label">Aciertos</span></div>
+    <div class="stat"><span class="stat-value" id="streakValue">0</span><span class="stat-label">Racha actual</span></div>
+    <div class="stat"><span class="stat-value" id="bestValue">0</span><span class="stat-label">Mejor racha</span></div>
+  </div>
+  <div class="history-row" id="historyRow" aria-hidden="true"></div>
+
+  <footer>Practica la suma y la resta de enteros</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var state = {
+    opMode: 'mix',
+    n: 3,
+    terms: [],
+    ops: [],
+    answer: 0,
+    locked: false,
+    score: 0,
+    total: 0,
+    streak: 0,
+    best: 0,
+    history: []
+  };
+
+  var opSegmented = document.getElementById('opSegmented');
+  var nButtonsWrap = document.getElementById('nButtons');
+  var form = document.getElementById('answerForm');
+  var feedback = document.getElementById('feedback');
+  var checkBtn = document.getElementById('checkBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var showAnswerBtn = document.getElementById('showAnswerBtn');
+  var scoreValue = document.getElementById('scoreValue');
+  var streakValue = document.getElementById('streakValue');
+  var bestValue = document.getElementById('bestValue');
+  var historyRow = document.getElementById('historyRow');
+
+  function randNonZero(min, max){
+    var v;
+    do { v = min + Math.floor(Math.random() * (max - min + 1)); } while(v === 0);
+    return v;
+  }
+
+  function fmtParenSigned(v){
+    return '(' + (v > 0 ? '+' : '−') + Math.abs(v) + ')';
+  }
+
+  function buildOpButtons(){
+    var opts = [{op:'+', label:'Suma'}, {op:'-', label:'Resta'}, {op:'mix', label:'Suma y resta'}];
+    opSegmented.innerHTML = '';
+    opts.forEach(function(o){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'seg-btn'; b.setAttribute('role','tab');
+      b.setAttribute('aria-selected', state.opMode === o.op ? 'true' : 'false');
+      b.textContent = o.label;
+      b.addEventListener('click', function(){
+        state.opMode = o.op;
+        buildOpButtons();
+        generate();
+      });
+      opSegmented.appendChild(b);
+    });
+  }
+
+  function buildNButtons(){
+    nButtonsWrap.innerHTML = '';
+    [2,3,4,5,6].forEach(function(n){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'n-btn';
+      b.setAttribute('aria-selected', state.n === n ? 'true' : 'false');
+      b.setAttribute('aria-label', n + ' números');
+      b.textContent = String(n);
+      b.addEventListener('click', function(){
+        state.n = n;
+        buildNButtons();
+        generate();
+      });
+      nButtonsWrap.appendChild(b);
+    });
+  }
+
+  function computeTotal(terms, ops){
+    var running = terms[0];
+    for(var i=1;i<terms.length;i++){
+      running = ops[i-1] === '+' ? running + terms[i] : running - terms[i];
+    }
+    return running;
+  }
+
+  function generate(){
+    state.terms = [];
+    for(var i=0;i<state.n;i++){ state.terms.push(randNonZero(-10,10)); }
+    state.ops = [];
+    for(var k=0;k<state.n-1;k++){
+      var op = state.opMode === 'mix' ? (Math.random() < 0.5 ? '+' : '-') : state.opMode;
+      state.ops.push(op);
+    }
+    state.answer = computeTotal(state.terms, state.ops);
+    state.locked = false;
+    renderEquation(true);
+    setFeedback('', 'neutral');
+    checkBtn.disabled = false;
+  }
+
+  function renderEquation(animate){
+    form.innerHTML = '';
+    if(animate){
+      form.classList.remove('pulse');
+      void form.offsetWidth;
+      form.classList.add('pulse');
+    }
+    state.terms.forEach(function(t, i){
+      if(i > 0){
+        var op = document.createElement('span');
+        op.className = 'eq-op';
+        op.textContent = state.ops[i-1] === '+' ? '+' : '−';
+        form.appendChild(op);
+      }
+      var num = document.createElement('span');
+      num.className = 'eq-num ' + (t < 0 ? 'neg' : 'pos');
+      num.textContent = fmtParenSigned(t);
+      form.appendChild(num);
+    });
+
+    var eq = document.createElement('span');
+    eq.className = 'eq-op eq-equals';
+    eq.textContent = '=';
+    form.appendChild(eq);
+
+    var label = document.createElement('label');
+    label.className = 'sr-only';
+    label.setAttribute('for', 'answerInput');
+    label.textContent = 'Tu respuesta';
+    form.appendChild(label);
+
+    var input = document.createElement('input');
+    input.type = 'number';
+    input.id = 'answerInput';
+    input.className = 'answer-input';
+    input.placeholder = '?';
+    input.setAttribute('inputmode', 'numeric');
+    input.setAttribute('autocomplete', 'off');
+    form.appendChild(input);
+
+    setTimeout(function(){ input.focus(); }, animate ? 120 : 0);
+  }
+
+  function showToken(kind, text){
+    var old = document.getElementById('answerInput');
+    if(old){
+      var span = document.createElement('span');
+      span.className = 'answer-token ' + kind;
+      span.textContent = text;
+      old.replaceWith(span);
+    }
+  }
+
+  function setFeedback(text, kind){
+    feedback.textContent = text;
+    feedback.className = 'feedback ' + kind;
+  }
+
+  function pushHistory(kind){
+    state.history.push(kind);
+    if(state.history.length > 14){ state.history.shift(); }
+    renderHistory();
+  }
+
+  function renderHistory(){
+    historyRow.innerHTML = '';
+    state.history.forEach(function(kind){
+      var d = document.createElement('span');
+      d.className = 'dot ' + kind;
+      historyRow.appendChild(d);
+    });
+  }
+
+  function renderStats(){
+    scoreValue.textContent = state.score + ' / ' + state.total;
+    streakValue.textContent = String(state.streak);
+    bestValue.textContent = String(state.best);
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(state.locked) return;
+    var input = document.getElementById('answerInput');
+    if(!input || input.value === ''){ return; }
+    var given = parseInt(input.value, 10);
+    state.total += 1;
+    if(given === state.answer){
+      state.locked = true;
+      state.score += 1;
+      state.streak += 1;
+      state.best = Math.max(state.best, state.streak);
+      showToken('good', fmtParenSigned(state.answer).replace(/[()]/g, ''));
+      setFeedback('¡Correcto!', 'good');
+      pushHistory('ok');
+      renderStats();
+      checkBtn.disabled = true;
+      setTimeout(generate, 1100);
+    } else {
+      state.streak = 0;
+      input.classList.remove('shake');
+      void input.offsetWidth;
+      input.classList.add('shake');
+      setFeedback('Casi, prueba otra vez.', 'bad');
+      pushHistory('bad');
+      renderStats();
+      input.select();
+    }
+  });
+
+  nextBtn.addEventListener('click', function(){ generate(); });
+
+  showAnswerBtn.addEventListener('click', function(){
+    if(state.locked) return;
+    state.locked = true;
+    state.streak = 0;
+    showToken('shown', String(state.answer));
+    setFeedback('La respuesta era ' + state.answer + '.', 'neutral');
+    pushHistory('shown');
+    renderStats();
+    checkBtn.disabled = true;
+  });
+
+  buildOpButtons();
+  buildNButtons();
+  generate();
+  renderStats();
+})();
+</script>
+
+</body></html>
