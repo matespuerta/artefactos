@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fracciones · 2.º ESO</title>
+<style>
+:root{--bg:#EAF1FB;--grid:#CBD9F0;--ink:#16264A;--mute:#53648A;--card:#fff;--a:#E4457A;--b:#0E9A9A;--hl:#FFD43B;--ok:#16874C;--bad:#C92D22;--btn:#16264A;--btnt:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1A33;--grid:#1D2E55;--ink:#E8EEFF;--mute:#9DB0D8;--card:#182648;--a:#FF7AA2;--b:#3DD6D0;--ok:#5FE0A0;--bad:#FF8A80;--btn:#FFD43B;--btnt:#16264A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1A33;--grid:#1D2E55;--ink:#E8EEFF;--mute:#9DB0D8;--card:#182648;--a:#FF7AA2;--b:#3DD6D0;--ok:#5FE0A0;--bad:#FF8A80;--btn:#FFD43B;--btnt:#16264A;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;color:var(--ink);font:400 1rem/1.5 Lexend,system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+header{padding-right:56px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+h1,h2{font-family:'Bricolage Grotesque',Lexend,sans-serif;font-weight:800;margin:0;line-height:1.05}
+h1{font-size:clamp(2.4rem,9vw,3.6rem)}
+h2{font-size:1.7rem;margin-bottom:6px}
+h3{font-size:1.05rem;margin:0 0 8px}
+.sc{display:flex;gap:14px;font-weight:500;background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:4px 16px}
+nav{display:flex;gap:8px;overflow-x:auto;padding:4px 4px 10px;margin:14px -4px 6px}
+button{font:inherit;color:inherit;cursor:pointer}
+.tab{border:2px solid var(--ink);background:var(--card);border-radius:999px;padding:.5rem 1rem;white-space:nowrap}
+.tab[aria-selected=true],.tab[aria-pressed=true]{background:var(--hl);color:#16264A;font-weight:600;box-shadow:3px 3px 0 var(--ink)}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:14px;padding:16px;margin:14px 0;box-shadow:4px 4px 0 var(--ink)}
+p{max-width:64ch;margin:.3rem 0 .8rem}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 .15em;font-weight:600;line-height:1.2}
+.fr>i{font-style:normal;padding:0 .3em}
+.fr>i:first-child{border-bottom:3px solid currentColor}
+.eq{font-size:1.9rem;margin:4px 0 12px}
+.chain{font-size:1.5rem;margin:10px 0}
+.bar{display:flex;height:30px;border:3px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--card);margin:8px 0}
+.bar b{flex:1;border-left:1px solid rgba(120,140,180,.55)}
+.bar b:first-child{border:0}
+.bar b.on{background:var(--c)}
+.ctl{display:grid;grid-template-columns:8.5em 1fr 2em;gap:8px;align-items:center;margin:4px 0}
+input[type=range]{accent-color:var(--a);width:100%}
+input[type=number]{width:3.2em;font:inherit;font-weight:600;text-align:center;color:var(--ink);background:transparent;border:2px dashed var(--mute);border-radius:8px;padding:.15em;-moz-appearance:textfield}
+input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+:focus-visible{outline:3px solid var(--b);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0}
+.go{background:var(--btn);color:var(--btnt);border:2px solid var(--btn);border-radius:10px;padding:.5rem 1.1rem;font-weight:600}
+.go.alt{background:transparent;color:var(--ink);border-color:var(--ink)}
+.fb{min-height:1.5em;margin:10px 0 4px;font-weight:500}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.chip{background:var(--card);border:2px solid var(--ink);border-radius:12px;padding:6px 14px;font-size:1.5rem;color:var(--ink)}
+.chip[disabled]{opacity:.2;cursor:default}
+.chips{display:flex;flex-wrap:wrap;gap:10px;min-height:76px;align-items:center}
+.slot{min-width:72px;min-height:70px;border:2px dashed var(--mute);border-radius:12px}
+.rv{display:grid;grid-template-columns:8.5em 1fr;gap:10px;align-items:center}
+.mute{color:var(--mute);font-size:.92rem}
+.pw{display:inline-flex;align-items:center;margin:0 .15em}.pp{font-size:2em;font-weight:300;line-height:1}.pw sup{align-self:flex-start;font-size:.65em;font-weight:600}.pw sup input{font-size:1.1rem}
+.cb{height:30px;border:3px solid var(--ink);border-radius:10px;overflow:hidden;background:var(--card);margin:8px 0}.cb i{display:block;height:100%;background:var(--c)}
+@media(max-width:480px){.ctl{grid-template-columns:7em 1fr 1.6em}.rv{grid-template-columns:7em 1fr}}
+</style>
+<style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
+</style>
+</head>
+<body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
+<main>
+<header>
+ <h1>Fracciones</h1>
+ <div class="sc" aria-live="polite"><span>Aciertos: <b id="sa">0/0</b></span><span>Racha: <b id="sr">0</b></span></div>
+</header>
+<nav role="tablist">
+ <button class="tab" data-t="t1" role="tab" aria-selected="true">Equivalentes</button>
+ <button class="tab" data-t="t2" role="tab" aria-selected="false">Común denominador</button>
+ <button class="tab" data-t="t3" role="tab" aria-selected="false">Ordenar</button>
+ <button class="tab" data-t="t4" role="tab" aria-selected="false">Operaciones</button>
+ <button class="tab" data-t="t5" role="tab" aria-selected="false">Potencias</button>
+ <button class="tab" data-t="t6" role="tab" aria-selected="false">Problemas</button>
+</nav>
+
+<section id="t1">
+ <h2>Fracciones equivalentes</h2>
+ <p>Dos fracciones son equivalentes si valen lo mismo. Se consiguen multiplicando (o dividiendo) numerador y denominador por el mismo número. Mueve los deslizadores: el dibujo cambia, pero la parte coloreada ocupa lo mismo.</p>
+ <div class="card">
+  <div class="ctl"><label for="sn">Numerador</label><input id="sn" type="range" min="1" max="2" value="3" oninput="ex1()"><output id="vn"></output></div>
+  <div class="ctl"><label for="sd">Denominador</label><input id="sd" type="range" min="2" max="10" value="4" oninput="ex1()"><output id="vd"></output></div>
+  <div class="ctl"><label for="sk">Multiplicar por</label><input id="sk" type="range" min="1" max="6" value="3" oninput="ex1()"><output id="vk"></output></div>
+  <div id="ex1"></div>
+ </div>
+ <div class="card">
+  <h3>Completa la igualdad</h3>
+  <div class="eq" id="q1"></div>
+  <div class="row"><button class="go chk" onclick="ck1()">Comprobar</button><button class="go alt" onclick="np1()">Otra</button></div>
+  <div class="fb" id="f1"></div>
+ </div>
+</section>
+
+<section id="t2" hidden>
+ <h2>Común denominador</h2>
+ <p>Para comparar, sumar o restar fracciones con distinto denominador, las convertimos en equivalentes con el mismo denominador: el mínimo común múltiplo (mcm) de los denominadores.</p>
+ <div class="card">
+  <div class="eq" id="q2"></div>
+  <p>1.º Calcula el mcm de los denominadores: <input id="m" type="number" inputmode="numeric" oninput="dm()"></p>
+  <p>2.º Escribe cada fracción con ese denominador:</p>
+  <div class="eq" id="q2b"></div>
+  <div class="row"><button class="go chk" onclick="ck2()">Comprobar</button><button class="go alt" onclick="hint2()">Pista</button><button class="go alt" onclick="sol2()">Ver solución</button><button class="go alt" onclick="np2()">Otra</button></div>
+  <div class="fb" id="f2"></div>
+  <div id="r2"></div>
+ </div>
+</section>
+
+<section id="t3" hidden>
+ <h2>Ordenar fracciones</h2>
+ <p>Toca las fracciones en el orden que se pide. Truco: ponlas con denominador común y compara los numeradores.</p>
+ <div class="card">
+  <h3 id="q3"></h3>
+  <div class="chips" id="pool"></div>
+  <p class="mute">Tu orden (toca una para quitarla):</p>
+  <div class="chips" id="slots"></div>
+  <div class="row"><button class="go chk" onclick="ck3()">Comprobar</button><button class="go alt" onclick="help3()">Ayuda</button><button class="go alt" onclick="sol3()">Ver solución</button><button class="go alt" onclick="np3()">Otra</button></div>
+  <div class="fb" id="f3"></div>
+  <div id="r3"></div>
+ </div>
+</section>
+
+<section id="t4" hidden>
+ <h2>Operaciones con fracciones</h2>
+ <p>Suma, resta, multiplica y divide. Escribe el resultado con numerador y denominador; mejor si lo simplificas.</p>
+ <div class="row" id="ops">
+  <button class="tab" data-o="mix" aria-pressed="true">Mezcla</button>
+  <button class="tab" data-o="+" aria-pressed="false">Suma +</button>
+  <button class="tab" data-o="−" aria-pressed="false">Resta −</button>
+  <button class="tab" data-o="×" aria-pressed="false">Producto ×</button>
+  <button class="tab" data-o="÷" aria-pressed="false">Cociente ÷</button>
+ </div>
+ <div class="card">
+  <div class="eq" id="q4"></div>
+  <div class="row"><button class="go chk" onclick="ck4()">Comprobar</button><button class="go alt" onclick="sol4()">Ver pasos</button><button class="go alt" onclick="np4()">Otra</button></div>
+  <div class="fb" id="f4"></div>
+  <div id="r4" class="chain"></div>
+ </div>
+</section>
+
+<section id="t5" hidden>
+ <h2>Potencias de fracciones</h2>
+ <p>Elevar una fracción a un exponente es multiplicarla por sí misma tantas veces como indica el exponente: se elevan el numerador y el denominador. Cualquier fracción elevada a 0 vale 1.</p>
+ <div class="card">
+  <div class="ctl"><label for="pn5">Numerador</label><input id="pn5" type="range" min="1" max="2" value="2" oninput="ex5()"><output id="vn5"></output></div>
+  <div class="ctl"><label for="pd5">Denominador</label><input id="pd5" type="range" min="2" max="6" value="3" oninput="ex5()"><output id="vd5"></output></div>
+  <div class="ctl"><label for="pe5">Exponente</label><input id="pe5" type="range" min="0" max="4" value="2" oninput="ex5()"><output id="ve5"></output></div>
+  <div id="ex5"></div>
+ </div>
+ <div class="card">
+  <h3>Practica</h3>
+  <p class="mute">Con la misma base: al multiplicar potencias se suman los exponentes y al dividir se restan.</p>
+  <div class="eq" id="q5"></div>
+  <div class="row"><button class="go chk" onclick="ck5()">Comprobar</button><button class="go alt" onclick="sol5()">Ver pasos</button><button class="go alt" onclick="np5()">Otra</button></div>
+  <div class="fb" id="f5"></div>
+  <div id="r5" class="chain"></div>
+ </div>
+</section>
+
+<section id="t6" hidden>
+ <h2>Problemas con fracciones</h2>
+ <p>Lee con calma, subraya los datos y piensa qué te piden antes de elegir la operación. Si te atascas, vuelve a intentarlo: al fallar te damos una pista.</p>
+ <div class="card">
+  <p id="q6" style="font-size:1.15rem"></p>
+  <div class="eq" id="a6"></div>
+  <div class="row"><button class="go chk" onclick="ck6()">Comprobar</button><button class="go alt" onclick="sol6()">Ver solución</button><button class="go alt" onclick="np6()">Otro problema</button></div>
+  <div class="fb" id="f6"></div>
+  <div id="r6"></div>
+ </div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a),lcm=(a,b)=>a*b/gcd(a,b);
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[R(0,a.length-1)];
+const fr=(n,d)=>`<span class="fr"><i>${n}</i><i>${d}</i></span>`;
+const inp=id=>`<input id="${id}" type="number" inputmode="numeric" aria-label="${id}">`;
+const col=(c,h)=>`<span style="color:var(--${c})">${h}</span>`;
+const bar=(n,d,c)=>`<div class="bar" style="--c:var(--${c})">${Array.from({length:d},(_,i)=>`<b class="${i<n?'on':''}"></b>`).join('')}</div>`;
+const fb=(id,g,h)=>{const e=$('#'+id);e.className='fb'+(g===1?' ok':g===0?' bad':'');e.innerHTML=h};
+let ok=0,tot=0,st=0;
+function score(g){tot++;if(g){ok++;st++}else st=0;$('#sa').textContent=ok+'/'+tot;$('#sr').textContent=st}
+const D=[2,3,4,5,6,8,10,12];
+
+/* pestañas */
+document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('[data-t]').forEach(x=>x.setAttribute('aria-selected',x===b));
+ ['t1','t2','t3','t4','t5','t6'].forEach(t=>$('#'+t).hidden=t!==b.dataset.t)});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const b=document.querySelector('section:not([hidden]) .chk');b&&b.click()}});
+
+/* 1. Equivalentes */
+function ex1(){
+ const sn=$('#sn'),sd=$('#sd'),sk=$('#sk');
+ sn.max=sd.value-1;if(+sn.value>+sn.max)sn.value=sn.max;
+ const n=+sn.value,d=+sd.value,k=+sk.value,g=gcd(n,d);
+ $('#vn').textContent=n;$('#vd').textContent=d;$('#vk').textContent=k;
+ $('#ex1').innerHTML=`<div class="eq">${col('a',fr(n,d))} = ${col('b',fr(n*k,d*k))}</div>${bar(n,d,'a')}${bar(n*k,d*k,'b')}
+ <p>${k==1?'Con ×1 no cambia nada. Prueba con otro número.':`Multiplicamos por ${k}: ${n}×${k} = ${n*k} y ${d}×${k} = ${d*k}.`}${g>1?` Además, ${fr(n,d)} se puede simplificar dividiendo entre ${g}: es ${fr(n/g,d/g)}.`:''}</p>`}
+let p1;
+function np1(){
+ const b=R(2,9),a=R(1,b-1),k=R(2,6),m=pick(['n','d']);p1={a,b,k,m,done:0};
+ $('#q1').innerHTML=`${fr(a,b)} = ${m=='n'?fr(inp('i1'),b*k):fr(a*k,inp('i1'))}`;fb('f1',null,'')}
+function ck1(){
+ if(p1.done)return;const e=$('#i1');if(e.value==='')return fb('f1',null,'Escribe un número en el hueco.');
+ const {a,b,k,m}=p1,g=+e.value===(m=='n'?a*k:b*k);score(g);
+ if(g){p1.done=1;fb('f1',1,`¡Correcto! Multiplicaste numerador y denominador por ${k}.`)}
+ else fb('f1',0,m=='n'?`Mira el denominador: pasa de ${b} a ${b*k}. ¿Por cuánto se ha multiplicado? Haz lo mismo arriba.`:`Mira el numerador: pasa de ${a} a ${a*k}. ¿Por cuánto se ha multiplicado? Haz lo mismo abajo.`)}
+
+/* 2. Común denominador */
+let p2;
+function np2(){
+ let d1,d2;do{d1=pick(D);d2=pick(D)}while(d1==d2);
+ p2={d1,d2,n1:R(1,d1-1),n2:R(1,d2-1),M:lcm(d1,d2),done:0};
+ $('#q2').innerHTML=`${col('a',fr(p2.n1,d1))} y ${col('b',fr(p2.n2,d2))}`;
+ $('#q2b').innerHTML=`${fr(p2.n1,d1)} = ${fr(inp('x'),'<span class="dd">?</span>')} &nbsp; ${fr(p2.n2,d2)} = ${fr(inp('y'),'<span class="dd">?</span>')}`;
+ $('#m').value='';fb('f2',null,'');$('#r2').innerHTML=''}
+function dm(){const v=$('#m').value||'?';document.querySelectorAll('.dd').forEach(s=>s.textContent=v)}
+function hint2(){const {d1,d2}=p2,mu=d=>[1,2,3,4,5,6].map(k=>k*d).join(', ');
+ fb('f2',null,`Múltiplos de ${d1}: ${mu(d1)}… Múltiplos de ${d2}: ${mu(d2)}… Busca el primero que se repita (si no aparece, sigue la lista).`)}
+function show2(){
+ const {n1,d1,n2,d2,M}=p2,x=n1*M/d1,y=n2*M/d2,c=x>y?'>':x<y?'<':'=';
+ $('#r2').innerHTML=`<div class="rv"><span>${fr(n1,d1)} = ${fr(x,M)}</span>${bar(x,M,'a')}</div><div class="rv"><span>${fr(n2,d2)} = ${fr(y,M)}</span>${bar(y,M,'b')}</div>
+ <p class="chain">${fr(x,M)} ${c} ${fr(y,M)}, así que ${fr(n1,d1)} ${c} ${fr(n2,d2)}</p>`}
+function ck2(){
+ if(p2.done)return;const {n1,d1,n2,d2,M}=p2,m=+$('#m').value,x=+$('#x').value,y=+$('#y').value;
+ if(!$('#m').value||!$('#x').value||!$('#y').value)return fb('f2',null,'Rellena los tres huecos.');
+ const e=[];
+ if(m!==M)e.push(m%d1==0&&m%d2==0?`${m} sirve como denominador común, pero no es el menor. Busca el mínimo común múltiplo.`:`${m} no es múltiplo de ${d1} y de ${d2} a la vez. Usa la pista.`);
+ else{if(x!==n1*M/d1)e.push(`Primer numerador: ${M} ÷ ${d1} = ${M/d1}, y eso se multiplica por ${n1}.`);
+  if(y!==n2*M/d2)e.push(`Segundo numerador: ${M} ÷ ${d2} = ${M/d2}, y eso se multiplica por ${n2}.`)}
+ score(!e.length);
+ if(!e.length){p2.done=1;fb('f2',1,`¡Perfecto! mcm(${d1}, ${d2}) = ${M}.`);show2()}else fb('f2',0,e.join(' '))}
+function sol2(){const {n1,d1,n2,d2,M}=p2;p2.done=1;$('#m').value=M;dm();$('#x').value=n1*M/d1;$('#y').value=n2*M/d2;fb('f2',null,`mcm(${d1}, ${d2}) = ${M}`);show2()}
+
+/* 3. Ordenar */
+let p3,ans=[];
+function ord3(){const f=p3.f,L=f.reduce((l,[n,d])=>lcm(l,d),1);
+ const idx=[0,1,2,3].sort((x,y)=>(f[x][0]*L/f[x][1]-f[y][0]*L/f[y][1])*(p3.asc?1:-1));return{L,idx}}
+function np3(){
+ const f=[],u=new Set();
+ while(f.length<4){const d=pick(D),n=R(1,d-1),g=gcd(n,d),k=n/g+'/'+d/g;if(!u.has(k)){u.add(k);f.push([n,d])}}
+ p3={f,asc:Math.random()<.6,done:0};ans=[];
+ $('#q3').textContent=`Ordena de ${p3.asc?'menor a mayor':'mayor a menor'}`;fb('f3',null,'');$('#r3').innerHTML='';r3()}
+function r3(){
+ $('#pool').innerHTML=p3.f.map(([n,d],i)=>`<button class="chip" ${ans.includes(i)?'disabled':''} onclick="add3(${i})">${fr(n,d)}</button>`).join('');
+ $('#slots').innerHTML=[0,1,2,3].map(k=>ans[k]!==undefined?`<button class="chip" onclick="rm3(${k})">${fr(...p3.f[ans[k]])}</button>`:'<span class="slot"></span>').join('')}
+function add3(i){if(!p3.done){ans.push(i);r3()}}
+function rm3(k){if(!p3.done){ans.splice(k,1);r3()}}
+function show3(){
+ const {L,idx}=ord3(),f=p3.f;
+ $('#r3').innerHTML=`<p class="chain">${idx.map(i=>fr(...f[i])).join(p3.asc?' &lt; ':' &gt; ')}</p><p>Con denominador común ${L}:</p>`+
+ idx.map(i=>`<div class="rv"><span>${fr(...f[i])} = ${fr(f[i][0]*L/f[i][1],L)}</span>${bar(f[i][0],f[i][1],'a')}</div>`).join('')}
+function help3(){const {L}=ord3();$('#r3').innerHTML=`<p>Denominador común: mcm = ${L}</p><div class="chain">${p3.f.map(([n,d])=>`${fr(n,d)} = ${fr(n*L/d,L)}`).join(' &nbsp; ')}</div><p>Ahora compara los numeradores.</p>`}
+function ck3(){
+ if(p3.done)return;if(ans.length<4)return fb('f3',null,'Coloca las cuatro fracciones.');
+ const {idx}=ord3(),g=ans.join()==idx.join();score(g);
+ if(g){p3.done=1;fb('f3',1,'¡Orden correcto!');show3()}else fb('f3',0,'Ese orden no es correcto. Pulsa “Ayuda” para ver las fracciones con denominador común.')}
+function sol3(){ans=ord3().idx.slice();p3.done=1;r3();fb('f3',null,'');show3()}
+
+/* 4. Operaciones */
+let p4,op4='mix';
+document.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{op4=b.dataset.o;
+ document.querySelectorAll('[data-o]').forEach(x=>x.setAttribute('aria-pressed',x===b));np4()});
+function np4(){
+ const o=op4=='mix'?pick(['+','−','×','÷']):op4,as=o=='+'||o=='−',Ds=as?D:[2,3,4,5,6,7,8,9];let n1,d1,n2,d2;
+ do{d1=pick(Ds);d2=pick(Ds);n1=R(1,d1-1);n2=R(1,d2-1)}while((o=='−'&&n1*d2<=n2*d1)||(as&&d1==d2));
+ const m=lcm(d1,d2),x=n1*m/d1,y=n2*m/d2;let a,b;
+ if(o=='+'){a=x+y;b=m}else if(o=='−'){a=x-y;b=m}else if(o=='×'){a=n1*n2;b=d1*d2}else{a=n1*d2;b=d1*n2}
+ const g=gcd(a,b);p4={o,n1,d1,n2,d2,m,x,y,a,b,rn:a/g,rd:b/g,done:0};
+ $('#q4').innerHTML=`${fr(n1,d1)} ${o} ${fr(n2,d2)} = ${fr(inp('i4n'),inp('i4d'))}`;fb('f4',null,'');$('#r4').innerHTML=''}
+function steps4(){
+ const {o,n1,d1,n2,d2,m,x,y,a,b,rn,rd}=p4;let s='';
+ if(o=='+'||o=='−')s+=`<p class="mute">Denominador común: mcm(${d1}, ${d2}) = ${m}</p>`;
+ if(o=='÷')s+='<p class="mute">Dividir es multiplicar por la inversa.</p>';
+ s+=`${fr(n1,d1)} ${o} ${fr(n2,d2)} = `;
+ if(o=='+'||o=='−')s+=`${fr(x,m)} ${o} ${fr(y,m)} = `;
+ if(o=='÷')s+=`${fr(n1,d1)} × ${fr(d2,n2)} = `;
+ s+=fr(a,b);if(rn!=a)s+=` = ${fr(rn,rd)}`;
+ $('#r4').innerHTML=s}
+function ck4(){
+ if(p4.done)return;const n=$('#i4n').value,d=$('#i4d').value;
+ if(n===''||d===''||+d==0)return fb('f4',null,'Escribe numerador y denominador (el denominador no puede ser 0).');
+ const g=+n*p4.rd===p4.rn*+d;score(g);
+ if(g){p4.done=1;const s=gcd(+n,+d)>1;fb('f4',1,s?`¡Bien! Pero aún se puede simplificar: ${fr(p4.rn,p4.rd)}`:'¡Correcto!');steps4()}
+ else fb('f4',0,{'+':'Primero pon las dos fracciones con el mismo denominador y suma los numeradores.','−':'Primero pon las dos fracciones con el mismo denominador y resta los numeradores.','×':'Multiplica numeradores entre sí y denominadores entre sí.','÷':'Multiplica la primera fracción por la inversa de la segunda.'}[p4.o])}
+function sol4(){p4.done=1;$('#i4n').value=p4.rn;$('#i4d').value=p4.rd;fb('f4',null,'');steps4()}
+
+/* 5. Potencias */
+const pw=(n,d,e)=>`<span class="pw"><span class="pp">(</span>${fr(n,d)}<span class="pp">)</span><sup>${e}</sup></span>`;
+const cb=(v,c)=>`<div class="cb" style="--c:var(--${c})"><i style="width:${Math.min(100,v*100)}%"></i></div>`;
+function ex5(){
+ const sn=$('#pn5'),sd=$('#pd5'),se=$('#pe5');
+ sn.max=sd.value-1;if(+sn.value>+sn.max)sn.value=sn.max;
+ const n=+sn.value,d=+sd.value,e=+se.value,A=n**e,B=d**e,g=gcd(A,B);
+ $('#vn5').textContent=n;$('#vd5').textContent=d;$('#ve5').textContent=e;
+ const t=e==0?'1':e==1?fr(n,d):`${Array(e).fill(fr(n,d)).join(' × ')} = ${fr(`${n}<sup>${e}</sup>`,`${d}<sup>${e}</sup>`)} = ${fr(A,B)}`;
+ $('#ex5').innerHTML=`<div class="eq">${pw(n,d,e)} = ${t}</div>${cb(n/d,'a')}${cb((n/d)**e,'b')}
+ <p>${e==0?'Cualquier fracción (distinta de 0) elevada a 0 vale 1.':e==1?'Con exponente 1 la fracción no cambia.':`Como ${fr(n,d)} es menor que 1, al elevarla se hace más pequeña: de ${(n/d).toFixed(2)} pasa a ${(A/B).toFixed(3)}.`}${e>1&&g>1?` Además se puede simplificar: ${fr(A/g,B/g)}.`:''}</p>`}
+let p5;
+function np5(){
+ const b=R(2,5);let a=R(1,b+1);if(a==b)a=b+1;
+ if(Math.random()<.6){const e=R(2,3),A=a**e,B=b**e,g=gcd(A,B);p5={m:'c',a,b,e,A,B,rn:A/g,rd:B/g,done:0};
+  $('#q5').innerHTML=`${pw(a,b,e)} = ${fr(inp('i5n'),inp('i5d'))}`}
+ else{a=R(1,b-1);const mul=Math.random()<.5,p=mul?R(1,3):R(2,5),q=mul?R(1,3):R(1,p-1);
+  p5={m:'p',a,b,p,q,mul,ans:mul?p+q:p-q,done:0};
+  $('#q5').innerHTML=`${pw(a,b,p)} ${mul?'×':'÷'} ${pw(a,b,q)} = ${pw(a,b,inp('i5e'))}`}
+ fb('f5',null,'');$('#r5').innerHTML=''}
+function st5(){
+ const {m,a,b}=p5;let s;
+ if(m=='c'){const {e,A,B,rn,rd}=p5;s=`${pw(a,b,e)} = ${Array(e).fill(fr(a,b)).join(' × ')} = ${fr(A,B)}`+(rn!=A?` = ${fr(rn,rd)}`:'')}
+ else{const {p,q,mul,ans}=p5;s=`${pw(a,b,p)} ${mul?'×':'÷'} ${pw(a,b,q)} = ${pw(a,b,p+(mul?' + ':' − ')+q)} = ${pw(a,b,ans)}`}
+ $('#r5').innerHTML=s}
+function ck5(){
+ if(p5.done)return;const {m,a,b}=p5;
+ if(m=='c'){const n=$('#i5n').value,d=$('#i5d').value;
+  if(n===''||d===''||+d==0)return fb('f5',null,'Escribe numerador y denominador (el denominador no puede ser 0).');
+  const g=+n*p5.B===p5.A*+d;score(g);
+  if(g){p5.done=1;fb('f5',1,gcd(+n,+d)>1?`¡Bien! Pero aún se puede simplificar: ${fr(p5.rn,p5.rd)}`:'¡Correcto!');st5()}
+  else fb('f5',0,`Eleva el numerador y el denominador al exponente ${p5.e}: ${a}<sup>${p5.e}</sup> y ${b}<sup>${p5.e}</sup>.`)}
+ else{const v=$('#i5e').value;if(v==='')return fb('f5',null,'Escribe el exponente.');
+  const g=+v===p5.ans;score(g);
+  if(g){p5.done=1;fb('f5',1,'¡Correcto!');st5()}
+  else fb('f5',0,p5.mul?'Misma base: al multiplicar potencias, los exponentes se suman.':'Misma base: al dividir potencias, los exponentes se restan.')}}
+function sol5(){
+ p5.done=1;
+ if(p5.m=='c'){$('#i5n').value=p5.rn;$('#i5d').value=p5.rd}else $('#i5e').value=p5.ans;
+ fb('f5',null,'');st5()}
+
+/* 6. Problemas */
+const NM=['Lucía','Mario','Carmen','Pablo','Irene','Hugo','Marta','Álvaro'];
+const sm=(a,b)=>{const g=gcd(a,b);return[a/g,b/g]};
+const sf=(a,b)=>{const [n,d]=sm(a,b);return n!=a?` = ${fr(n,d)}`:''};
+function two(){let d1,d2,n1,n2,m,x,y;do{d1=pick(D);d2=pick(D);n1=R(1,d1-1);n2=R(1,d2-1);m=lcm(d1,d2);x=n1*m/d1;y=n2*m/d2}while(d1==d2||x+y>=m);return{d1,d2,n1,n2,m,x,y}}
+const GEN=[
+ ()=>{const b=pick([3,4,5,6,8]),a=R(1,b-1),k=R(3,9),N=b*k;
+  return{ty:'i',u:'alumnos',ans:a*k,t:`En un curso de ${N} alumnos, ${fr(a,b)} van de excursión. ¿Cuántos alumnos van de excursión?`,s:`${N} ÷ ${b} = ${k} alumnos es una parte, y ${k} × ${a} = ${a*k}.`,h:'Divide la cantidad entre el denominador y multiplica por el numerador.'}},
+ ()=>{const b=pick([3,4,5,6,8]),a=R(1,b-1),N=b*R(4,15),g=N/b*a;
+  return{ty:'i',u:'€',ans:N-g,t:`${pick(NM)} tiene ${N} € y gasta ${fr(a,b)} en un regalo. ¿Cuánto dinero le queda?`,s:`Gasta ${N} ÷ ${b} × ${a} = ${g} €. Le quedan ${N} − ${g} = ${N-g} €.`,h:'Calcula primero lo que gasta y réstalo del total.'}},
+ ()=>{const {d1,d2,n1,n2,m,x,y}=two(),[rn,rd]=sm(x+y,m);
+  return{ty:'f',rn,rd,t:`${pick(NM)} lee ${fr(n1,d1)} de un libro el sábado y ${fr(n2,d2)} el domingo. ¿Qué fracción del libro ha leído en total?`,s:`${fr(n1,d1)} + ${fr(n2,d2)} = ${fr(x,m)} + ${fr(y,m)} = ${fr(x+y,m)}${sf(x+y,m)}`,h:'Suma las fracciones: primero busca un denominador común.'}},
+ ()=>{const {d1,d2,n1,n2,m,x,y}=two(),[rn,rd]=sm(m-x-y,m);
+  return{ty:'f',rn,rd,t:`Se reparte una tarta: se comen ${fr(n1,d1)} el primer día y ${fr(n2,d2)} el segundo. ¿Qué fracción de la tarta queda?`,s:`Se comen ${fr(x,m)} + ${fr(y,m)} = ${fr(x+y,m)}. Queda 1 − ${fr(x+y,m)} = ${fr(m-x-y,m)}${sf(m-x-y,m)}`,h:'Suma lo que se ha comido y réstalo de la tarta entera, que vale 1.'}},
+ ()=>{const {d1,d2,n1,n2,m}=two(),N=m*R(1,2),az=N/d1*n1,ro=N/d2*n2;
+  return{ty:'i',u:'camisetas',ans:N-az-ro,t:`En una tienda hay ${N} camisetas: ${fr(n1,d1)} son azules y ${fr(n2,d2)} son rojas. ¿Cuántas camisetas son de otro color?`,s:`Azules: ${N} ÷ ${d1} × ${n1} = ${az}. Rojas: ${N} ÷ ${d2} × ${n2} = ${ro}. Resto: ${N} − ${az} − ${ro} = ${N-az-ro}.`,h:'Calcula cuántas son azules, cuántas son rojas y réstalas del total.'}},
+ ()=>{const b=pick([2,3,4]),k=pick([2,3,4]),a=R(1,b-1);
+  return{ty:'i',u:'vasos',ans:a*k,t:`Una jarra tiene ${fr(a,b)} de litro de zumo. ¿Cuántos vasos de ${fr(1,b*k)} de litro se pueden llenar?`,s:`${fr(a,b)} ÷ ${fr(1,b*k)} = ${fr(a,b)} × ${fr(b*k,1)} = ${fr(a*b*k,b)} = ${a*k} vasos.`,h:'Cuántas veces cabe una fracción en otra es una división de fracciones.'}},
+ ()=>{const d1=pick([2,3,4,5,6]),d2=pick([2,3,4,5,6]),n1=R(1,d1-1),n2=R(1,d2-1),[rn,rd]=sm(n1*n2,d1*d2),nm=pick(NM);
+  return{ty:'f',rn,rd,t:`A ${nm} le quedan ${fr(n1,d1)} de una pizza y se come ${fr(n2,d2)} de lo que le queda. ¿Qué fracción de la pizza entera se ha comido?`,s:`${fr(n1,d1)} × ${fr(n2,d2)} = ${fr(n1*n2,d1*d2)}${sf(n1*n2,d1*d2)}`,h:'“De” significa multiplicar: calcula la fracción de una fracción.'}},
+ ()=>{const b=pick([3,4,5,6]),a=R(2,b-1),k=R(3,12),v=a*k;
+  return{ty:'i',u:'entradas',ans:b*k,t:`Los ${fr(a,b)} de las entradas de un concierto son ${v} entradas. ¿Cuántas entradas hay en total?`,s:`${v} ÷ ${a} = ${k} entradas es una parte (${fr(1,b)}). El total es ${k} × ${b} = ${b*k}.`,h:`Si ${a} partes son ${v}, divide entre ${a} para saber cuánto vale una parte.`}}
+];
+let p6,l6=-1;
+function np6(){let i;do{i=R(0,GEN.length-1)}while(i==l6);l6=i;p6=Object.assign(GEN[i](),{done:0});
+ $('#q6').innerHTML=p6.t;
+ $('#a6').innerHTML=p6.ty=='i'?`Respuesta: ${inp('i6a')} ${p6.u}`:`Respuesta: ${fr(inp('i6n'),inp('i6d'))}`;
+ fb('f6',null,'');$('#r6').innerHTML=''}
+function ck6(){
+ if(p6.done)return;let g;
+ if(p6.ty=='i'){const v=$('#i6a').value;if(v==='')return fb('f6',null,'Escribe tu respuesta.');g=+v===p6.ans;score(g);
+  if(g){p6.done=1;fb('f6',1,'¡Correcto!');$('#r6').innerHTML=p6.s}else fb('f6',0,'Todavía no. '+p6.h)}
+ else{const n=$('#i6n').value,d=$('#i6d').value;if(n===''||d===''||+d==0)return fb('f6',null,'Escribe numerador y denominador (el denominador no puede ser 0).');
+  g=+n*p6.rd===p6.rn*+d;score(g);
+  if(g){p6.done=1;fb('f6',1,gcd(+n,+d)>1?`¡Bien! Pero aún se puede simplificar: ${fr(p6.rn,p6.rd)}`:'¡Correcto!');$('#r6').innerHTML=p6.s}else fb('f6',0,'Todavía no. '+p6.h)}}
+function sol6(){
+ p6.done=1;
+ if(p6.ty=='i')$('#i6a').value=p6.ans;else{$('#i6n').value=p6.rn;$('#i6d').value=p6.rd}
+ fb('f6',null,'');$('#r6').innerHTML=p6.s}
+
+ex1();np1();np2();np3();np4();ex5();np5();np6();
+</script>
+</body>
+</html>
