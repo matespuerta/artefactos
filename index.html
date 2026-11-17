@@ -24,6 +24,9 @@ a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
 a.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .card b{font-size:1.05rem}
 .card span{color:var(--soft);font-size:.92rem}
+.card .tags{display:flex;gap:6px;flex-wrap:wrap;align-self:flex-start}
+.card .tag.rojo{color:#c0392b;background:rgba(229,83,75,.14)}
+@media(prefers-color-scheme:dark){.card .tag.rojo{color:#ff8f86;background:rgba(255,120,110,.18)}}
 .card .tag{align-self:flex-start;font-size:.75rem;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:999px;padding:2px 9px}
 footer{margin-top:36px;color:var(--soft);font-size:.85rem}
 main{position:relative}
@@ -63,7 +66,7 @@ h1{padding-right:130px}
 
   <h2>1.º Bachillerato CCSS</h2>
   <div class="grid">
-    <a class="card" href="inecuaciones-paso-a-paso/"><span class="tag">Inecuaciones</span><b>Inecuaciones paso a paso</b><span>Inecuaciones paso a paso y sistemas para programación lineal (se usa mucho en 2.º Bachillerato).</span></a>
+    <a class="card" href="inecuaciones-paso-a-paso/"><span class="tags"><span class="tag">Inecuaciones</span><span class="tag rojo">2ºBACH</span></span><b>Inecuaciones paso a paso</b><span>Inecuaciones paso a paso y sistemas para programación lineal (se usa mucho en 2.º Bachillerato).</span></a>
     <a class="card" href="sistemas-gauss-problemas/"><span class="tag">Método de Gauss</span><b>Problemas de sistemas por Gauss</b><span>Siete tipos de problema (compras, entradas, inversiones, edades, mezclas, producción y billetes), resueltos paso a paso con sistemas escalonados.</span></a>
   </div>
 
