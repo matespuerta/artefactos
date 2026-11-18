@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polinomios y fracciones algebraicas · 1º Bachillerato</title>
+<style>
+  :root{
+    --paper:#f6f1e7; --card:#fffdf8; --ink:#1d2733; --muted:#6b6457; --line:#e3dacb;
+    --accent:#c2410c; --accent-soft:#fbe6d9; --ok:#166534; --ok-soft:#dcf2e3; --bad:#9f1239; --bad-soft:#fbe4ea;
+    --math:'STIX Two Text', 'Cambria Math', serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.5;
+    background-image:radial-gradient(circle at 1px 1px, rgba(29,39,51,.06) 1px, transparent 0);background-size:22px 22px}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px}
+  header h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(28px,4.5vw,44px);margin:0 0 4px;letter-spacing:-.5px}
+  header p{margin:0;color:var(--muted)}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:22px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .row+.row{margin-top:12px}
+  label.small{font-size:13px;color:var(--muted);font-weight:500}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:transparent;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+  .seg button+button{border-left:1px solid var(--line)}
+  .seg button.on{background:var(--ink);color:#fff}
+  .btn{border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;padding:9px 16px;font:inherit;font-weight:600;font-size:14px;cursor:pointer}
+  .btn.alt{background:transparent;color:var(--ink)}
+  .btn.acc{background:var(--accent);border-color:var(--accent)}
+  .btn.sm{padding:7px 13px;font-size:13px}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+  .gens{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .gen{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fff}
+  .gen h2{font-family:'Fraunces',serif;font-weight:500;font-size:18px;margin:0}
+  .gen p{margin:0;font-size:13px;color:var(--muted)}
+  .gen .btn{margin-top:auto;align-self:flex-start}
+  input[type=text]{font:inherit;font-size:14px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:200px;flex:1}
+  .err{color:var(--bad);font-size:13px;margin-top:6px;min-height:1em}
+  .m{font-family:var(--math);font-size:1.08em}
+  .big{font-family:var(--math);font-size:clamp(20px,3.2vw,28px);margin:8px 0;overflow-x:auto;white-space:nowrap;padding:4px 0}
+  .mid{font-family:var(--math);font-size:20px;margin:8px 0;overflow-x:auto;padding:2px 0;white-space:nowrap}
+  sup{font-size:.65em}
+  .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;line-height:1.2}
+  .frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .25em .1em}
+  .frac>span:last-child{padding:.1em .25em 0}
+  .rad{border-top:1.5px solid currentColor;padding:0 .1em;margin-left:1px}
+  .x{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px;color:var(--muted)}
+  .list-head{margin:30px 0 4px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .list-head h2{font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin:0}
+  .list-head span{color:var(--muted);font-size:14px}
+  .ex{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:14px;overflow:hidden}
+  .ex.open{border-color:var(--ink)}
+  .ex-head{display:flex;align-items:center;gap:14px;padding:14px 18px}
+  .stmt{flex:1;font-family:var(--math);font-size:clamp(18px,2.8vw,24px);overflow-x:auto;white-space:nowrap;padding:4px 0}
+  .stmt .lead{font-family:'IBM Plex Sans';font-size:13px;color:var(--muted);margin-right:8px}
+  .ex-body{border-top:1px solid var(--line);padding:6px 18px 18px;background:#fcf9f2}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+  .progress{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
+  .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-family:'IBM Plex Sans';font-size:13px;font-weight:600;flex:none}
+  .ex-head .num{background:var(--ink)}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-top:12px;animation:in .35s ease}
+  @keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .step h3{margin:0 0 8px;font-family:'Fraunces',serif;font-weight:500;font-size:19px;display:flex;gap:10px;align-items:center}
+  .step p{margin:6px 0}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .chip{font-family:var(--math);font-size:16px;padding:3px 10px;border-radius:999px;background:var(--bad-soft);color:var(--bad)}
+  .chip.ok{background:var(--ok-soft);color:var(--ok);font-weight:600}
+  .ruf-wrap{overflow-x:auto;margin:12px 0}
+  table.ruf{border-collapse:collapse;font-family:var(--math);font-size:20px;margin:0 auto}
+  table.ruf.sm{font-size:17px}
+  table.ruf td{padding:5px 13px;text-align:center;min-width:40px}
+  table.ruf td.rc{border-right:2px solid var(--ink);color:var(--accent);font-weight:600}
+  table.ruf tr.res td{border-top:2px solid var(--ink)}
+  table.ruf td.rem{border-left:2px solid var(--ink);background:var(--ok-soft);color:var(--ok);font-weight:600}
+  table.ruf tr.prod td{color:var(--muted)}
+  .note{font-size:13.5px;color:var(--muted)}
+  .box{background:var(--accent-soft);border-radius:10px;padding:10px 14px;margin-top:10px;overflow-x:auto}
+  .fb{border-left:3px solid var(--line);padding:2px 0 2px 14px;margin:12px 0}
+  .fb .fbt{font-family:var(--math);font-size:19px;font-weight:600;margin:0 0 4px}
+  .final{border:2px solid var(--ink)}
+  .rootlist{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+  .root{font-family:var(--math);font-size:19px;background:var(--ok-soft);color:var(--ok);padding:5px 12px;border-radius:10px}
+  .root.cx{background:#ece8f8;color:#4c1d95}
+  .root small{font-family:'IBM Plex Sans';font-size:12px;opacity:.8;margin-left:4px}
+  .warn{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 14px}
+  .hidden{display:none}
+  @media (max-width:600px){.ex-head{flex-wrap:wrap}.stmt{flex-basis:100%;order:3}}
+</style>
+<style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+header h1{padding-right:70px}
+</style>
+</head>
+<body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
+<div class="wrap">
+  <header>
+    <h1>Polinomios y fracciones algebraicas</h1>
+    <p>Genera 5 ejercicios y resuélvelos uno a uno, paso a paso.</p>
+  </header>
+
+  <div class="panel">
+    <div class="gens">
+      <div class="gen">
+        <h2>Polinomios · Ruffini</h2>
+        <p>Raíces por Ruffini hasta grado 2, ecuación de segundo grado y factorización.</p>
+        <div class="row"><label class="small">Grado</label>
+          <div class="seg" id="deg">
+            <button data-d="0" class="on">Mix</button><button data-d="2">2</button><button data-d="3">3</button><button data-d="4">4</button><button data-d="5">5</button><button data-d="6">6</button>
+          </div></div>
+        <button class="btn acc" id="genPoly">Generar 5 polinomios</button>
+      </div>
+      <div class="gen">
+        <h2>Simplificar fracciones</h2>
+        <p>Factorizar numerador y denominador y eliminar los factores comunes.</p>
+        <button class="btn acc" id="genSimp">Generar 5 fracciones</button>
+      </div>
+      <div class="gen">
+        <h2>Operar fracciones</h2>
+        <p>Sumas, restas, productos y divisiones de fracciones algebraicas, simplificando el resultado.</p>
+        <div class="row"><label class="small">Operación</label>
+          <div class="seg" id="ops">
+            <button data-o="mix" class="on">Mix</button><button data-o="+">+</button><button data-o="−">−</button><button data-o="·">·</button><button data-o=":">:</button>
+          </div></div>
+        <button class="btn acc" id="genOps">Generar 5 operaciones</button>
+      </div>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <label class="small">O escribe un polinomio propio (coeficientes de mayor a menor grado):</label>
+      <input type="text" id="custom" placeholder="ej. 1 -2 -5 6   →  x³ − 2x² − 5x + 6">
+      <button class="btn alt" id="useCustom">Resolver</button>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div id="list"></div>
+</div>
+
+<script>
+/* =========================================================
+   Utilidades numéricas y de polinomios (coeficientes de mayor a menor grado)
+   ========================================================= */
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const lcm=(a,b)=>Math.abs(a/gcd(a,b)*b);
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const fmt=n=>n<0?'−'+Math.abs(n):''+n;
+const par=n=>n<0?'('+fmt(n)+')':fmt(n);
+const X='<i>x</i>';
+const SUB=['₁','₂','₃','₄','₅','₆','₇'];
+const isSq=n=>n>=0&&Number.isInteger(Math.sqrt(n));
+
+function trim(p){p=p.slice();while(p.length>1&&p[0]===0)p.shift();return p}
+function add(a,b){const n=Math.max(a.length,b.length),r=[];for(let i=0;i<n;i++){r.push((a[a.length-n+i]||0)+(b[b.length-n+i]||0))}return trim(r)}
+const scale=(p,k)=>trim(p.map(a=>a*k));
+const sub=(a,b)=>add(a,scale(b,-1));
+function mul(a,b){const r=new Array(a.length+b.length-1).fill(0);a.forEach((x,i)=>b.forEach((y,j)=>r[i+j]+=x*y));return trim(r)}
+const powP=(p,m)=>{let r=[1];for(let i=0;i<m;i++)r=mul(r,p);return r};
+const evalP=(c,x)=>c.reduce((acc,a)=>acc*x+a,0);
+const isZero=p=>p.length===1&&p[0]===0;
+const nTerms=p=>p.filter(a=>a!==0).length;
+function divisors(n){n=Math.abs(n);const d=[];for(let i=1;i<=n;i++)if(n%i===0)d.push(i);return d}
+function ruffini(c,r){
+  const q=[c[0]],prods=[];
+  for(let i=1;i<c.length;i++){const p=r*q[i-1];prods.push(p);q.push(c[i]+p)}
+  return {q:q.slice(0,-1),rem:q[q.length-1],prods};
+}
+function sqrtSplit(n){let k=1;for(let i=Math.floor(Math.sqrt(n));i>1;i--){if(n%(i*i)===0){k=i;break}}return {k,m:n/(k*k)}}
+
+/* ---------- presentación ---------- */
+function polyHTML(c){
+  const n=c.length-1;let s='';
+  c.forEach((a,i)=>{
+    if(a===0)return;const p=n-i,abs=Math.abs(a);
+    let t=(abs===1&&p>0)?'':''+abs;
+    if(p>0)t+=X+(p>1?'<sup>'+p+'</sup>':'');
+    s+= s===''?(a<0?'−':'')+t:(a<0?' − ':' + ')+t;
+  });
+  return s||'0';
+}
+const wrapP=p=>nTerms(p)>1?'('+polyHTML(p)+')':polyHTML(p);
+const wrapNeg=p=>(nTerms(p)>1||p.find(a=>a!==0)<0)?'('+polyHTML(p)+')':polyHTML(p);
+function fracBox(num,den){return `<span class="frac"><span>${num}</span><span>${den}</span></span>`}
+function fracHTML(p,q){
+  if(q<0){p=-p;q=-q} const g=gcd(p,q)||1;p/=g;q/=g;
+  if(q===1)return fmt(p);
+  return (p<0?'−':'')+fracBox(Math.abs(p),q);
+}
+const sq=v=>`√<span class="rad">${v}</span>`;
+function rufTable(cur,r,prods,q,small){
+  return `<div class="ruf-wrap"><table class="ruf${small?' sm':''}">
+    <tr><td class="rc"></td>${cur.map(c=>`<td>${fmt(c)}</td>`).join('')}</tr>
+    <tr class="prod"><td class="rc">${fmt(r)}</td><td></td>${prods.map(p=>`<td>${fmt(p)}</td>`).join('')}</tr>
+    <tr class="res"><td class="rc"></td>${q.map(c=>`<td><b>${fmt(c)}</b></td>`).join('')}<td class="rem">0</td></tr>
+  </table></div>`;
+}
+function trialChips(trials){
+  return `<div class="chips">${trials.map(([c,v])=>`<span class="chip ${v===0?'ok':''}">P(${fmt(c)}) = ${fmt(v)}${v===0?' ✓':''}</span>`).join('')}</div>`;
+}
+
+/* =========================================================
+   1) POLINOMIOS: Ruffini + ecuación de 2º grado
+   ========================================================= */
+function linFactor(r){return r===0?X:`(${X} ${r>0?'−':'+'} ${Math.abs(r)})`}
+function rootHTML(R){
+  if(R.kind==='rat')return fracHTML(R.p,R.q);
+  const Ks=R.K===1?'':R.K, tail=R.kind==='cx'?(R.m===1?`${Ks}<i>i</i>`:`${Ks}${sq(R.m)}<i>i</i>`):`${Ks}${sq(R.m)}`;
+  let num=R.B!==0?fmt(R.B)+(R.s>0?' + ':' − ')+tail:(R.s>0?'':'−')+tail;
+  return R.D===1?num:fracBox(num,R.D);
+}
+function pmHTML(B,K,m,D){
+  const num=(B!==0?fmt(B)+' ':'')+'± '+(K===1?'':K)+sq(m);
+  return D===1?num:fracBox(num,D);
+}
+function rootFactorHTML(R,k){
+  let f;
+  if(R.kind==='rat'){
+    f=R.q===1?linFactor(R.p):`(${X} ${R.p>0?'−':'+'} ${fracBox(Math.abs(R.p),R.q)})`;
+  }else if(R.D===1){
+    const b=R.B>0?` − ${R.B}`:R.B<0?` + ${-R.B}`:'';
+    f=`(${X}${b} ${R.s>0?'−':'+'} ${R.K===1?'':R.K}${sq(R.m)})`;
+  }else f=`(${X} − ${rootHTML(R)})`;
+  return k>1?f+`<sup>${k}</sup>`:f;
+}
+function rootVal(R){return R.kind==='rat'?R.p/R.q:(R.B+R.s*R.K*Math.sqrt(R.m))/R.D}
+function groupRoots(roots){
+  const map=new Map();
+  roots.forEach(R=>{const key=R.kind==='rat'?R.p/R.q+'':'irr'+R.B+'_'+R.s+'_'+R.K+'_'+R.m+'_'+R.D;
+    if(!map.has(key))map.set(key,{R,k:0});map.get(key).k++});
+  return [...map.values()].sort((a,b)=>rootVal(a.R)-rootVal(b.R));
+}
+const intRoot=r=>({kind:'rat',p:r,q:1});
+function mkRat(p,q){if(q<0){p=-p;q=-q}const g=gcd(p,q)||1;return {kind:'rat',p:p/g,q:q/g}}
+function leadStr(a){return a===1?'':a===-1?'−':fmt(a)}
+const multName=k=>({2:'doble',3:'triple',4:'cuádruple',5:'quíntuple',6:'séxtuple'}[k]||'');
+
+function genPoly(deg){
+  for(let t=0;t<2000;t++){
+    let lead=pick([1,1,1,1,1,-1,-1,2,2,-2,3]);
+    const type=pick(['ent','ent','irr','irr','cx','cx','rat','doble']);
+    let quad;
+    if(type==='ent'){const a=ri(-5,5),b=ri(-5,5);quad=[1,-(a+b),a*b]}
+    else if(type==='doble'){const a=ri(-4,4);quad=[1,-2*a,a*a]}
+    else if(type==='irr'){const b=ri(-6,6),c=ri(-8,6),D=b*b-4*c;if(D<=0||isSq(D))continue;quad=[1,b,c]}
+    else if(type==='cx'){const b=ri(-5,5),c=ri(1,10),D=b*b-4*c;if(D>=0)continue;quad=[1,b,c]}
+    else{const L=pick([2,3,2,-2]);let p=ri(-5,5);if(p===0||gcd(p,L)!==1)continue;const s=ri(-4,4);
+      quad=[L,-(L*s+p),p*s];lead=1;}
+    let P=quad.map(c=>c*lead);
+    const pool=[-3,-2,-2,-1,-1,-1,0,1,1,1,2,2,3,4,-4];
+    for(let i=0;i<deg-2;i++)P=mul(P,[1,-pick(pool)]);
+    if(Math.max(...P.map(Math.abs))>600)continue;
+    if(deg>3&&P[P.length-1]===0&&P[P.length-2]===0&&Math.random()<.7)continue;
+    return P;
+  }
+  return [1,-2,-5,6];
+}
+
+function solvePoly(P){
+  const steps=[],deg=P.length-1,lead=P[0];
+  let plan=deg>2?`Aplicaremos Ruffini ${deg-2} ${deg-2===1?'vez':'veces'} para bajar el grado de ${deg} a 2, y después resolveremos la ecuación de segundo grado.`
+          :deg===2?'Es de segundo grado: aplicamos directamente la fórmula.':'Es de primer grado: despejamos directamente.';
+  steps.push({t:'Planteamiento',h:`<p>Buscamos las raíces de <span class="m">P(${X}) = ${polyHTML(P)}</span>, es decir, resolvemos <span class="m">P(${X}) = 0</span>.</p>
+    <p>Grado ${deg}. Coeficientes: <span class="m">${P.map(fmt).join(', ')}</span>.</p><p>${plan}</p>
+    ${deg>2?`<p class="note">Toda raíz entera de P(x) divide al término independiente.</p>`:''}`});
+
+  let cur=P.slice();const found=[];let stuck=false,nR=0;
+  while(cur.length-1>2){
+    nR++;
+    const a0=cur[cur.length-1];let cands,note;
+    if(a0===0){cands=[0];note=`<p>El término independiente es <b>0</b>, así que <span class="m">${X} = 0</span> es raíz.</p>`}
+    else{const ds=divisors(a0);cands=ds.flatMap(d=>[d,-d]);
+      note=`<p>Candidatos: divisores del término independiente <span class="m">${fmt(a0)}</span> → <span class="m">±${ds.join(', ±')}</span></p>`}
+    const trials=[];let r=null;
+    for(const c of cands){const v=evalP(cur,c);trials.push([c,v]);if(v===0){r=c;break}}
+    if(r===null){
+      stuck=true;
+      steps.push({t:`Ruffini: no hay más raíces enteras`,h:note+
+        `<div class="chips">${trials.map(([c,v])=>`<span class="chip">P(${fmt(c)}) = ${fmt(v)}</span>`).join('')}</div>
+        <div class="warn">Ningún divisor anula <span class="m">${polyHTML(cur)}</span>: no tiene raíces enteras y no podemos seguir con Ruffini.</div>`});
+      break;
+    }
+    const {q,prods}=ruffini(cur,r);found.push(r);
+    const sofar=groupRoots(found.map(intRoot)).map(g=>rootFactorHTML(g.R,g.k)).join('');
+    steps.push({t:`Ruffini con ${X} = ${fmt(r)}`,h:note+
+      `<p>Probamos valores hasta que el resto sea 0:</p>${trialChips(trials)}
+      ${nR===1?`<p class="note">Bajamos el primer coeficiente; lo multiplicamos por ${fmt(r)}, lo colocamos bajo el siguiente y sumamos; repetimos hasta el final.</p>`:''}
+      ${rufTable(cur,r,prods,q)}
+      <p>Cociente: <span class="m">Q${SUB[nR-1]||''}(${X}) = ${polyHTML(q)}</span> &nbsp;·&nbsp; resto 0</p>
+      <div class="box"><div class="mid">P(${X}) = ${sofar}·(${polyHTML(q)})</div></div>`});
+    cur=q;
+  }
+
+  const realRoots=found.map(intRoot);let cxRoots=[],quadLeft=null;
+  if(!stuck){
+    if(cur.length-1===2){
+      const [a,b,c]=cur;const D=b*b-4*a*c;
+      let h=`<p>Resolvemos <span class="m">${polyHTML(cur)} = 0</span> con <span class="m">a = ${fmt(a)}, b = ${fmt(b)}, c = ${fmt(c)}</span>:</p>
+        <div class="mid">${X} = ${fracBox(`−<i>b</i> ± ${sq('<i>b</i><sup>2</sup> − 4<i>ac</i>')}`,'2<i>a</i>')}
+        = ${fracBox(`${b===0?'0':'−'+par(b)} ± ${sq(`${par(b)}<sup>2</sup> − 4·${par(a)}·${par(c)}`)}`,`2·${par(a)}`)}</div>
+        <p>Discriminante: <span class="m">Δ = ${b*b} ${4*a*c<0?'+':'−'} ${Math.abs(4*a*c)} = <b>${fmt(D)}</b></span></p>`;
+      if(isSq(D)){
+        const s=Math.sqrt(D);
+        if(D===0){
+          realRoots.push(mkRat(-b,2*a),mkRat(-b,2*a));
+          h+=`<p>Δ = 0 → una raíz doble:</p><div class="mid">${X} = ${fracBox(fmt(-b),fmt(2*a))} = <b>${fracHTML(-b,2*a)}</b></div>`;
+        }else{
+          realRoots.push(mkRat(-b+s,2*a),mkRat(-b-s,2*a));
+          h+=`<p>Δ > 0 y es cuadrado perfecto (√${D} = ${s}) → dos raíces racionales:</p>
+            <div class="mid">${X}₁ = ${fracBox(`${fmt(-b)} + ${s}`,fmt(2*a))} = <b>${fracHTML(-b+s,2*a)}</b></div>
+            <div class="mid">${X}₂ = ${fracBox(`${fmt(-b)} − ${s}`,fmt(2*a))} = <b>${fracHTML(-b-s,2*a)}</b></div>`;
+        }
+      }else{
+        const {k,m}=sqrtSplit(Math.abs(D));let g=gcd(gcd(b,k),2*a);let B=-b/g,K=k/g,Dd=2*a/g;if(Dd<0){B=-B;Dd=-Dd}
+        const simp=k>1?` = ${sq(`${k*k}·${m}`)} = ${k}${sq(m)}`:'';
+        const kind=D>0?'irr':'cx';
+        const r1={kind,B,K,m,D:Dd,s:1},r2={kind,B,K,m,D:Dd,s:-1};
+        if(D>0){
+          realRoots.push(r1,r2);
+          h+=`<p>Δ > 0 pero no es cuadrado perfecto → dos raíces reales irracionales.</p>
+            <p class="m">√${D}${simp}</p>
+            <div class="mid">${X} = ${fracBox(`${fmt(-b)} ± ${k===1?'':k}${sq(m)}`,fmt(2*a))}${g!==1||2*a<0?` = ${pmHTML(B,K,m,Dd)}`:''}</div>
+            <div class="mid">${X}₁ = <b>${rootHTML(r1)}</b> ≈ ${rootVal(r1).toFixed(3).replace('-','−')}</div>
+            <div class="mid">${X}₂ = <b>${rootHTML(r2)}</b> ≈ ${rootVal(r2).toFixed(3).replace('-','−')}</div>`;
+        }else{
+          cxRoots=[r1,r2];quadLeft=cur;
+          h+=`<p>Δ < 0 → <b>no hay raíces reales</b>; las dos raíces son complejas conjugadas.</p>
+            <p class="m">√(${fmt(D)}) = ${k===1?'':k}${m===1?'':sq(m)}<i>i</i>${simp?` &nbsp;(pues √${-D} = ${k}${sq(m)})`:''}</p>
+            <div class="mid">${X}₁ = <b>${rootHTML(r1)}</b> &nbsp;&nbsp; ${X}₂ = <b>${rootHTML(r2)}</b></div>
+            <p class="note">El factor <span class="m">${polyHTML(cur)}</span> es irreducible en los reales y se queda así en la factorización.</p>`;
+        }
+      }
+      steps.push({t:'Ecuación de segundo grado',h});
+    }else if(cur.length-1===1){
+      const [a,b]=cur;realRoots.push(mkRat(-b,a));
+      steps.push({t:'Ecuación de primer grado',h:`<div class="mid">${polyHTML(cur)} = 0 &nbsp;→&nbsp; ${X} = ${fracBox(fmt(-b),fmt(a))} = <b>${fracHTML(-b,a)}</b></div>`});
+    }
+  }else quadLeft=cur;
+
+  const G=groupRoots(realRoots);
+  const factors=G.map(g=>rootFactorHTML(g.R,g.k)).join('');
+  let fact;
+  if(quadLeft) fact=factors?factors+`(${polyHTML(quadLeft)})`:polyHTML(quadLeft)+' &nbsp;<span class="note">(irreducible)</span>';
+  else fact=leadStr(lead)+factors;
+  const rl=G.map(g=>`<span class="root">${X} = ${rootHTML(g.R)}${g.k>1?`<small>${multName(g.k)}</small>`:''}</span>`).join('')+
+           cxRoots.map(R=>`<span class="root cx">${X} = ${rootHTML(R)}<small>compleja</small></span>`).join('');
+  steps.push({t:'Solución',final:true,h:`
+    <p><b>Raíces reales</b> (${realRoots.length} contando multiplicidad${stuck?'; faltan las del factor sin raíces enteras':''}):</p>
+    <div class="rootlist">${rl||'<span class="note">Ninguna</span>'}</div>
+    ${cxRoots.length?'<p class="note">Las raíces moradas son complejas: no aparecen en la factorización real.</p>':''}
+    <p><b>Polinomio factorizado:</b></p>
+    <div class="big">${polyHTML(P)} = ${fact}</div>
+    ${lead!==1&&!quadLeft?`<p class="note">El coeficiente principal (${fmt(lead)}) se mantiene delante de los factores.</p>`:''}`});
+  return steps;
+}
+
+/* =========================================================
+   2) FACTORIZACIÓN para fracciones: F = { c: constante, fs: [{p: polinomio primitivo, m: multiplicidad}] }
+   ========================================================= */
+const key=p=>p.join(',');
+function mergeFs(fs){
+  const map=new Map();
+  fs.forEach(f=>{const k=key(f.p);if(!map.has(k))map.set(k,{p:f.p,m:0});map.get(k).m+=f.m});
+  const sk=f=>isXf(f.p)?-1e9:f.p.length===2?-f.p[1]/f.p[0]:1e9+f.p.length;
+  return [...map.values()].filter(f=>f.m>0).sort((a,b)=>sk(a)-sk(b));
+}
+const mulF=(A,B)=>({c:A.c*B.c,fs:mergeFs([...A.fs,...B.fs])});
+function expandF(F){let r=[F.c];F.fs.forEach(f=>r=mul(r,powP(f.p,f.m)));return r}
+const isXf=p=>p.length===2&&p[0]===1&&p[1]===0;
+function piece(p,m,paren){
+  let base=isXf(p)?X:(paren||m>1)?'('+polyHTML(p)+')':polyHTML(p);
+  return m>1?base+`<sup>${m}</sup>`:base;
+}
+function facHTML(F,forceParen){
+  if(!F.fs.length)return fmt(F.c);
+  const single=F.fs.length===1&&F.fs[0].m===1;
+  const paren=forceParen||!(single&&F.c===1);
+  const pre=F.c===1?'':F.c===-1?'−':fmt(F.c);
+  return pre+F.fs.map(f=>piece(f.p,f.m,paren)).join('');
+}
+
+function factorize(P){
+  P=trim(P);const steps=[];let fs=[];
+  if(P.length===1)return {c:P[0],fs:[],steps};
+  let g=P.reduce((a,b)=>gcd(a,b),0);if(P[0]<0)g=-g;
+  let cur=P.map(a=>a/g);let c=g,k=0;
+  while(cur[cur.length-1]===0){cur.pop();k++}
+  if(k>0)fs.push({p:[1,0],m:k});
+  if(cur.length===1){return {c,fs:mergeFs(fs),steps}}
+  if(k>0||Math.abs(g)!==1){
+    const common=(g===1?'':g===-1?'−':fmt(g))+(k>0?X+(k>1?`<sup>${k}</sup>`:''):'');
+    const shown=common===''?'':common;
+    steps.push(`<p>Sacamos factor común <span class="m">${shown}</span>: <span class="m">${polyHTML(P)} = ${shown}(${polyHTML(cur)})</span></p>`);
+  }else if(g===-1){
+    steps.push(`<p>Sacamos el signo: <span class="m">${polyHTML(P)} = −(${polyHTML(cur)})</span></p>`);
+  }
+  while(cur.length-1>=3){
+    const ds=divisors(cur[cur.length-1]);const cands=ds.flatMap(d=>[d,-d]);
+    let r=null;const trials=[];
+    for(const cd of cands){const v=evalP(cur,cd);trials.push([cd,v]);if(v===0){r=cd;break}}
+    if(r===null){steps.push(`<p><span class="m">${polyHTML(cur)}</span> no tiene raíces enteras (probados ±${ds.join(', ±')}); lo dejamos así.</p>`);break}
+    const {q,prods}=ruffini(cur,r);
+    steps.push(`<p>Ruffini con <span class="m">${X} = ${fmt(r)}</span> (divisor de ${fmt(cur[cur.length-1])}):</p>${rufTable(cur,r,prods,q,true)}
+      <p class="m">${polyHTML(cur)} = ${linFactor(r)}(${polyHTML(q)})</p>`);
+    fs.push({p:[1,-r],m:1});cur=q;
+  }
+  if(cur.length-1===2){
+    const [a,b,cc]=cur;const D=b*b-4*a*cc;
+    if(isSq(D)){
+      const s=Math.sqrt(D);const r1=mkRat(-b+s,2*a),r2=mkRat(-b-s,2*a);
+      const f1=[r1.q,-r1.p],f2=[r2.q,-r2.p];const extra=a/(r1.q*r2.q);c*=extra;
+      const Fq={c:extra,fs:mergeFs([{p:f1,m:1},{p:f2,m:1}])};
+      steps.push(`<p>Resolvemos <span class="m">${polyHTML(cur)} = 0</span>: &nbsp;<span class="m">Δ = ${fmt(b*b)} ${4*a*cc<0?'+':'−'} ${Math.abs(4*a*cc)} = ${D}</span>,
+        &nbsp;<span class="m">${X} = ${fracBox(`${fmt(-b)} ± ${s}`,fmt(2*a))}</span> → <span class="m">${X}₁ = ${rootHTML(r1)}</span>, <span class="m">${X}₂ = ${rootHTML(r2)}</span></p>
+        <p class="m">${polyHTML(cur)} = ${facHTML(Fq,true)}</p>`);
+      fs.push({p:f1,m:1},{p:f2,m:1});
+    }else{
+      steps.push(`<p><span class="m">${polyHTML(cur)}</span>: Δ = ${fmt(D)} ${D<0?'&lt; 0, no tiene raíces reales':'no es cuadrado perfecto, no tiene raíces racionales'}; se queda así.</p>`);
+      fs.push({p:cur,m:1});
+    }
+  }else fs.push({p:cur,m:1});
+  return {c,fs:mergeFs(fs),steps};
+}
+function factorBlock(label,P,F){
+  F=F||factorize(P);
+  if(!F.steps.length)return {F,h:`<p class="m">${label} = ${polyHTML(P)} <span class="note">— ${P.length===1?'es un número':'ya está factorizado'}</span></p>`};
+  return {F,h:`<div class="fb"><p class="fbt">${label} = ${polyHTML(P)}</p>${F.steps.join('')}
+    <p>→ <span class="m">${label} = <b>${facHTML(F)}</b></span></p></div>`};
+}
+
+/* ---------- simplificación ---------- */
+function simplifyData(NF,DF){
+  const dmap=new Map(DF.fs.map(f=>[key(f.p),f]));const common={};
+  NF.fs.forEach(f=>{const d=dmap.get(key(f.p));if(d)common[key(f.p)]=Math.min(f.m,d.m)});
+  const red=F=>({c:F.c,fs:F.fs.map(f=>({p:f.p,m:f.m-(common[key(f.p)]||0)})).filter(f=>f.m>0)});
+  const N=red(NF),D=red(DF);
+  const g=gcd(N.c,D.c)||1;let nc=N.c/g,dc=D.c/g;if(dc<0){nc=-nc;dc=-dc}
+  const numNote=(g!==1||D.c<0)?`Los números: <span class="m">${fracHTML(NF.c,DF.c)==='1'?'1':fracBox(fmt(NF.c),fmt(DF.c))} = ${fracHTML(NF.c,DF.c)}</span>`:'';
+  N.c=nc;D.c=dc;
+  return {common,N,D,numNote,has:Object.keys(common).length>0};
+}
+function cancelHTML(F,common){
+  const parts=[];
+  F.fs.forEach(f=>{const k=common[key(f.p)]||0,rem=f.m-k;
+    if(k>0)parts.push(`<span class="x">${piece(f.p,k,true)}</span>`);
+    if(rem>0)parts.push(piece(f.p,rem,true));});
+  const pre=F.c===1?(parts.length?'':'1'):F.c===-1?'−':fmt(F.c);
+  return pre+parts.join('');
+}
+function commonList(common,NF){
+  return NF.fs.filter(f=>common[key(f.p)]).map(f=>`<span class="m">${piece(f.p,common[key(f.p)],true)}</span>`).join(', ');
+}
+function resultHTML(N,D){
+  if(isZero(expandF(N)))return '0';
+  if(!D.fs.length&&D.c===1)return facHTML(N);
+  return fracBox(facHTML(N),facHTML(D));
+}
+function expandedHTML(N,D){
+  const en=expandF(N),ed=expandF(D);
+  if(!D.fs.length&&D.c===1)return polyHTML(en);
+  return fracBox(polyHTML(en),polyHTML(ed));
+}
+function needsExpanded(N,D){
+  const many=F=>F.fs.length>1||F.fs.some(f=>f.m>1)||(F.fs.length&&Math.abs(F.c)!==1);
+  return many(N)||many(D);
+}
+function domainHTML(Fs){
+  const vals=new Map();
+  Fs.forEach(F=>F.fs.forEach(f=>{if(f.p.length===2){const R=mkRat(-f.p[1],f.p[0]);vals.set(R.p/R.q,R)}
+    else if(f.p.length===3){const [a,b,c]=f.p,D=b*b-4*a*c;if(D>=0&&!isSq(D))vals.set('irr'+key(f.p),{irr:f.p})}}));
+  const arr=[...vals.values()].filter(R=>!R.irr).sort((a,b)=>a.p/a.q-b.p/b.q);
+  const irr=[...vals.values()].filter(R=>R.irr);
+  if(!arr.length&&!irr.length)return '';
+  return `<p class="note">Condición: la expresión solo tiene sentido si ningún denominador se anula, es decir, para <span class="m">${X} ≠ ${arr.map(R=>fracHTML(R.p,R.q)).join(', ')}</span>${irr.length?' (y las raíces de '+irr.map(r=>polyHTML(r.irr)).join(', ')+')':''}.</p>`;
+}
+function cancelStep(NF,DF,title){
+  const S=simplifyData(NF,DF);
+  let h=`<div class="big">${fracBox(cancelHTML(NF,S.common),cancelHTML(DF,S.common))}</div>`;
+  if(S.has)h+=`<p>Factores comunes que se eliminan: ${commonList(S.common,NF)}.</p>`;
+  else h+=`<p>No hay factores comunes entre numerador y denominador.</p>`;
+  if(S.numNote)h+=`<p>${S.numNote}</p>`;
+  h+=`<div class="box"><div class="big">= ${resultHTML(S.N,S.D)}</div></div>`;
+  return {S,step:{t:title||'Eliminamos los factores comunes',h}};
+}
+function finalStep(S,domFs,label){
+  let h=`<div class="big">${label?label+' = ':''}${resultHTML(S.N,S.D)}</div>`;
+  if(needsExpanded(S.N,S.D)&&!isZero(expandF(S.N)))h+=`<p>Desarrollando: <span class="m">${expandedHTML(S.N,S.D)}</span></p>`;
+  h+=domainHTML(domFs);
+  return {t:'Solución',final:true,h};
+}
+
+/* ---------- generador: simplificar ---------- */
+function genSimplify(){
+  for(let t=0;t<3000;t++){
+    const roots=shuffle([-4,-3,-2,-1,0,1,2,3,4,5,-5]);
+    const nC=pick([1,1,2,2]);let idx=0;
+    const common=[];for(let i=0;i<nC;i++)common.push({p:[1,-roots[idx++]],m:1});
+    if(nC===1&&Math.random()<.3)common[0].m=2;
+    const nE=pick([0,1,1,2]),dE=pick([1,1,2]);
+    const numX=[],denX=[];
+    for(let i=0;i<nE;i++)numX.push({p:[1,-roots[idx++]],m:1});
+    for(let i=0;i<dE;i++)denX.push({p:[1,-roots[idx++]],m:1});
+    if(Math.random()<.15)numX.push({p:pick([[1,0,1],[1,0,4],[1,2,5]]),m:1});
+    const cN=pick([1,1,1,1,2,3,-1,2,4]),cD=pick([1,1,1,1,2,3,4,6]);
+    const N=expandF({c:cN,fs:[...common,...numX]}),D=expandF({c:cD,fs:[...common,...denX]});
+    if(N.length-1>4||D.length-1>4||D.length-1<2)continue;
+    if(Math.max(...N.map(Math.abs),...D.map(Math.abs))>200)continue;
+    return {N,D};
+  }
+  return {N:[1,-1],D:[1,0,-1]};
+}
+function solveSimplify(N,D){
+  const steps=[];
+  steps.push({t:'Planteamiento',h:`<div class="big">${fracBox(polyHTML(N),polyHTML(D))}</div>
+    <p>Para simplificar una fracción algebraica <b>factorizamos</b> numerador y denominador y después <b>eliminamos los factores comunes</b>. (Solo se pueden tachar factores que multiplican, nunca sumandos.)</p>`});
+  const bn=factorBlock('N('+X+')',N);steps.push({t:'Factorizamos el numerador',h:bn.h});
+  const bd=factorBlock('D('+X+')',D);steps.push({t:'Factorizamos el denominador',h:bd.h});
+  const {S,step}=cancelStep(bn.F,bd.F);steps.push(step);
+  steps.push(finalStep(S,[bd.F]));
+  steps.result={N:expandF(S.N),D:expandF(S.D)};
+  return steps;
+}
+
+/* ---------- generador: operaciones ---------- */
+function genOp(op){
+  const lin=r=>({p:[1,-r],m:1});
+  for(let t=0;t<5000;t++){
+    const R=shuffle([-4,-3,-2,-1,0,1,2,3,4,5,-5]);
+    if(op==='+'||op==='−'){
+      const [a,b,c]=R;const pat=ri(1,4);let F1,F2;
+      if(pat===1){F1=[lin(a),lin(b)];F2=[lin(a)]}
+      else if(pat===2){F1=[lin(a),lin(b)];F2=[lin(a),lin(c)]}
+      else if(pat===3){F1=[lin(a)];F2=[lin(b)]}
+      else{F1=[{p:[1,-a],m:2}];F2=[lin(a),lin(b)]}
+      if(Math.random()<.5)[F1,F2]=[F2,F1];
+      const k1=Math.random()<.2?pick([2,3]):1,k2=Math.random()<.3?pick([2,3]):1;
+      const D1=expandF({c:k1,fs:F1}),D2=expandF({c:k2,fs:F2});
+      const mkN=()=>pick([[ri(1,5)],[-ri(1,5)],[1,ri(-4,4)],[ri(2,3),ri(-4,4)],[1,ri(-4,4)]]).map(x=>x);
+      const N1=trim(mkN()),N2=trim(mkN());
+      const bad=(N,F)=>F.some(f=>f.p.length===2&&evalP(N,-f.p[1])===0)||isZero(N);
+      if(bad(N1,F1)||bad(N2,F2))continue;
+      if(D1.length-1>3||D2.length-1>3)continue;
+      // evitar que el resultado sea 0
+      const test=op==='+'?evalP(N1,7)/evalP(D1,7)+evalP(N2,7)/evalP(D2,7):evalP(N1,7)/evalP(D1,7)-evalP(N2,7)/evalP(D2,7);
+      if(Math.abs(test)<1e-9)continue;
+      return {op,N1,D1,N2,D2};
+    }else{
+      const slots={N1:[],D1:[],N2:[],D2:[]};let i=0;
+      const nS=pick([2,2,3]),nU=pick([1,1,2]);
+      for(let s=0;s<nS;s++){const pr=op==='·'?pick([['N1','D2'],['N2','D1']]):pick([['N1','N2'],['D1','D2']]);
+        const r=R[i++];slots[pr[0]].push(r);slots[pr[1]].push(r);}
+      for(let u=0;u<nU;u++)slots[pick(['N1','D1','N2','D2'])].push(R[i++]);
+      if(!slots.D1.length||!slots.D2.length||(op===':'&&!slots.N2.length))continue;
+      const k=()=>Math.random()<.25?pick([2,3,4]):1;
+      const build=arr=>expandF({c:k(),fs:mergeFs(arr.map(lin))});
+      const P={N1:build(slots.N1),D1:build(slots.D1),N2:build(slots.N2),D2:build(slots.D2)};
+      if(Object.values(P).some(p=>p.length-1>3))continue;
+      if(Object.values(P).some(p=>Math.max(...p.map(Math.abs))>120))continue;
+      return {op,...P};
+    }
+  }
+}
+function solveOp(E){
+  const {op,N1,D1,N2,D2}=E;const steps=[];
+  const stmt=`${fracBox(polyHTML(N1),polyHTML(D1))} ${op} ${fracBox(polyHTML(N2),polyHTML(D2))}`;
+  if(op==='+'||op==='−'){
+    steps.push({t:'Planteamiento',h:`<div class="big">${stmt}</div>
+      <p>Para ${op==='+'?'sumar':'restar'} fracciones algebraicas necesitamos <b>común denominador</b>: factorizamos los denominadores y calculamos su <b>m.c.m.</b></p>`});
+    const b1=factorBlock('D'+SUB[0]+'('+X+')',D1),b2=factorBlock('D'+SUB[1]+'('+X+')',D2);
+    steps.push({t:'Factorizamos los denominadores',h:b1.h+b2.h});
+    const F1=b1.F,F2=b2.F;
+    // m.c.m.
+    const fmap=new Map();[...F1.fs,...F2.fs].forEach(f=>{const k=key(f.p);fmap.set(k,{p:f.p,m:Math.max(f.m,(fmap.get(k)||{m:0}).m)})});
+    const M={c:lcm(F1.c,F2.c),fs:mergeFs([...fmap.values()])};
+    steps.push({t:'Mínimo común múltiplo',h:`<p>Tomamos los factores comunes y no comunes con el mayor exponente${M.c!==1?', y el m.c.m. de los números':''}:</p>
+      <div class="box"><div class="mid">m.c.m. = ${facHTML(M)}</div></div>`});
+    // fracciones equivalentes
+    const mult=F=>{const m=new Map(F.fs.map(f=>[key(f.p),f.m]));return {c:M.c/F.c,fs:M.fs.map(f=>({p:f.p,m:f.m-(m.get(key(f.p))||0)})).filter(f=>f.m>0)}};
+    const m1=mult(F1),m2=mult(F2);
+    const N1b=mul(N1,expandF(m1)),N2b=mul(N2,expandF(m2));
+    const eq=(N,F,m,Nb,i)=>{
+      if(!m.fs.length&&m.c===1)return `<p>La ${i}ª fracción ya tiene el m.c.m. como denominador.</p><div class="mid">${fracBox(polyHTML(N),facHTML(F))}</div>`;
+      return `<p>${i}ª fracción: multiplicamos numerador y denominador por <span class="m">${facHTML(m,true)}</span></p>
+        <div class="mid">${fracBox(polyHTML(N),facHTML(F))} = ${fracBox(wrapP(N)+'·'+facHTML(m,true),facHTML(M))} = ${fracBox(polyHTML(Nb),facHTML(M))}</div>`};
+    steps.push({t:'Fracciones con el mismo denominador',h:eq(N1,F1,m1,N1b,1)+eq(N2,F2,m2,N2b,2)});
+    // operar numeradores
+    const num=op==='+'?add(N1b,N2b):sub(N1b,N2b);
+    steps.push({t:`${op==='+'?'Sumamos':'Restamos'} los numeradores`,h:`
+      <div class="mid">${fracBox(`${polyHTML(N1b)} ${op} ${op==='−'?wrapNeg(N2b):(N2b.find(a=>a!==0)<0?wrapNeg(N2b):polyHTML(N2b))}`,facHTML(M))} = ${fracBox(polyHTML(num),facHTML(M))}</div>
+      ${op==='−'&&nTerms(N2b)>1?'<p class="note">Cuidado: el signo − delante del paréntesis cambia el signo de todos sus términos.</p>':''}`});
+    // simplificar
+    const bn=factorBlock('N('+X+')',num);
+    const {S,step}=cancelStep(bn.F,M,'Factorizamos el numerador y simplificamos');
+    step.h=(bn.F.steps.length?bn.h:`<p class="m">N(${X}) = ${polyHTML(num)} <span class="note">— no se puede factorizar más</span></p>`)+step.h;
+    steps.push(step);
+    steps.push(finalStep(S,[F1,F2]));
+    steps.result={N:expandF(S.N),D:expandF(S.D)};
+    return steps;
+  }
+  // producto o cociente
+  let A=N1,B=D1,C=N2,Dd=D2,intro;
+  if(op===':'){C=D2;Dd=N2;
+    intro=`<p>Dividir es <b>multiplicar por la inversa</b> de la segunda fracción:</p>
+      <div class="big">${stmt} = ${fracBox(polyHTML(N1),polyHTML(D1))} · ${fracBox(polyHTML(D2),polyHTML(N2))}</div>`;
+  }else intro=`<p>Para multiplicar, el resultado tiene como numerador el producto de numeradores y como denominador el producto de denominadores. Antes de multiplicar, conviene <b>factorizarlo todo</b> para poder simplificar.</p>`;
+  steps.push({t:'Planteamiento',h:`<div class="big">${stmt}</div>${intro}`});
+  const labs=op===':'?['N'+SUB[0],'D'+SUB[0],'D'+SUB[1],'N'+SUB[1]]:['N'+SUB[0],'D'+SUB[0],'N'+SUB[1],'D'+SUB[1]];
+  const bA=factorBlock(labs[0]+'('+X+')',A),bB=factorBlock(labs[1]+'('+X+')',B),bC=factorBlock(labs[2]+'('+X+')',C),bD=factorBlock(labs[3]+'('+X+')',Dd);
+  steps.push({t:'Factorizamos numeradores y denominadores',h:bA.h+bB.h+bC.h+bD.h});
+  const NF=mulF(bA.F,bC.F),DF=mulF(bB.F,bD.F);
+  const prod=`<p>Escribimos todo como una sola fracción:</p><div class="mid">${fracBox(facHTML(bA.F,true)+' · '+facHTML(bC.F,true),facHTML(bB.F,true)+' · '+facHTML(bD.F,true))}</div>`;
+  const {S,step}=cancelStep(NF,DF,'Multiplicamos y simplificamos');
+  step.h=prod+step.h;steps.push(step);
+  const dom=op===':'?[factorize(D1),factorize(D2),factorize(N2)]:[factorize(D1),factorize(D2)];
+  steps.push(finalStep(S,dom));
+  steps.result={N:expandF(S.N),D:expandF(S.D)};
+  return steps;
+}
+
+/* =========================================================
+   Interfaz: lista de ejercicios
+   ========================================================= */
+let EX=[],deg=0,opSel='mix';
+const $=id=>document.getElementById(id);
+function setList(title,sub,list){
+  EX=list.map(e=>({...e,steps:null,shown:0}));
+  $('list').innerHTML=`<div class="list-head"><h2>${title}</h2><span>${sub}</span></div>`+
+    EX.map((e,i)=>`<div class="ex" id="ex${i}">
+      <div class="ex-head"><span class="num">${i+1}</span><div class="stmt">${e.stmt}</div>
+        <button class="btn sm" data-a="open" data-i="${i}" id="ob${i}">Resolver</button></div>
+      <div class="ex-body hidden" id="exb${i}"><div id="exs${i}"></div>
+        <div class="controls">
+          <button class="btn" data-a="next" data-i="${i}" id="nx${i}">Siguiente paso ▸</button>
+          <button class="btn alt" data-a="all" data-i="${i}" id="al${i}">Resolver todo</button>
+          <button class="btn alt" data-a="hide" data-i="${i}" id="hd${i}">Volver a empezar</button>
+        </div><div class="progress" id="pg${i}"></div></div></div>`).join('');
+}
+function updEx(i){
+  const e=EX[i];
+  e.steps.forEach((_,j)=>$(`st${i}_${j}`).classList.toggle('hidden',j>=e.shown));
+  $('nx'+i).disabled=$('al'+i).disabled=e.shown>=e.steps.length;
+  $('hd'+i).disabled=e.shown<=1;
+  $('pg'+i).textContent=`Paso ${e.shown} de ${e.steps.length}`;
+}
+$('list').addEventListener('click',ev=>{
+  const b=ev.target.closest('button[data-a]');if(!b)return;
+  const i=+b.dataset.i,e=EX[i],a=b.dataset.a;
+  if(a==='open'){
+    const body=$('exb'+i),open=body.classList.contains('hidden');
+    if(open&&!e.steps){
+      e.steps=e.solve();e.shown=1;
+      $('exs'+i).innerHTML=e.steps.map((s,j)=>`<div class="step hidden ${s.final?'final':''}" id="st${i}_${j}"><h3><span class="num">${s.final?'✓':j+1}</span>${s.t}</h3>${s.h}</div>`).join('');
+      updEx(i);
+    }
+    body.classList.toggle('hidden',!open);$('ex'+i).classList.toggle('open',open);
+    b.textContent=open?'Cerrar':'Resolver';
+    return;
+  }
+  if(a==='next'){e.shown++;updEx(i);$(`st${i}_${e.shown-1}`).scrollIntoView({behavior:'smooth',block:'nearest'})}
+  if(a==='all'){e.shown=e.steps.length;updEx(i)}
+  if(a==='hide'){e.shown=1;updEx(i)}
+});
+
+const polyEx=P=>({stmt:`P(${X}) = ${polyHTML(P)}`,solve:()=>solvePoly(P)});
+function makePolys(){
+  const used=new Set(),list=[];
+  const degs=deg?[deg,deg,deg,deg,deg]:shuffle([2,3,4,5,6]);
+  for(const d of degs){let P,t=0;do{P=genPoly(d)}while(used.has(key(P))&&t++<50);used.add(key(P));list.push(polyEx(P))}
+  setList('Polinomios','Resuelve cada uno con Ruffini y la ecuación de segundo grado',list);
+}
+function makeSimps(){
+  const used=new Set(),list=[];
+  while(list.length<5){const {N,D}=genSimplify();const k=key(N)+'/'+key(D);if(used.has(k))continue;used.add(k);
+    list.push({stmt:`<span class="lead">Simplifica</span>${fracBox(polyHTML(N),polyHTML(D))}`,solve:()=>solveSimplify(N,D)})}
+  setList('Simplificar fracciones algebraicas','Factoriza y elimina los factores comunes',list);
+}
+function makeOps(){
+  const ops=opSel==='mix'?shuffle(['+','−','·',':',pick(['+','−','·',':'])]):[opSel,opSel,opSel,opSel,opSel];
+  const list=ops.map(op=>{const E=genOp(op);
+    return {stmt:`<span class="lead">Opera y simplifica</span>${fracBox(polyHTML(E.N1),polyHTML(E.D1))} ${op} ${fracBox(polyHTML(E.N2),polyHTML(E.D2))}`,solve:()=>solveOp(E)}});
+  setList('Operaciones con fracciones algebraicas','Opera y simplifica el resultado',list);
+}
+
+$('deg').onclick=e=>{const b=e.target.closest('button');if(!b)return;deg=+b.dataset.d;[...$('deg').children].forEach(x=>x.classList.toggle('on',x===b))};
+$('ops').onclick=e=>{const b=e.target.closest('button');if(!b)return;opSel=b.dataset.o;[...$('ops').children].forEach(x=>x.classList.toggle('on',x===b))};
+$('genPoly').onclick=()=>{$('err').textContent='';makePolys()};
+$('genSimp').onclick=()=>{$('err').textContent='';makeSimps()};
+$('genOps').onclick=()=>{$('err').textContent='';makeOps()};
+$('useCustom').onclick=()=>{
+  const c=$('custom').value.replace(/−/g,'-').split(/[\s,;]+/).filter(Boolean).map(Number);
+  if(!c.length||c.some(x=>!Number.isInteger(x))){$('err').textContent='Escribe solo números enteros separados por espacios o comas.';return}
+  while(c.length&&c[0]===0)c.shift();
+  if(c.length<2){$('err').textContent='El polinomio debe ser al menos de grado 1.';return}
+  if(c.length>7){$('err').textContent='Como máximo grado 6 (7 coeficientes).';return}
+  $('err').textContent='';setList('Tu polinomio','',[polyEx(c)]);$('ob0').click();
+};
+$('custom').addEventListener('keydown',e=>{if(e.key==='Enter')$('useCustom').click()});
+makePolys();
+</script>
+</body>
+</html>
