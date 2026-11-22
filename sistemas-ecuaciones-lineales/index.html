@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sistemas de ecuaciones lineales</title>
+<style>
+/* Idea: cuaderno cuadriculado; tinta azul de bolígrafo sobre papel frío; verde/ámbar/rojo solo para clasificar sistemas */
+:root{
+  --paper:#f3f5fa; --grid:#dde3f0; --card:#ffffff; --ink:#1a2236; --muted:#566178; --rule:#d2d9e8;
+  --accent:#2350c8; --accent-soft:#e3eafb;
+  --good:#16683f; --good-bg:#def2e7; --warn:#85500a; --warn-bg:#faedd0; --bad:#a3271f; --bad-bg:#fae3e0;
+  --display:Georgia, 'Times New Roman', serif;
+  --body:system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --math:Georgia, 'Times New Roman', serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111827; --grid:#1a2335; --card:#192133; --ink:#e7ebf4; --muted:#9aa6bd; --rule:#2c3955;
+    --accent:#8fb0ff; --accent-soft:#22305a;
+    --good:#74d6a3; --good-bg:#143024; --warn:#f0b65c; --warn-bg:#3a2d12; --bad:#ff9d95; --bad-bg:#3b1b19;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111827; --grid:#1a2335; --card:#192133; --ink:#e7ebf4; --muted:#9aa6bd; --rule:#2c3955;
+  --accent:#8fb0ff; --accent-soft:#22305a;
+  --good:#74d6a3; --good-bg:#143024; --warn:#f0b65c; --warn-bg:#3a2d12; --bad:#ff9d95; --bad-bg:#3b1b19;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:26px 26px;
+  color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.5;
+}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 64px}
+.top{margin-bottom:20px}
+.kicker{margin:0 0 4px;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(2rem,5vw,3rem);line-height:1.1;margin:0 0 8px;text-wrap:balance}
+.lead{margin:0;max-width:62ch;color:var(--muted)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 14px}
+.tab{
+  flex:1 1 280px;text-align:left;font:inherit;color:var(--ink);background:var(--card);
+  border:1.5px solid var(--rule);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:2px
+}
+.tab b{font-weight:600}
+.tab small{color:var(--muted);font-size:.85rem}
+.tab[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent) inset}
+.tab:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel{background:var(--card);border:1.5px solid var(--rule);border-radius:14px;padding:20px 18px 24px}
+.panel[hidden]{display:none}
+h2{font-family:var(--display);font-weight:600;font-size:1.6rem;margin:0 0 6px;text-wrap:balance}
+h3{font-size:1rem;margin:0 0 8px;font-weight:600}
+.recall{background:var(--accent-soft);border-radius:10px;padding:12px 14px;margin:12px 0 18px;font-size:.95rem}
+.recall p{margin:0 0 6px}.recall p:last-child{margin:0}
+.recall ul{margin:4px 0 0;padding-left:1.2rem}
+.ctrl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:end;padding:12px 0 16px;border-bottom:1px solid var(--rule);margin-bottom:18px}
+.ctrl label,.ctrl .lab{display:flex;flex-direction:column;gap:3px;font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+select,input[type=number]{font:inherit;font-size:.95rem;color:var(--ink);background:var(--card);border:1.5px solid var(--rule);border-radius:8px;padding:7px 9px;min-height:40px}
+input[type=number]{width:104px}
+button{font:inherit;cursor:pointer}
+.btn{font-weight:600;font-size:.95rem;border-radius:8px;min-height:40px;padding:0 16px;border:1.5px solid var(--accent);background:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn{color:#0e1626}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn{color:#0e1626}}
+.btn.alt{background:transparent;color:var(--accent)}
+.seg{display:inline-flex;border:1.5px solid var(--rule);border-radius:8px;overflow:hidden}
+.seg button{background:var(--card);color:var(--ink);border:0;border-right:1px solid var(--rule);padding:0 12px;min-height:37px;font-size:.9rem}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:600}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0e1626}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0e1626}}
+.spacer{flex:1}
+.exh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.exh .num{font-size:.8rem;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.statement{font-size:1.05rem;margin:0 0 10px}
+.stmt{border:1.5px solid var(--ink);border-radius:10px;padding:14px 18px;margin-bottom:20px}
+.math{font-family:var(--math);font-size:1.3rem;line-height:1.35}
+.math i,.m i{font-style:italic}
+.m{font-family:var(--math);font-size:1.18rem}
+sup{font-size:.7em;line-height:0}
+/* sistema */
+.sysbox{display:flex;align-items:stretch;gap:6px;width:max-content;max-width:100%;overflow-x:auto}
+.brace{width:14px;flex:none;align-self:stretch;color:var(--ink)}
+.eqs{display:grid;grid-template-columns:repeat(3,max-content) max-content max-content;column-gap:.55em;row-gap:.35em;align-items:center;font-family:var(--math);font-size:1.4rem}
+.eqs .tm{white-space:nowrap}
+.eqs .eqm{padding:0 .1em}
+/* matrices */
+.mat,.det{display:inline-grid;grid-template-columns:repeat(var(--cols),auto);gap:.15em 1em;padding:.3em .7em;vertical-align:middle;font-family:var(--math);font-size:1.2rem;text-align:center;align-items:center;font-variant-numeric:tabular-nums}
+.mat{border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:14px/45%}
+.det{border-left:2px solid var(--ink);border-right:2px solid var(--ink)}
+.mat>span,.det>span{padding:0 .1em}
+.mat .sep{border-left:1.5px dashed var(--muted);padding-left:.55em}
+.hl{background:var(--accent-soft);color:var(--accent);border-radius:4px;font-weight:600}
+.fr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.1;font-size:.85em;margin:0 .1em}
+.fr>span:first-child{border-bottom:1.3px solid currentColor;padding:0 .2em}
+.fr>span:last-child{padding:0 .2em}
+/* pasos */
+.steps{display:flex;flex-direction:column;gap:16px}
+.step{border-left:3px solid var(--accent);padding:2px 0 2px 14px}
+.step h3 .k{display:inline-block;min-width:1.5em;color:var(--accent)}
+.step p{margin:4px 0 8px}
+.row{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:6px 0}
+.dblock{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--rule);border-radius:10px;min-width:0}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:10px}
+.dlab{font-family:var(--math);font-size:1.25rem}
+.calc{font-family:var(--math);font-size:1.08rem;overflow-x:auto;padding-bottom:2px}
+.calc div{white-space:normal}
+.muted{color:var(--muted)}
+.ok{color:var(--good);font-weight:600}
+.result{margin-top:18px;border:2px solid var(--accent);border-radius:12px;padding:12px 16px;background:var(--accent-soft)}
+.result h3{margin-bottom:6px}
+.bigsol{font-family:var(--math);font-size:1.6rem;display:flex;flex-wrap:wrap;gap:6px 26px}
+.pill{display:inline-block;font-weight:600;font-size:.85rem;border-radius:999px;padding:2px 11px;white-space:nowrap}
+.pill.scd{background:var(--good-bg);color:var(--good)}
+.pill.sci{background:var(--warn-bg);color:var(--warn)}
+.pill.si{background:var(--bad-bg);color:var(--bad)}
+.minors{display:flex;flex-wrap:wrap;gap:8px 16px;margin:6px 0}
+.minor{display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--rule);border-radius:8px;font-family:var(--math);font-size:1.1rem}
+.minor small{font-family:var(--body);font-size:.75rem;color:var(--muted);max-width:7ch;line-height:1.15}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:1rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--rule);text-align:left;white-space:nowrap}
+th i{text-transform:none}
+th{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+td.mm{font-family:var(--math);font-size:1.15rem}
+[data-detail="enun"] .steps,[data-detail="enun"] .result{display:none}
+[data-detail="res"] .steps{display:none}
+@media (max-width:520px){.eqs{font-size:1.15rem}.panel{padding:16px 12px 20px}.mat,.det{font-size:1.05rem}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
+</style>
+</head>
+<body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
+
+<div class="wrap">
+  <header class="top">
+    <p class="kicker">2.º de Bachillerato · Matemáticas</p>
+    <h1>Sistemas de ecuaciones lineales</h1>
+    <p class="lead">Dos apartados con generador de ejercicios. Cada pulsación de «Nuevo ejercicio» crea un sistema distinto, con su desarrollo completo.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Apartados">
+    <button class="tab" role="tab" id="tab-cramer" aria-controls="p-cramer" aria-selected="true"><b>1 · Sistemas compatibles determinados</b><small>Resolución por la regla de Cramer</small></button>
+    <button class="tab" role="tab" id="tab-rouche" aria-controls="p-rouche" aria-selected="false"><b>2 · Discusión según un parámetro</b><small>Teorema de Rouché-Frobenius con determinantes</small></button>
+  </div>
+
+  <section class="panel" id="p-cramer" role="tabpanel" aria-labelledby="tab-cramer" data-detail="full">
+    <h2>Regla de Cramer en sistemas 3×3</h2>
+    <div class="recall">
+      <p>Si <span class="m">|<i>A</i>| ≠ 0</span>, el sistema es compatible determinado y</p>
+      <p class="m" style="text-align:center">
+        <i>x</i> = <span class="fr"><span>Δ<sub><i>x</i></sub></span><span>|<i>A</i>|</span></span>,&nbsp;&nbsp;
+        <i>y</i> = <span class="fr"><span>Δ<sub><i>y</i></sub></span><span>|<i>A</i>|</span></span>,&nbsp;&nbsp;
+        <i>z</i> = <span class="fr"><span>Δ<sub><i>z</i></sub></span><span>|<i>A</i>|</span></span>
+      </p>
+      <p>Δ<sub><i>x</i></sub> es el determinante que resulta de cambiar en <i>A</i> la columna de <i>x</i> por la de términos independientes (y lo mismo para Δ<sub><i>y</i></sub> y Δ<sub><i>z</i></sub>). Los determinantes se calculan con la regla de Sarrus.</p>
+    </div>
+    <div class="ctrl">
+      <div class="lab">Mostrar
+        <div class="seg" id="seg-cramer">
+          <button type="button" data-d="enun" aria-pressed="false">Enunciado</button>
+          <button type="button" data-d="res" aria-pressed="false">Resultado</button>
+          <button type="button" data-d="full" aria-pressed="true">Desarrollo</button>
+        </div>
+      </div>
+      <span class="spacer"></span>
+      
+      <button type="button" class="btn" id="new-cramer">Nuevo ejercicio</button>
+    </div>
+    <div id="out-cramer" aria-live="polite"></div>
+  </section>
+
+  <section class="panel" id="p-rouche" role="tabpanel" aria-labelledby="tab-rouche" data-detail="full" hidden>
+    <h2>Discusión de un sistema 3×3 con un parámetro</h2>
+    <div class="recall">
+      <p><b>Teorema de Rouché-Frobenius.</b> Sean <i>A</i> la matriz de coeficientes, <i>A</i>* la ampliada y <i>n</i> = 3 el número de incógnitas:</p>
+      <ul>
+        <li>rg(<i>A</i>) = rg(<i>A</i>*) = 3: compatible determinado (S.C.D.).</li>
+        <li>rg(<i>A</i>) = rg(<i>A</i>*) &lt; 3: compatible indeterminado (S.C.I.), con 3 − rg(<i>A</i>) parámetros libres.</li>
+        <li>rg(<i>A</i>) &lt; rg(<i>A</i>*): incompatible (S.I.).</li>
+      </ul>
+      <p>El rango es el orden del mayor menor distinto de cero. Se calcula |<i>A</i>|, se buscan los valores del parámetro que lo anulan y, para cada uno, se estudian los menores de <i>A</i> y de <i>A</i>*.</p>
+    </div>
+    <div class="ctrl">
+      <div class="lab">Mostrar
+        <div class="seg" id="seg-rouche">
+          <button type="button" data-d="enun" aria-pressed="false">Enunciado</button>
+          <button type="button" data-d="res" aria-pressed="false">Resultado</button>
+          <button type="button" data-d="full" aria-pressed="true">Desarrollo</button>
+        </div>
+      </div>
+      <span class="spacer"></span>
+      
+      <button type="button" class="btn" id="new-rouche">Nuevo ejercicio</button>
+    </div>
+    <div id="out-rouche" aria-live="polite"></div>
+  </section>
+</div>
+
+<script>
+// ===MATH-START
+const MINUS='−';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const ri=(r,lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+const pick=(r,arr)=>arr[Math.floor(r()*arr.length)];
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a};
+const F=(n,d=1)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return{n:n/g,d:d/g}};
+const fadd=(a,b)=>F(a.n*b.d+b.n*a.d,a.d*b.d);
+const fmul=(a,b)=>F(a.n*b.n,a.d*b.d);
+
+// Sarrus: [posiciones de los tres factores, signo]
+const SARR=[[[0,0],[1,1],[2,2],1],[[0,1],[1,2],[2,0],1],[[0,2],[1,0],[2,1],1],[[0,2],[1,1],[2,0],-1],[[0,0],[1,2],[2,1],-1],[[0,1],[1,0],[2,2],-1]];
+const det3=M=>SARR.reduce((s,t)=>s+t[3]*M[t[0][0]][t[0][1]]*M[t[1][0]][t[1][1]]*M[t[2][0]][t[2][1]],0);
+const det2=(a,b,c,d)=>a*d-b*c;
+const repl=(A,b,i)=>A.map((r,k)=>r.map((x,j)=>j===i?b[k]:x));
+
+// Polinomios en el parámetro: [c0,c1,c2,...]
+const ptrim=p=>{p=p.slice();while(p.length>1&&p[p.length-1]===0)p.pop();return p};
+const padd=(a,b)=>{const n=Math.max(a.length,b.length),o=[];for(let i=0;i<n;i++)o.push((a[i]||0)+(b[i]||0));return ptrim(o)};
+const pmul=(a,b)=>{const o=Array(a.length+b.length-1).fill(0);for(let i=0;i<a.length;i++)for(let j=0;j<b.length;j++)o[i+j]+=a[i]*b[j];return ptrim(o)};
+const pscale=(a,k)=>ptrim(a.map(x=>x*k));
+const pev=(p,x)=>p.reduceRight((s,c)=>s*x+c,0);
+const pzero=p=>p.every(x=>x===0);
+function pdet3(M){
+  let s=[0];
+  for(const t of SARR){
+    const pr=pmul(pmul(M[t[0][0]][t[0][1]],M[t[1][0]][t[1][1]]),M[t[2][0]][t[2][1]]);
+    s=padd(s,pscale(pr,t[3]));
+  }
+  return s;
+}
+function pdivRoot(q,r){const hi=q.slice().reverse();const out=[hi[0]];for(let i=1;i<hi.length-1;i++)out.push(hi[i]+r*out[i-1]);return out.reverse()}
+function intRoots(p){
+  let q=p.slice(),found=[],total=0,all=[];
+  for(let r=-6;r<=6;r++){
+    while(q.length>1&&pev(q,r)===0){q=pdivRoot(q,r);total++;all.push(r);if(!found.includes(r))found.push(r)}
+  }
+  return{roots:found,total,all,lead:q[0],ok:q.length===1};
+}
+
+// ---------- Apartado 1
+function genCramer(seed,level){
+  const rng=mulberry32(seed*7919+13);
+  const cfg={facil:{R:2,S:3,dmin:1,dmax:10,frac:false},medio:{R:3,S:5,dmin:2,dmax:30,frac:false},frac:{R:3,S:0,dmin:2,dmax:30,frac:true}}[level];
+  for(let t=0;t<40000;t++){
+    const A=[0,1,2].map(()=>[0,1,2].map(()=>ri(rng,-cfg.R,cfg.R)));
+    if(A.some(r=>r.filter(x=>x!==0).length<2))continue;
+    const D=det3(A);
+    if(Math.abs(D)<cfg.dmin||Math.abs(D)>cfg.dmax)continue;
+    let b;
+    if(!cfg.frac){
+      const sol=[0,1,2].map(()=>ri(rng,-cfg.S,cfg.S));
+      if(sol.filter(x=>x===0).length>1)continue;
+      b=A.map(r=>r[0]*sol[0]+r[1]*sol[1]+r[2]*sol[2]);
+      if(b.some(x=>Math.abs(x)>30))continue;
+    }else{
+      b=[0,1,2].map(()=>ri(rng,-9,9));
+      if(b.every(x=>x===0))continue;
+      const Ds=[0,1,2].map(i=>det3(repl(A,b,i)));
+      if(Ds.every(x=>x%D===0))continue;
+    }
+    const Ds=[0,1,2].map(i=>det3(repl(A,b,i)));
+    return{A,b,D,Ds,sol:Ds.map(d=>F(d,D))};
+  }
+  return null;
+}
+
+// ---------- Apartado 2
+function classify(An,bn){
+  const pairs=[[0,1],[0,2],[1,2]];
+  let minorA=null;
+  for(const rp of pairs){for(const cp of pairs){
+    const v=det2(An[rp[0]][cp[0]],An[rp[0]][cp[1]],An[rp[1]][cp[0]],An[rp[1]][cp[1]]);
+    if(v!==0){minorA={rows:rp,cols:cp,val:v};break}
+  }if(minorA)break}
+  if(minorA){
+    const cp=minorA.cols;
+    const M=An.map((r,i)=>[r[cp[0]],r[cp[1]],bn[i]]);
+    const minors=[{cols:[cp[0]+1,cp[1]+1,4],M,val:det3(M)}];
+    const rgAs=minors[0].val!==0?3:2;
+    return{rgA:2,minorA,minors,rgAs,type:rgAs===3?'SI':'SCI'};
+  }
+  let ent=null;
+  for(let i=0;i<3&&!ent;i++)for(let j=0;j<3;j++)if(An[i][j]!==0){ent={i,j,val:An[i][j]};break}
+  if(!ent)return{rgA:0};
+  const minors=[0,1,2].filter(k=>k!==ent.i).map(k=>{
+    const M=[[An[ent.i][ent.j],bn[ent.i]],[An[k][ent.j],bn[k]]];
+    return{rows:[ent.i+1,k+1],col:ent.j+1,M,val:det2(M[0][0],M[0][1],M[1][0],M[1][1])};
+  });
+  const rgAs=minors.some(m=>m.val!==0)?2:1;
+  return{rgA:1,ent,minors,rgAs,type:rgAs===2?'SI':'SCI'};
+}
+const evalM=(A,r)=>A.map(row=>row.map(p=>pev(p,r)));
+const shuf=(rng,a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));const t=a[i];a[i]=a[j];a[j]=t}return a};
+const polyOK=(p,cm,dm)=>Math.abs(p[0])<=cm&&Math.abs(p[1]||0)<=dm;
+const AxW=(A,w)=>A.map(r=>r.reduce((s,p,j)=>padd(s,pscale(p,w[j])),[0]));
+function pickTarget(rng,want){
+  if(want===1)return[pick(rng,['SCI','SI'])];
+  const u=rng();
+  if(u<0.35)return Array(want).fill('SI');
+  if(u<0.8){const t=Array(want).fill('SI');t[ri(rng,0,want-1)]='SCI';return t}
+  return Array(want).fill('SCI');
+}
+function buildInfo(A,b,roots){return roots.map(r=>{const bn=b.map(p=>pev(p,r));return Object.assign({r},classify(evalM(A,r),bn))})}
+function makeB(rng,A,roots,target){
+  const nS=target.filter(t=>t==='SCI').length;
+  let b;
+  if(nS===0){
+    b=[0,1,2].map(()=>[ri(rng,-4,4)]);
+    if(rng()<0.35){const i=ri(rng,0,2);b[i]=ptrim([ri(rng,-3,3),pick(rng,[1,-1])])}
+  }else{
+    const w=[0,1,2].map(()=>ri(rng,-2,2));
+    b=AxW(A,w);
+    if(nS<target.length){
+      const s=roots[target.indexOf('SCI')];
+      const e=[0,1,2].map(()=>ri(rng,-2,2));
+      b=b.map((p,i)=>padd(p,pmul([-s,1],[e[i]])));
+    }else if(w.every(x=>x===0))return null;
+  }
+  if(b.every(pzero))return null;
+  if(!b.every(p=>polyOK(p,9,5)))return null;
+  return b;
+}
+// Construcción: D(m) diagonal con factores (m - r) y constantes; operaciones elementales
+// (que conservan el determinante salvo signo) la mezclan sin salir de entradas lineales en m.
+function buildDiag(rng,want){
+  const pool=[-4,-3,-2,-1,0,1,2,3,4],rs=[];
+  while(rs.length<want){const r=pick(rng,pool);if(!rs.includes(r))rs.push(r)}
+  const lin=r=>ptrim([-r,1]),cst=()=>[pick(rng,[1,1,1,-1,2])];
+  if(want===3)return[lin(rs[0]),lin(rs[1]),lin(rs[2])];
+  if(want===2)return rng()<0.4?[lin(rs[0]),lin(rs[1]),cst()]:[lin(rs[0]),lin(rs[0]),lin(rs[1])];
+  return rng()<0.5?[lin(rs[0]),cst(),cst()]:[lin(rs[0]),lin(rs[0]),cst()];
+}
+function scramble(rng,M){
+  const nOps=ri(rng,2,4);
+  for(let n=0;n<nOps;n++){
+    const a=ri(rng,0,2);let c=ri(rng,0,2);while(c===a)c=ri(rng,0,2);
+    const sc=pick(rng,[1,-1,1,-1,2,-2]);
+    if(rng()<0.5)M[a]=M[a].map((p,j)=>padd(p,pscale(M[c][j],sc)));
+    else for(let i=0;i<3;i++)M[i][a]=padd(M[i][a],pscale(M[i][c],sc));
+  }
+  const rp=shuf(rng,[0,1,2]),cp=shuf(rng,[0,1,2]);
+  return rp.map(i=>cp.map(j=>M[i][j]));
+}
+function genConstructive(rng,want,target){
+  let fallback=null;
+  for(let t=0;t<600;t++){
+    const diag=buildDiag(rng,want);
+    let M=[0,1,2].map(i=>[0,1,2].map(j=>i===j?diag[i]:[0]));
+    M=scramble(rng,M);
+    if(!M.every(r=>r.every(p=>polyOK(p,6,3))))continue;
+    if(M.some(r=>r.filter(p=>!pzero(p)).length<2))continue;
+    const np=M.reduce((s,r)=>s+r.filter(p=>p.length>1).length,0);
+    if(np<2||np>6)continue;
+    const dp=pdet3(M);
+    if(dp.length<2)continue;
+    const rr=intRoots(dp);
+    if(!rr.ok||rr.roots.length!==want)continue;
+    if(rr.roots.some(r=>classify(evalM(M,r),[0,0,0]).rgA===0))continue;
+    for(let u=0;u<25;u++){
+      const b=makeB(rng,M,rr.roots,target);if(!b)continue;
+      const info=buildInfo(M,b,rr.roots);
+      const cand={A:M,b,detP:dp,roots:rr.roots,total:rr.total,all:rr.all,lead:rr.lead,info};
+      if(info.every((x,i)=>x.type===target[i]))return cand;
+      if(!fallback)fallback=cand;
+    }
+  }
+  return fallback;
+}
+// Muestreo aleatorio de matrices dispersas (da, entre otros, raíces dobles con rango 2)
+function genRandom(rng,want,target){
+  for(let t=0;t<4000;t++){
+    const k=ri(rng,2,5),pos=new Set();
+    while(pos.size<k)pos.add(ri(rng,0,8));
+    const A=[0,1,2].map(i=>[0,1,2].map(j=>{
+      const c=ri(rng,-3,3);
+      const d=pos.has(i*3+j)?(rng()<0.85?pick(rng,[1,-1]):pick(rng,[2,-2])):0;
+      return ptrim([c,d]);
+    }));
+    if(A.some(r=>r.filter(p=>!pzero(p)).length<2))continue;
+    const dp=pdet3(A);
+    if(dp.length<2||dp.length>4)continue;
+    const rr=intRoots(dp);
+    if(!rr.ok||rr.roots.length!==want)continue;
+    if(rr.roots.some(r=>classify(evalM(A,r),[0,0,0]).rgA===0))continue;
+    for(let u=0;u<60;u++){
+      const b=makeB(rng,A,rr.roots,target);if(!b)continue;
+      const info=buildInfo(A,b,rr.roots);
+      if(info.every((x,i)=>x.type===target[i]))return{A,b,detP:dp,roots:rr.roots,total:rr.total,all:rr.all,lead:rr.lead,info};
+    }
+  }
+  return null;
+}
+function genRouche(seed,mode){
+  const rng=mulberry32(seed*104729+7);
+  const v=pick(rng,['m','a','k']);
+  for(let tries=0;tries<30;tries++){
+    const u=rng();
+    const want=mode==='mix'?(u<0.15?1:u<0.65?2:3):Number(mode);
+    const target=pickTarget(rng,want);
+    let ex=null;
+    if(want<3&&rng()<0.2)ex=genRandom(rng,want,target);
+    if(!ex)ex=genConstructive(rng,want,target);
+    if(ex){ex.v=v;return ex}
+  }
+  return null;
+}
+// ===MATH-END
+
+// ---------- Presentación
+const num=n=>n<0?MINUS+(-n):String(n);
+const par=n=>n<0?'('+num(n)+')':String(n);
+const frHTML=f=>f.d===1?num(f.n):(f.n<0?MINUS:'')+'<span class="fr"><span>'+Math.abs(f.n)+'</span><span>'+f.d+'</span></span>';
+const frPar=f=>f.n<0?'('+frHTML(f)+')':frHTML(f);
+const I=s=>'<i>'+s+'</i>';
+
+function polyStr(p,v){
+  let out='';
+  for(let k=p.length-1;k>=0;k--){
+    const a=p[k];if(a===0)continue;
+    const abs=Math.abs(a);
+    const body=k===0?String(abs):(abs===1?'':String(abs))+I(v)+(k>1?'<sup>'+k+'</sup>':'');
+    out=out===''?(a<0?MINUS:'')+body:out+(a<0?' '+MINUS+' ':' + ')+body;
+  }
+  return out||'0';
+}
+const polyPar=(p,v)=>{const nz=p.filter(x=>x!==0).length;const s=polyStr(p,v);return(nz>1||p[p.length-1]<0)?'('+s+')':s};
+function termCell(p,varName,v,first){
+  if(pzero(p))return'<span></span>';
+  const nz=p.filter(x=>x!==0).length;
+  let neg,inner;
+  if(nz===1){
+    const k=p.findIndex(x=>x!==0),a=p[k],abs=Math.abs(a);
+    neg=a<0;
+    inner=(abs===1?'':String(abs))+(k>0?I(v):'')+I(varName);
+  }else{
+    neg=p.every(x=>x<=0);
+    inner='('+polyStr(neg?p.map(x=>0-x):p,v)+')'+I(varName);
+  }
+  const sign=first?(neg?MINUS:''):(neg?MINUS+' ':'+ ');
+  return'<span class="tm">'+sign+inner+'</span>';
+}
+function sysHTML(A,b,v){
+  const names=['x','y','z'];
+  let cells='';
+  for(let i=0;i<3;i++){
+    let first=true;
+    for(let j=0;j<3;j++){
+      cells+=termCell(A[i][j],names[j],v,first);
+      if(!pzero(A[i][j]))first=false;
+    }
+    cells+='<span class="eqm">=</span><span class="tm">'+polyStr(b[i],v)+'</span>';
+  }
+  return'<div class="sysbox"><svg class="brace" viewBox="0 0 12 100" preserveAspectRatio="none" aria-hidden="true"><path d="M11 1 Q6 1 6 12 L6 38 Q6 49 1 50 Q6 51 6 62 L6 88 Q6 99 11 99" fill="none" stroke="currentColor" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg><div class="eqs">'+cells+'</div></div>';
+}
+function gridHTML(cls,rows,opts={}){
+  const n=rows[0].length;
+  return'<span class="'+cls+'" style="--cols:'+n+'">'+rows.map(r=>r.map((c,j)=>{
+    const k=[];if(opts.hl===j)k.push('hl');if(opts.sep&&j===n-1)k.push('sep');
+    return'<span'+(k.length?' class="'+k.join(' ')+'"':'')+'>'+c+'</span>';
+  }).join('')).join('')+'</span>';
+}
+const intRows=M=>M.map(r=>r.map(num));
+function sarrusInt(M){
+  const f=SARR.map(t=>({s:t[3],v:[M[t[0][0]][t[0][1]],M[t[1][0]][t[1][1]],M[t[2][0]][t[2][1]]]}));
+  const e1=f.map((t,i)=>(i===0?'':(t.s<0?' '+MINUS+' ':' + '))+t.v.map(par).join('·')).join('');
+  const pr=f.map(t=>({s:t.s,p:t.v[0]*t.v[1]*t.v[2]}));
+  const e2=pr.map((t,i)=>i===0?num(t.p):(t.s<0?' '+MINUS+' ':' + ')+par(t.p)).join('');
+  return{e1,e2,val:det3(M)};
+}
+function detBlock(label,M,hl){
+  const s=sarrusInt(M);
+  return'<div class="dblock"><div class="row" style="margin:0"><span class="dlab">'+label+' =</span>'+gridHTML('det',intRows(M),{hl})+'</div>'
+    +'<div class="calc"><div>= '+s.e1+'</div><div>= '+s.e2+' = <b>'+num(s.val)+'</b></div></div></div>';
+}
+
+function renderCramer(ex){
+  const{A,b,D,Ds,sol}=ex;
+  const names=['x','y','z'];
+  const P=M=>M.map(r=>r.map(x=>[x]));
+  const stmt='<p class="statement">Resuelve por la regla de Cramer:</p><div class="stmt">'+sysHTML(P(A),b.map(x=>[x]),'m')+'</div>';
+  const detsHTML=Ds.map((d,i)=>detBlock('Δ<sub>'+I(names[i])+'</sub>',repl(A,b,i),i)).join('');
+  const sols=sol.map((f,i)=>'<div class="math">'+I(names[i])+' = <span class="fr"><span>Δ<sub>'+I(names[i])+'</sub></span><span>|'+I('A')+'|</span></span> = <span class="fr"><span>'+num(Ds[i])+'</span><span>'+num(D)+'</span></span> = '+frHTML(f)+'</div>').join('');
+  const checks=A.map((r,i)=>{
+    const terms=[];let tot=F(0);
+    for(let j=0;j<3;j++){if(r[j]===0)continue;terms.push(par(r[j])+'·'+frPar(sol[j]));tot=fadd(tot,fmul(F(r[j]),sol[j]))}
+    const good=tot.n===b[i]&&tot.d===1;
+    return'<div>'+terms.join(' + ')+' = '+frHTML(tot)+' '+(good?'<span class="ok">✓ ('+num(b[i])+')</span>':'<b>✗</b>')+'</div>';
+  }).join('');
+  const steps='<div class="steps">'
+    +'<div class="step"><h3><span class="k">1</span> Determinante de la matriz de coeficientes</h3>'
+    +'<div class="dgrid">'+detBlock('|'+I('A')+'|',A,-1)+'</div>'
+    +'<p>Como |'+I('A')+'| = '+num(D)+' ≠ 0, el sistema es compatible determinado y se puede aplicar la regla de Cramer.</p></div>'
+    +'<div class="step"><h3><span class="k">2</span> Determinantes de las incógnitas</h3><p class="muted">La columna sombreada es la de términos independientes.</p><div class="dgrid">'+detsHTML+'</div></div>'
+    +'<div class="step"><h3><span class="k">3</span> Cociente de determinantes</h3><div class="row" style="gap:10px 36px">'+sols+'</div></div>'
+    +'<div class="step"><h3><span class="k">4</span> Comprobación en las tres ecuaciones</h3><div class="calc">'+checks+'</div></div>'
+    +'</div>';
+  const res='<div class="result"><h3>Solución</h3><div class="bigsol">'+sol.map((f,i)=>'<span>'+I(names[i])+' = '+frHTML(f)+'</span>').join('')+'</div></div>';
+  return stmt+steps+res;
+}
+
+function factorStr(lead,roots,v){
+  const groups=[];
+  roots.forEach(r=>{const g=groups.find(x=>x.r===r);g?g.m++:groups.push({r,m:1})});
+  const s=groups.map(g=>{
+    const base=g.r===0?I(v):'('+I(v)+' '+(g.r<0?'+':MINUS)+' '+Math.abs(g.r)+')';
+    return base+(g.m>1?'<sup>'+g.m+'</sup>':'');
+  }).join('');
+  return(lead===1?'':lead===-1?MINUS:num(lead))+s;
+}
+function sarrusPoly(M,v){
+  const e=p=>polyPar(p,v);
+  return SARR.map((t,i)=>(i===0?'':(t[3]<0?' '+MINUS+' ':' + '))+[M[t[0][0]][t[0][1]],M[t[1][0]][t[1][1]],M[t[2][0]][t[2][1]]].map(e).join('·')).join('');
+}
+function relRows(An){
+  let p=0;while(An[p].every(z=>z===0))p++;
+  const j0=An[p].findIndex(z=>z!==0),out=[];
+  for(let q=0;q<3;q++){
+    if(q===p)continue;
+    const lam=F(An[q][j0],An[p][j0]);
+    const rhs=lam.n===0?'(0, 0, 0)':(lam.n===1&&lam.d===1?'':lam.n===-1&&lam.d===1?MINUS:frHTML(lam)+'·')+'F<sub>'+(p+1)+'</sub>';
+    out.push('F<sub>'+(q+1)+'</sub> = '+rhs);
+  }
+  return out.join(', ');
+}
+const TYPE={SCD:['scd','S.C.D.','compatible determinado'],SCI:['sci','S.C.I.','compatible indeterminado'],SI:['si','S.I.','incompatible']};
+const pill=t=>'<span class="pill '+TYPE[t][0]+'">'+TYPE[t][1]+'</span>';
+const loc=r=>r.join('');
+
+function renderRouche(ex){
+  const{v,A,b,detP,roots,lead,info}=ex;
+  const stmt='<p class="statement">Discute, según los valores de '+I(v)+', el sistema:</p><div class="stmt">'+sysHTML(A,b,v)+'</div>';
+  const Arows=A.map(r=>r.map(p=>polyStr(p,v)));
+  const Aext=A.map((r,i)=>r.map(p=>polyStr(p,v)).concat([polyStr(b[i],v)]));
+  const rootList=roots.map(r=>I(v)+' = '+num(r)).join(' &nbsp;o&nbsp; ');
+  const nl=roots.map(r=>I(v)+' ≠ '+num(r));
+  const neq=nl.length<2?nl[0]:nl.slice(0,-1).join(', ')+' y '+nl[nl.length-1];
+  const lines=[];
+  lines.push('<div class="step"><h3><span class="k">1</span> Matrices del sistema</h3><div class="row">'
+    +'<span class="dlab">'+I('A')+' =</span>'+gridHTML('mat',Arows)
+    +'<span class="dlab">'+I('A')+'* =</span>'+gridHTML('mat',Aext,{sep:true})+'</div></div>');
+  lines.push('<div class="step"><h3><span class="k">2</span> Valores que anulan |'+I('A')+'|</h3>'
+    +'<div class="calc"><div>|'+I('A')+'| = '+sarrusPoly(A,v)+'</div>'
+    +'<div>|'+I('A')+'| = '+polyStr(detP,v)+' = '+factorStr(lead,ex.all,v)+'</div></div>'
+    +'<p>|'+I('A')+'| = 0 ⇔ '+rootList+'.</p></div>');
+  lines.push('<div class="step"><h3><span class="k">3</span> Caso '+neq+'</h3>'
+    +'<p>Entonces |'+I('A')+'| ≠ 0, de modo que rg('+I('A')+') = 3. Como '+I('A')+'* tiene solo 3 filas, rg('+I('A')+'*) = 3. Por tanto rg('+I('A')+') = rg('+I('A')+'*) = 3 = <i>n</i> y el sistema es '+pill('SCD')+' (compatible determinado).</p></div>');
+  info.forEach((x,idx)=>{
+    const An=evalM(A,x.r),bn=b.map(p=>pev(p,x.r));
+    const Ext=An.map((r,i)=>r.concat([bn[i]]));
+    const head='<div class="step"><h3><span class="k">'+(4+idx)+'</span> Caso '+I(v)+' = '+num(x.r)+'</h3>'
+      +'<div class="row"><span class="dlab">'+I('A')+' =</span>'+gridHTML('mat',intRows(An))+'<span class="dlab">'+I('A')+'* =</span>'+gridHTML('mat',intRows(Ext),{sep:true})+'</div>';
+    if(x.rgA===1){
+      const e=x.ent;
+      const shown=[];
+      for(const m of x.minors){shown.push(m);if(m.val!==0)break}
+      const chips=shown.map(m=>'<div class="minor"><small>filas '+m.rows.join(' y ')+', columnas '+m.col+' y 4</small>'+gridHTML('det',intRows(m.M))+'<span>= '+(m.val===0?'0':'<b>'+num(m.val)+'</b>')+'</span></div>').join('');
+      const concl=x.type==='SI'
+        ?'Este menor de orden 2 es distinto de cero, luego rg('+I('A')+'*) = 2. Como rg('+I('A')+') = 1 &lt; 2 = rg('+I('A')+'*), el sistema es '+pill('SI')+' (incompatible).'
+        :'Los dos menores valen 0, así que rg('+I('A')+'*) = 1. Entonces rg('+I('A')+') = rg('+I('A')+'*) = 1 &lt; 3 y el sistema es '+pill('SCI')+' (compatible indeterminado, con 2 parámetros libres).';
+      lines.push(head
+        +'<p><b>Rango de '+I('A')+'.</b> Como |'+I('A')+'| = 0, rg('+I('A')+') &lt; 3. Las filas son proporcionales ('+relRows(An)+'), así que los nueve menores de orden 2 valen 0. Como hay elementos distintos de cero, rg('+I('A')+') = 1.</p>'
+        +'<p><b>Rango de '+I('A')+'*.</b> Se orla el elemento <i>a</i><sub>'+(e.i+1)+(e.j+1)+'</sub> = '+num(e.val)+' ≠ 0 con la columna de términos independientes y con cada una de las otras filas:</p>'
+        +'<div class="minors">'+chips+'</div><p>'+concl+'</p></div>');
+      return;
+    }
+    const ma=x.minorA;
+    const sub=[[An[ma.rows[0]][ma.cols[0]],An[ma.rows[0]][ma.cols[1]]],[An[ma.rows[1]][ma.cols[0]],An[ma.rows[1]][ma.cols[1]]]];
+    const minorsHTML=x.minors.map(m=>'<div class="minor"><small>columnas '+m.cols.join(', ')+'</small>'+gridHTML('det',intRows(m.M))+'<span>= '+(m.val===0?'0':'<b>'+num(m.val)+'</b>')+'</span></div>').join('');
+    const concl=x.type==='SI'
+      ?'Este menor de orden 3 es distinto de cero, luego rg('+I('A')+'*) = 3. Como rg('+I('A')+') = 2 &lt; 3 = rg('+I('A')+'*), el sistema es '+pill('SI')+' (incompatible).'
+      :'Este menor vale 0 y el otro orlado, |'+I('A')+'|, también es 0. Ningún menor de orden 3 de '+I('A')+'* que contenga al de orden 2 es distinto de cero, así que rg('+I('A')+'*) = 2. Entonces rg('+I('A')+') = rg('+I('A')+'*) = 2 &lt; 3 y el sistema es '+pill('SCI')+' (compatible indeterminado, con 1 parámetro libre).';
+    lines.push(head
+      +'<p><b>Rango de '+I('A')+'.</b> Como |'+I('A')+'| = 0, rg('+I('A')+') &lt; 3. El menor formado por las filas '+(ma.rows[0]+1)+' y '+(ma.rows[1]+1)+' y las columnas '+(ma.cols[0]+1)+' y '+(ma.cols[1]+1)+' es</p>'
+      +'<div class="row">'+gridHTML('det',intRows(sub))+'<span class="m">= <b>'+num(ma.val)+'</b> ≠ 0,</span><span>luego rg('+I('A')+') = 2.</span></div>'
+      +'<p><b>Rango de '+I('A')+'*.</b> Basta orlar el menor anterior con la tercera fila y la columna de términos independientes:</p>'
+      +'<div class="minors">'+minorsHTML+'</div><p>'+concl+'</p></div>');
+  });
+  const rows=[['<span class="mm">'+neq+'</span>',3,3,'SCD']].concat(info.map(x=>['<span class="mm">'+I(v)+' = '+num(x.r)+'</span>',x.rgA,x.rgAs,x.type]));
+  const table='<div class="tablewrap"><table><thead><tr><th>Valor de '+I(v)+'</th><th>rg('+I('A')+')</th><th>rg('+I('A')+'*)</th><th>Clasificación</th></tr></thead><tbody>'
+    +rows.map(r=>'<tr><td class="mm">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+pill(r[3])+' '+TYPE[r[3]][2]+'</td></tr>').join('')+'</tbody></table></div>';
+  const res='<div class="result"><h3>Discusión</h3>'+table+'</div>';
+  return stmt+'<div class="steps">'+lines.join('')+'</div>'+res;
+}
+
+// ---------- Interacción
+const rnd=()=>1+Math.floor(Math.random()*99999);
+const S={cramer:{seed:rnd(),level:'facil',detail:'full'},rouche:{seed:rnd(),level:'mix',detail:'full'}};
+function draw(k){
+  const s=S[k],out=document.getElementById('out-'+k);
+  try{
+    let ex;
+    if(k==='cramer'){const q=mulberry32(s.seed+99);const lv=q()<0.5?'frac':(q()<0.6?'facil':'medio');ex=genCramer(s.seed,lv)}
+    else ex=genRouche(s.seed,'mix');
+    out.innerHTML=(k==='cramer'?renderCramer:renderRouche)(ex);
+  }catch(e){out.textContent='No se pudo generar este ejercicio. Prueba con otro código.'}
+    document.getElementById('p-'+k).dataset.detail=s.detail;
+}
+['cramer','rouche'].forEach(k=>{
+  document.getElementById('new-'+k).addEventListener('click',()=>{S[k].seed=rnd();draw(k)});
+  document.querySelectorAll('#seg-'+k+' button').forEach(btn=>btn.addEventListener('click',()=>{
+    S[k].detail=btn.dataset.d;
+    document.querySelectorAll('#seg-'+k+' button').forEach(o=>o.setAttribute('aria-pressed',String(o===btn)));
+    document.getElementById('p-'+k).dataset.detail=S[k].detail;
+  }));
+});
+function showTab(k){
+  ['cramer','rouche'].forEach(x=>{
+    document.getElementById('p-'+x).hidden=x!==k;
+    document.getElementById('tab-'+x).setAttribute('aria-selected',String(x===k));
+  });
+}
+function fromHash(){showTab(location.hash==='#discusion'?'rouche':'cramer')}
+document.getElementById('tab-cramer').addEventListener('click',()=>{showTab('cramer');try{history.replaceState(null,'','#cramer')}catch(e){}});
+document.getElementById('tab-rouche').addEventListener('click',()=>{showTab('rouche');try{history.replaceState(null,'','#discusion')}catch(e){}});
+window.addEventListener('hashchange',fromHash);
+draw('cramer');draw('rouche');fromHash();
+</script>
+</body>
+</html>
