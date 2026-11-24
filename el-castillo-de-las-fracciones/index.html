@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El castillo de las fracciones</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1f2330;--mu:#626883;--bd:#dfe3ee;--ok:#1b8a4b;--bad:#d03a3a;--warn:#a85f00;--inp:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13151c;--card:#1c1f29;--tx:#eceef6;--mu:#a0a6bc;--bd:#303546;--ok:#4cc57d;--bad:#ff7b7b;--warn:#f0b04a;--inp:#252936}}
+:root[data-theme="dark"]{--bg:#13151c;--card:#1c1f29;--tx:#eceef6;--mu:#a0a6bc;--bd:#303546;--ok:#4cc57d;--bad:#ff7b7b;--warn:#f0b04a;--inp:#252936}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:700 16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.w{max-width:860px;margin:0 auto;padding:18px 16px 56px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font:600 clamp(1.6rem,5vw,2.3rem)/1.1 "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0}
+.sub{color:var(--mu);margin:.3rem 0 0;font-weight:500}
+.stat{text-align:right;color:var(--mu);font-weight:700}
+.stat b{color:var(--tx);font:600 1.3rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif}
+.pb{height:8px;background:var(--bd);border-radius:9px;margin:14px 0 6px;overflow:hidden}
+.pb i{display:block;height:100%;width:0;background:var(--ok);transition:width .4s}
+#nav{display:flex;align-items:flex-end;gap:8px;margin:14px 0 0;padding:6px 2px 0;overflow-x:auto}
+.t{flex:1 0 54px;border:2px solid var(--c);background:var(--card);color:var(--c);border-radius:6px 6px 4px 4px;font:600 1.15rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:14px}
+.t::before{content:"";position:absolute;left:-2px;right:-2px;top:-9px;height:9px;background:repeating-linear-gradient(90deg,var(--c) 0 9px,transparent 9px 17px)}
+.t.on{background:var(--c);color:#fff}
+.t.dn:not(.on){background:color-mix(in srgb,var(--c) 18%,var(--card))}
+.t:focus-visible,.go:focus-visible,.sol:focus-visible,.nx:focus-visible,.lnk:focus-visible,.in:focus-visible{outline:3px solid var(--c,#3e63dd);outline-offset:2px}
+.base{height:6px;background:var(--bd);border-radius:0 0 6px 6px}
+.bh{margin:26px 0 4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.bh h2{font:600 1.55rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;color:var(--c)}
+.lv{color:var(--mu);font-weight:700;font-size:.9rem}
+.tip{border-left:5px solid var(--c);background:var(--card);border-radius:0 12px 12px 0;padding:10px 14px;margin:10px 0 6px;font-weight:600}
+.rule{color:var(--mu);font-size:.92rem;font-weight:600;margin:0 0 14px}
+.ex{background:var(--card);border:2px solid var(--bd);border-radius:16px;padding:16px;margin:12px 0;display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px}
+.ex.ok{border-color:var(--ok)}
+.ex.rv{border-color:var(--warn)}
+.num{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font:600 .95rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif}
+.expr{display:inline-flex;align-items:center;flex-wrap:wrap;gap:.2em .35em;font:700 1.5rem system-ui,-apple-system,"Segoe UI",sans-serif}
+.expr>span,.pw{display:inline-flex;align-items:center}
+.eq{font:700 1.5rem system-ui,-apple-system,"Segoe UI",sans-serif}
+.fr{display:inline-flex;flex-direction:column;align-items:center;line-height:1.2;vertical-align:middle}
+.fr>i{font-style:normal;padding:0 .3em}
+.fr>i:first-child{border-bottom:2px solid currentColor}
+.fr.big>i:first-child{border-bottom-width:3px;padding-bottom:.1em}
+.fr.big>i:last-child{padding-top:.1em}
+.pa{font-size:1.8em;font-weight:500;line-height:1;opacity:.75}
+.pw{align-items:flex-start}
+.pw sup{font-size:.62em;margin:-.15em 0 0 .08em}
+.ans{display:inline-flex;flex-direction:column;align-items:center}
+.in{width:68px;height:40px;text-align:center;font:700 1.25rem system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--tx);background:var(--inp);border:2px solid var(--bd);border-radius:10px}
+.bar{width:68px;height:3px;background:var(--tx);margin:4px 0;border-radius:2px}
+.go,.nx{border:0;background:var(--c);color:#fff;font:600 1rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;padding:10px 18px;border-radius:12px;cursor:pointer}
+.go[disabled]{opacity:.45;cursor:default}
+.fb{flex-basis:100%;font-weight:700;min-height:1.2em}
+.fb.good{color:var(--ok)}.fb.bad{color:var(--bad)}.fb.warn{color:var(--warn)}
+.lnk{background:none;border:0;color:var(--c);text-decoration:underline;font:700 1rem system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer;padding:0 0 0 6px}
+.sol{border:2px solid var(--c);background:transparent;color:var(--c);font:600 1rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;padding:8px 14px;border-radius:12px;cursor:pointer}
+.sp{flex-basis:100%;border-top:2px dashed var(--bd);padding-top:12px}
+.sp h4{margin:0 0 8px;font:600 1.1rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--c)}
+.stp{margin:0 0 12px}.stp p{margin:0 0 4px;line-height:2}.stp .expr{font-size:1.3rem;margin-top:2px}
+.sp small{color:var(--mu);font-weight:600}.res{font-weight:800;margin:4px 0 0}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:10px;flex-wrap:wrap}
+.rs{background:none;border:1px solid var(--bd);color:var(--mu);border-radius:10px;padding:6px 12px;font:700 .85rem system-ui,-apple-system,"Segoe UI",sans-serif;cursor:pointer}
+.end{text-align:center;background:var(--card);border:2px solid var(--ok);border-radius:18px;padding:22px;margin-top:22px}
+.end h3{font:600 1.5rem "Trebuchet MS",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0 0 6px}
+@media (max-width:520px){.expr,.eq{font-size:1.25rem}.in,.bar{width:58px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+body>h1,body .wrap>h1:first-child,body .wrap>header h1{padding-right:64px}
+</style>
+</head>
+<body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
+
+<div class="w">
+<header>
+  <div><h1>El castillo de las fracciones</h1><p class="sub">Operaciones combinadas en 10 bloques, de la base a la torre más alta.</p></div>
+  <div class="stat"><b id="sc">0</b> aciertos sin ayuda<br><span id="pg">0 de 42 resueltos</span></div>
+</header>
+<div class="pb" role="progressbar" aria-label="Progreso total"><i id="bar"></i></div>
+<div id="nav" role="tablist" aria-label="Bloques"></div><div class="base"></div>
+<main id="main"></main>
+</div>
+<script>
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const fr=(n,d=1)=>{const g=gcd(n,d)||1,s=d<0?-1:1;return{n:s*n/g,d:s*d/g}};
+const F=(n,d=1)=>({t:'f',n,d}),op=o=>(a,b)=>({t:'b',o,a,b});
+const A=op('+'),S=op('-'),M=op('*'),D=op('/'),P=(a,k)=>({t:'p',a,k}),C=(a,b)=>({t:'c',a,b});
+function ev(x){
+ if(x.t=='f')return fr(x.n,x.d);
+ if(x.t=='p'){const b=ev(x.a);let r=fr(1);for(let i=0;i<x.k;i++)r=fr(r.n*b.n,r.d*b.d);return r}
+ const a=ev(x.a),b=ev(x.b);
+ if(x.t=='c'||x.o=='/')return fr(a.n*b.d,a.d*b.n);
+ return x.o=='+'?fr(a.n*b.d+b.n*a.d,a.d*b.d):x.o=='-'?fr(a.n*b.d-b.n*a.d,a.d*b.d):fr(a.n*b.n,a.d*b.d)}
+const pr=x=>x.t=='b'?('+-'.includes(x.o)?1:2):x.t=='p'?3:4;
+const par=h=>`<span class="pa">(</span>${h}<span class="pa">)</span>`;
+const SYM={'+':'+','-':'−','*':'×','/':'÷'};
+function R(x){
+ if(x.t=='f')return x.d==1?`<span>${x.n}</span>`:`<span class="fr"><i>${x.n}</i><i>${x.d}</i></span>`;
+ if(x.t=='c')return `<span class="fr big"><i>${R(x.a)}</i><i>${R(x.b)}</i></span>`;
+ if(x.t=='p'){const b=x.a,s=b.t=='f'&&b.d==1;return `<span class="pw">${s?R(b):par(R(b))}<sup>${x.k}</sup></span>`}
+ const p=pr(x),w=(y,need)=>need?par(R(y)):R(y);
+ return w(x.a,pr(x.a)<p)+`<span>${SYM[x.o]}</span>`+w(x.b,pr(x.b)<p||(pr(x.b)==p&&'-/'.includes(x.o)))}
+const B=[
+ {n:'Sumas y restas sencillas',c:'#e5484d',tip:'Con el mismo denominador, se suman o restan los numeradores y el denominador no cambia. Con distinto denominador, primero busca un denominador común.',
+  ex:[A(F(3,8),F(1,8)),S(F(5,6),F(1,6)),A(F(1,2),F(1,4)),S(F(7,10),F(1,5))]},
+ {n:'Multiplicaciones y divisiones',c:'#e8590c',tip:'Multiplicar: numerador por numerador y denominador por denominador. Dividir: multiplica por la inversa de la segunda fracción.',
+  ex:[M(F(2,3),F(3,4)),M(F(5,6),F(9,10)),D(F(3,4),F(3,8)),D(F(2,3),F(4,9))]},
+ {n:'Sumas y restas combinadas',c:'#2f9e44',tip:'Pasa todas las fracciones a un denominador común y opera de izquierda a derecha.',
+  ex:[S(A(F(1,2),F(1,3)),F(1,6)),A(S(F(5,4),F(1,2)),F(1,8)),S(A(F(3,5),F(1,2)),F(3,10)),S(S(F(7,6),F(1,3)),F(1,4))]},
+ {n:'Prioridad de operaciones',c:'#0c8f8f',tip:'Primero las multiplicaciones y divisiones; después las sumas y las restas.',
+  ex:[A(F(1,2),M(F(1,3),F(3,4))),S(F(5,6),D(F(2,3),F(4,3))),A(M(F(3,4),F(2,3)),F(1,6)),S(F(7,8),M(F(1,4),F(3,2)))]},
+ {n:'Paréntesis',c:'#3e63dd',tip:'Resuelve primero lo que hay dentro de los paréntesis y después sigue con el resto.',
+  ex:[M(A(F(1,2),F(1,3)),F(6,5)),D(S(F(3,4),F(1,2)),F(1,8)),M(F(2,3),S(F(5,6),F(1,4))),D(A(F(2,5),F(1,2)),F(3,10))]},
+ {n:'Potencias',c:'#5b5bd6',tip:'Una potencia de fracción eleva el numerador y el denominador: (a/b)² = a²/b². Las potencias se resuelven antes que × y ÷.',
+  ex:[P(F(2,3),2),A(P(F(1,2),3),F(3,8)),S(P(F(3,2),2),F(5,4)),D(P(F(3,4),2),F(3,8))]},
+ {n:'Potencias y paréntesis',c:'#2b8ac6',tip:'Si hay una suma o resta entre paréntesis elevada a una potencia, resuélvela primero dentro del paréntesis y después aplica la potencia.',
+  ex:[S(P(A(F(1,2),F(1,3)),2),F(1,4)),A(M(F(3,2),P(F(2,3),2)),F(1,2)),D(P(S(F(5,6),F(1,3)),2),P(F(1,2),3)),S(F(1,1),M(P(F(1,2),2),F(2,3)))]},
+ {n:'Castillos de fracciones',c:'#8e4ec6',tip:'Un castillo es una división: la fracción de arriba entre la de abajo. Resuelve por separado lo de arriba y lo de abajo, y después divide.',
+  ex:[C(F(1,2),F(3,4)),C(F(5,6),F(10,9)),C(A(F(1,2),F(1,3)),F(5,12)),C(F(3,4),S(F(1,2),F(1,6)))]},
+ {n:'Castillos avanzados',c:'#a8641a',tip:'Ahora los castillos llevan sumas, restas y potencias, o se combinan con otras operaciones. Convierte cada castillo en una sola fracción antes de seguir.',
+  ex:[C(A(F(1,2),F(1,4)),S(F(1,2),F(1,4))),C(P(F(1,2),2),A(F(1,4),F(1,2))),S(F(5,4),C(F(2,3),F(4,3))),M(C(F(3,5),F(9,10)),A(F(1,2),F(1,4))),D(C(F(1,2),F(1,3)),F(3,4))]},
+ {n:'Gran reto final',c:'#d6409f',tip:'Orden: paréntesis y castillos, potencias, multiplicaciones y divisiones, y por último sumas y restas. Simplifica al final.',
+  ex:[C(A(F(1,2),F(1,3)),S(F(1,2),F(1,3))),A(C(F(2,3),F(4,9)),P(F(1,2),2)),M(C(P(F(2,3),2),F(8,27)),F(1,3)),S(C(F(3,4),A(F(1,2),F(1,4))),P(F(1,3),2)),C(S(F(5,6),F(1,3)),A(F(1,4),F(1,6)))]}
+];
+B.forEach(b=>b.ex=b.ex.map(e=>({e,a:ev(e)})));
+const TOT=B.reduce((s,b)=>s+b.ex.length,0);
+let cur=0,st;const $=id=>document.getElementById(id);
+const init=()=>{st=B.map(b=>b.ex.map(()=>({t:0,s:0})));cur=0;draw()};
+function stats(){
+ const all=st.flat(),d=all.filter(x=>x.s).length;
+ $('sc').textContent=all.filter(x=>x.s==1&&!x.v).length;$('pg').textContent=d+' de '+TOT+' resueltos';$('bar').style.width=(100*d/TOT)+'%';
+ $('nav').innerHTML=B.map((b,i)=>`<button class="t ${i==cur?'on':''} ${st[i].every(x=>x.s)?'dn':''}" style="--c:${b.c};height:${44+i*8}px" data-b="${i}" aria-label="Bloque ${i+1}: ${b.n}">${st[i].every(x=>x.s)?'✓':i+1}</button>`).join('');
+ const done=st[cur].every(x=>x.s),f=$('foot');
+ if(f)f.innerHTML=done?(cur<B.length-1?`<span>¡Bloque superado!</span><button class="nx" data-nx>Siguiente bloque</button>`:''):'';
+ const e=$('end');if(e)e.innerHTML=st.flat().every(x=>x.s)?`<div class="end"><h3>¡Has conquistado el castillo!</h3><p>Aciertos sin ayuda: ${all.filter(x=>x.s==1&&!x.v).length} de ${TOT}.</p><button class="rs" data-rs>Empezar de nuevo</button></div>`:'';
+}
+function draw(){
+ const b=B[cur];
+ $('main').style.setProperty('--c',b.c);
+ $('main').innerHTML=`<div class="bh"><h2>Bloque ${cur+1}. ${b.n}</h2><span class="lv">Nivel ${cur+1} de ${B.length}</span></div>
+ <div class="tip">${b.tip}</div>
+ <p class="rule">Escribe el resultado simplificado. Si es un número entero, escríbelo arriba y deja el denominador vacío.</p>
+ <div id="list">${b.ex.map((x,i)=>`<div class="ex ${['','ok','rv'][st[cur][i].s]}" data-i="${i}"><span class="num">${i+1}</span><div class="expr">${R(x.e)}</div><span class="eq">=</span>
+ <div class="ans"><input class="in n" inputmode="numeric" autocomplete="off" aria-label="Numerador"><span class="bar"></span><input class="in d" inputmode="numeric" autocomplete="off" aria-label="Denominador"></div>
+ <button class="go">Comprobar</button><button class="sol" data-sol>Ver solución</button><div class="fb" aria-live="polite"></div></div>`).join('')}</div>
+ <div class="foot" id="foot"></div><div id="end"></div>`;
+ b.ex.forEach((x,i)=>{if(st[cur][i].s)finish(i,st[cur][i].s,true)});
+ stats();
+}
+function finish(i,s,quiet){
+ const c=$('list').children[i],a=B[cur].ex[i].a;
+ c.className='ex '+(s==1?'ok':'rv');c.querySelectorAll('input,.go').forEach(n=>n.disabled=true);
+ const ins=c.querySelectorAll('input');ins[0].value=a.n;ins[1].value=a.d==1?'':a.d;
+ if(!quiet||s==2)msg(c,s==1?'good':'warn',s==1?'¡Correcto! Está bien simplificado.':'Solución: '+(a.d==1?a.n:a.n+'/'+a.d)+'. Prueba a rehacerlo paso a paso.');
+}
+const lcm=(a,b)=>a/gcd(a,b)*b;
+const tail=(n,d,r)=>n===r.n&&d===r.d?'':` = ${R(F(r.n,r.d))} <small>(simplificado)</small>`;
+function why(x,a,b,r){
+ const f=v=>R(F(v.n,v.d));
+ if(x.t=='p'){const n=a.n**x.k,d=a.d**x.k;return `Elevamos numerador y denominador al exponente: ${R(P(F(a.n,a.d),x.k))} = ${R(F(n,d))}`+tail(n,d,r)}
+ if(x.t=='c'||x.o=='/'){const n=a.n*b.d,d=a.d*b.n;return (x.t=='c'?'El castillo es una división: la fracción de arriba entre la de abajo. ':'')+`Dividir es multiplicar por la inversa: ${f(a)} ÷ ${f(b)} = ${f(a)} × ${R(F(b.d,b.n))} = ${R(F(n,d))}`+tail(n,d,r)}
+ if(x.o=='*'){const n=a.n*b.n,d=a.d*b.d;return `Multiplicamos numeradores y denominadores: ${f(a)} × ${f(b)} = ${R(F(n,d))}`+tail(n,d,r)}
+ const m=lcm(a.d,b.d),s=x.o=='+'?'+':'−',an=a.n*m/a.d,bn=b.n*m/b.d,n=x.o=='+'?an+bn:an-bn,eq=a.d==b.d;
+ return (eq?`Mismo denominador: ${x.o=='+'?'sumamos':'restamos'} los numeradores. `:`Denominador común ${m}: `)+`${f(a)} ${s} ${f(b)} = `+(eq?'':`${R(F(an,m))} ${s} ${R(F(bn,m))} = `)+R(F(n,m))+tail(n,m,r)}
+function expl(e){
+ const t=JSON.parse(JSON.stringify(e));let n=0,out='';
+ while(t.t!='f'){
+  let best=null;
+  (function w(x,g,c){
+   if(x.t=='f')return;
+   const ch=x.t=='p'?[x.a]:[x.a,x.b];
+   if(ch.every(y=>y.t=='f')){const p=x.t=='p'?3:x.t=='c'?2:pr(x);if(!best||g>best.g||(g==best.g&&p>best.p))best={x,g,p,c};return}
+   ch.forEach((y,i)=>{let g2=g,c2=c;
+    if(x.t=='c'){g2=g+1;c2='c'}
+    else if(x.t=='p'){g2=g+1;c2='p'}
+    else if(y.t=='b'&&(pr(y)<pr(x)||(i==1&&pr(y)==pr(x)&&'-/'.includes(x.o)))){g2=g+1;c2='p'}
+    w(y,g2,c2)})
+  })(t,0,'');
+  const x=best.x,ch=x.t=='p'?[x.a]:[x.a,x.b],a=ev(ch[0]),b=ch[1]&&ev(ch[1]),r=ev(x);
+  const lab=best.c=='c'?'En el castillo':best.c=='p'?'En el paréntesis':x.t=='p'?'Potencia':x.t=='c'?'Castillo':best.p==2?'Multiplicación o división':'Suma o resta';
+  const h=why(x,a,b,r);
+  Object.keys(x).forEach(q=>delete x[q]);Object.assign(x,{t:'f',n:r.n,d:r.d});
+  out+=`<div class="stp"><p><b>Paso ${++n}. ${lab}.</b> ${h}</p>`+(t.t=='f'?'':`<div class="expr"><span>=</span>${R(t)}</div>`)+'</div>'}
+ const r=ev(e);
+ return out+`<p class="res">Resultado: ${R(F(r.n,r.d))} <small>(ya simplificado)</small></p>`}
+function toggle(c,open){
+ let p=c.querySelector('.sp');const bt=c.querySelector('.sol');
+ if(p&&!open){p.remove();bt.textContent='Ver solución';return}
+ if(p)return;
+ const i=+c.dataset.i,s=st[cur][i];if(!s.s)s.v=1;
+ p=document.createElement('div');p.className='sp';p.innerHTML='<h4>Solución paso a paso</h4>'+expl(B[cur].ex[i].e);
+ c.appendChild(p);bt.textContent='Ocultar solución';stats()}
+function msg(c,k,h){const f=c.querySelector('.fb');f.className='fb '+k;f.innerHTML=h}
+function check(c){
+ const i=+c.dataset.i,s=st[cur][i],a=B[cur].ex[i].a;
+ const ns=c.querySelector('.n').value.trim().replace('−','-'),ds=c.querySelector('.d').value.trim();
+ if(!/^-?\d+$/.test(ns)||(ds&&!/^\d+$/.test(ds))||+ds===0&&ds)return msg(c,'warn','Escribe números enteros en el numerador y, si hace falta, en el denominador.');
+ const n=+ns,d=ds?+ds:1;
+ if(n*a.d!==a.n*d){s.t++;return msg(c,'bad','No es correcto. Revisa el orden de las operaciones.'+(s.t>=2?'<button class="lnk" data-rv>Mostrar el resultado</button>':''))}
+ if(gcd(n,d)>1)return msg(c,'warn','El valor es correcto, pero falta simplificar la fracción.');
+ s.s=1;finish(i,1);stats();
+}
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.b!==undefined){cur=+t.dataset.b;draw();return}
+ if(t.dataset.nx!==undefined){cur++;draw();scrollTo({top:0,behavior:'smooth'});return}
+ if(t.dataset.rs!==undefined){init();scrollTo({top:0});return}
+ const c=t.closest('.ex');if(!c)return;
+ if(t.classList.contains('go'))check(c);
+ if(t.dataset.sol!==undefined)toggle(c);
+ if(t.dataset.rv!==undefined){st[cur][+c.dataset.i].s=2;finish(+c.dataset.i,2);stats();toggle(c,true)}
+});
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('in')){const c=e.target.closest('.ex');if(c)check(c)}});
+init();
+</script>
+</body>
+</html>
