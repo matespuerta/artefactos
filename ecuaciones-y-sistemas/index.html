@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ecuaciones y sistemas paso a paso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* VOICE: cuaderno de clase, mismo estilo que la página de polinomios
+   IDEA: cuaderno de ejercicios con pestañas por tipo de ecuación
+   PICTURE: la propia lista de ejercicios, que se despliega paso a paso
+   COLOUR and TYPE: papel, tinta oscura y un acento naranja; Fraunces, IBM Plex Sans y STIX para las fórmulas
+   LAYOUT: cabecera, pestañas, panel de opciones y 5 ejercicios */
+:root{--paper:#f6f1e7;--card:#fffdf8;--card2:#fff;--soft:#fcf9f2;--ink:#1d2733;--onink:#fff;--muted:#6b6457;--line:#e3dacb;
+  --accent:#c2410c;--accent-soft:#fbe6d9;--ok:#166534;--ok-soft:#dcf2e3;--bad:#9f1239;--bad-soft:#fbe4ea;
+  --math:'STIX Two Text','Cambria Math',serif;color-scheme:light}
+:root[data-theme=dark]{--paper:#14181d;--card:#1c2229;--card2:#20272f;--soft:#181d23;--ink:#ece6da;--onink:#14181d;--muted:#a39c8f;--line:#333c46;
+  --accent:#f0804a;--accent-soft:#3a2418;--ok:#7dd3a0;--ok-soft:#173226;--bad:#f49ab0;--bad-soft:#3b1a24;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#14181d;--card:#1c2229;--card2:#20272f;--soft:#181d23;--ink:#ece6da;--onink:#14181d;--muted:#a39c8f;--line:#333c46;
+  --accent:#f0804a;--accent-soft:#3a2418;--ok:#7dd3a0;--ok-soft:#173226;--bad:#f49ab0;--bad-soft:#3b1a24;color-scheme:dark}}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;line-height:1.5;overflow-x:clip;
+  background-image:radial-gradient(circle at 1px 1px, color-mix(in srgb,var(--ink) 7%,transparent) 1px, transparent 0);background-size:22px 22px}
+.wrap{max-width:980px;margin:0 auto;padding:32px 20px 80px}
+header h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(28px,4.5vw,44px);margin:0 0 4px;letter-spacing:-.5px;line-height:1.08}
+header p{margin:0;color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 15px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;min-height:40px}
+.tab:hover{border-color:var(--ink)}
+.tab.on{background:var(--ink);border-color:var(--ink);color:var(--onink)}
+.tab:focus-visible,.btn:focus-visible,.seg button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:16px}
+.panel h2{font-family:'Fraunces',serif;font-weight:500;font-size:24px;margin:0 0 4px}
+.panel p{margin:0 0 12px;color:var(--muted);font-size:15px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+label.small{font-size:13px;color:var(--muted);font-weight:500}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink);min-height:38px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--ink);color:var(--onink)}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--onink);border-radius:10px;padding:9px 16px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;min-height:40px}
+.btn.alt{background:transparent;color:var(--ink)}
+.btn.acc{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sm{padding:7px 13px;font-size:13px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.m{font-family:var(--math);font-size:1.08em}
+.big{font-family:var(--math);font-size:clamp(20px,3.2vw,27px);margin:8px 0;overflow-x:auto;white-space:nowrap;padding:4px 0}
+.mid{font-family:var(--math);font-size:20px;margin:8px 0;overflow-x:auto;padding:2px 0;white-space:nowrap}
+sup{font-size:.68em}sub{font-size:.68em}
+sup sup{font-size:.85em}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;line-height:1.2}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .25em .1em}
+.frac>span:last-child{padding:.1em .25em 0}
+.rad{border-top:1.5px solid currentColor;padding:0 .12em;margin-left:1px}
+.list-head{margin:28px 0 4px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.list-head h2{font-family:'Fraunces',serif;font-weight:500;font-size:22px;margin:0}
+.list-head span{color:var(--muted);font-size:14px}
+.ex{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-top:14px;overflow:hidden}
+.ex.open{border-color:var(--ink)}
+.ex-head{display:flex;align-items:center;gap:14px;padding:14px 18px}
+.stmt{flex:1;font-family:var(--math);font-size:clamp(18px,2.8vw,24px);overflow-x:auto;white-space:nowrap;padding:4px 0}
+.ex-body{border-top:1px solid var(--line);padding:6px 18px 18px;background:var(--soft)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.progress{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-family:'IBM Plex Sans';font-size:13px;font-weight:600;flex:none}
+.ex-head .num{background:var(--ink);color:var(--onink)}
+.step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-top:12px;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.step{animation:none}}
+.step h3{margin:0 0 8px;font-family:'Fraunces',serif;font-weight:500;font-size:19px;display:flex;gap:10px;align-items:center}
+.step p{margin:6px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font-family:var(--math);font-size:16px;padding:3px 10px;border-radius:999px;background:var(--bad-soft);color:var(--bad)}
+.chip.ok{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.ruf-wrap{overflow-x:auto;margin:12px 0}
+table.ruf{border-collapse:collapse;font-family:var(--math);font-size:20px;margin:0 auto}
+table.ruf td{padding:5px 13px;text-align:center;min-width:40px}
+table.ruf td.rc{border-right:2px solid var(--ink);color:var(--accent);font-weight:600}
+table.ruf tr.res td{border-top:2px solid var(--ink)}
+table.ruf td.rem{border-left:2px solid var(--ink);background:var(--ok-soft);color:var(--ok);font-weight:600}
+table.ruf tr.prod td{color:var(--muted)}
+.note{font-size:13.5px;color:var(--muted)}
+.box{background:var(--accent-soft);border-radius:10px;padding:8px 14px;margin-top:10px;overflow-x:auto}
+.final{border:2px solid var(--ink)}
+.rootlist{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.root{font-family:var(--math);font-size:19px;background:var(--ok-soft);color:var(--ok);padding:5px 12px;border-radius:10px;white-space:nowrap}
+.root small{font-family:'IBM Plex Sans';font-size:12px;opacity:.8;margin-left:4px}
+.warn{background:var(--bad-soft);color:var(--bad);border-radius:10px;padding:10px 14px}
+.chk{border-radius:10px;padding:8px 12px;margin:8px 0;overflow-x:auto;font-size:15px}
+.chk.ok{background:var(--ok-soft)}
+.chk.bad{background:var(--bad-soft)}
+.chk b{white-space:nowrap}
+.badt{color:var(--bad);font-family:'IBM Plex Sans';font-size:15px}
+.sys{display:inline-flex;align-items:center;gap:4px;vertical-align:middle}
+.sys .brace{font-size:2.5em;font-weight:300;line-height:1;font-family:var(--math)}
+.sys.n3 .brace{font-size:3.6em}
+.sys .eqs{display:flex;flex-direction:column;gap:2px}
+.mxw{display:flex;align-items:center;gap:10px;overflow-x:auto;margin:12px 0;font-family:var(--math);font-size:19px;padding-bottom:2px}
+.mxs div{height:36px;line-height:36px;white-space:nowrap;color:var(--muted);font-size:16px}
+.mxs.ops div{color:var(--accent);font-family:'IBM Plex Sans';font-size:14px}
+.mxb{border-left:2px solid var(--ink);border-right:2px solid var(--ink);border-radius:10px;padding:0 6px;flex:none}
+.mxb table{border-collapse:collapse}
+.mxb td{height:36px;padding:0 12px;text-align:right;min-width:42px}
+.mxb td.sep{border-left:1.5px solid var(--muted)}
+.mxb tr.chg td{color:var(--accent);font-weight:600}
+.red{display:inline-flex;flex-direction:column;align-items:flex-end}
+.red .mid{margin:2px 0}
+.red .sum{border-top:2px solid var(--ink);padding-top:4px}
+.hidden{display:none}
+@media (max-width:600px){.ex-head{flex-wrap:wrap}.stmt{flex-basis:100%;order:3}.wrap{padding:24px 14px 60px}.step{padding:14px}.ex-body{padding:6px 10px 14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Ecuaciones y sistemas</h1>
+    <p>Elige un tipo, genera 5 ejercicios y abre la solución paso a paso de cada uno.</p>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="panel">
+    <h2 id="pTitle"></h2>
+    <p id="pDesc"></p>
+    <div class="row">
+      <div class="row" id="subRow"><label class="small">Tipo</label><div class="seg" id="subs"></div></div>
+      <button class="btn acc" id="gen">Generar 5 ejemplos nuevos</button>
+    </div>
+  </div>
+  <div id="list"></div>
+</div>
+
+<script>
+{
+/* =========================================================
+   Utilidades
+   ========================================================= */
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const fmt=n=>n<0?'−'+Math.abs(n):''+(n===0?0:n);
+const par=n=>n<0?'('+fmt(n)+')':fmt(n);
+const dec=(v,d=4)=>(+v.toFixed(d)).toString().replace('.',',').replace('-','−');
+const V=v=>`<i>${v}</i>`;
+const X=V('x'),Y=V('y'),Z=V('z');
+const SUB=['₁','₂','₃','₄','₅','₆','₇'];
+const EQ=i=>`E<sub>${i+1}</sub>`;
+const isSq=n=>n>=0&&Number.isInteger(Math.sqrt(n));
+function trim(p){p=p.slice();while(p.length>1&&p[0]===0)p.shift();return p}
+function add(a,b){const n=Math.max(a.length,b.length),r=[];for(let i=0;i<n;i++)r.push((a[a.length-n+i]||0)+(b[b.length-n+i]||0));return trim(r)}
+const scale=(p,k)=>trim(p.map(a=>a*k));
+const sub=(a,b)=>add(a,scale(b,-1));
+function mul(a,b){const r=new Array(a.length+b.length-1).fill(0);a.forEach((x,i)=>b.forEach((y,j)=>r[i+j]+=x*y));return trim(r)}
+const evalP=(c,x)=>c.reduce((acc,a)=>acc*x+a,0);
+const nTerms=p=>p.filter(a=>a!==0).length;
+const lead=p=>p.find(a=>a!==0)||0;
+function divisors(n){n=Math.abs(n);const d=[];for(let i=1;i<=n;i++)if(n%i===0)d.push(i);return d}
+function ruffini(c,r){const q=[c[0]],prods=[];for(let i=1;i<c.length;i++){const p=r*q[i-1];prods.push(p);q.push(c[i]+p)}return {q:q.slice(0,-1),rem:q[q.length-1],prods}}
+function sqrtSplit(n){let k=1;for(let i=Math.floor(Math.sqrt(n));i>1;i--){if(n%(i*i)===0){k=i;break}}return {k,m:n/(k*k)}}
+
+function polyHTML(c,v='x'){
+  const n=c.length-1;let s='';
+  c.forEach((a,i)=>{if(a===0)return;const p=n-i,abs=Math.abs(a);
+    let t=(abs===1&&p>0)?'':''+abs;if(p>0)t+=V(v)+(p>1?'<sup>'+p+'</sup>':'');
+    s+=s===''?(a<0?'−':'')+t:(a<0?' − ':' + ')+t;});
+  return s||'0';
+}
+function linHTML(terms){let s='';terms.forEach(([a,v])=>{if(!a)return;const abs=Math.abs(a);const t=(abs===1&&v?'':''+abs)+v;s+=s===''?(a<0?'−':'')+t:(a<0?' − ':' + ')+t});return s||'0'}
+const fracBox=(n,d)=>`<span class="frac"><span>${n}</span><span>${d}</span></span>`;
+function fracHTML(p,q){if(q<0){p=-p;q=-q}const g=gcd(p,q)||1;p/=g;q/=g;if(q===1)return fmt(p);return (p<0?'−':'')+fracBox(Math.abs(p),q)}
+const sq=v=>`√<span class="rad">${v}</span>`;
+const wrap=(c,v='x')=>nTerms(c)>1?'('+polyHTML(c,v)+')':polyHTML(c,v);
+const lf=r=>r===0?X:'('+polyHTML([1,-r])+')';
+function rat(p,q=1){if(q<0){p=-p;q=-q}const g=gcd(p,q)||1;p/=g;q/=g;return {p,q,v:p/q,h:fracHTML(p,q)}}
+const addR=(a,b)=>rat(a.p*b.q+b.p*a.q,a.q*b.q);
+const PW=(b,e)=>`${b}<sup>${e}</sup>`;
+function subLin(p,q,x){if(p===0)return fmt(q);return (p===1?'':p===-1?'−':fmt(p)+'·')+par(x)+(q>0?' + '+q:q<0?' − '+(-q):'')}
+function normalize(P){let g=P.reduce((a,b)=>gcd(a,b),0)||1;if(lead(P)<0)g=-g;return {P:P.map(c=>c/g||0),g}}
+function intRoots(P){
+  if(P.length===2){const r=-P[1]/P[0];return Number.isInteger(r)?[r]:null}
+  if(P.length===3){const [a,b,c]=P,D=b*b-4*a*c;if(D<0||!isSq(D))return null;const s=Math.sqrt(D),r1=(-b+s)/(2*a),r2=(-b-s)/(2*a);return Number.isInteger(r1)&&Number.isInteger(r2)?[r1,r2]:null}
+  return null;
+}
+function sqrtRat(r){
+  const {p,q}=r;
+  if(isSq(p)&&isSq(q)){const s=rat(Math.sqrt(p),Math.sqrt(q));return {v:s.v,h:s.h,exact:true}}
+  const {k,m}=sqrtSplit(p*q),g=gcd(k,q),K=k/g,Q=q/g,num=(K===1?'':K)+sq(m);
+  return {v:Math.sqrt(p/q),h:Q===1?num:fracBox(num,Q),exact:false};
+}
+const sysHTML=lines=>`<span class="sys n${lines.length}"><span class="brace">{</span><span class="eqs">${lines.map(l=>`<span>${l}</span>`).join('')}</span></span>`;
+
+/* ---------- ecuación de segundo grado (con casos incompletos) ---------- */
+function quad(a,b,c,v='x'){
+  const x=V(v),eq=`<span class="m">${polyHTML([a,b,c],v)} = 0</span>`;
+  if(a===0){
+    const r=rat(-c,b);
+    return {roots:[r],h:`<p>Es de primer grado: ${eq}</p><div class="mid">${polyHTML([b,0],v)} = ${fmt(-c)} &nbsp;→&nbsp; ${x} = ${b===1?'':fracBox(fmt(-c),fmt(b))+' = '}<b>${r.h}</b></div>`};
+  }
+  if(c===0&&b!==0){
+    const r=rat(-b,a);
+    return {roots:[rat(0),r],h:`<p>Es incompleta (no tiene término independiente): ${eq}. Sacamos factor común ${x}:</p>
+      <div class="mid">${x}·(${polyHTML([a,b],v)}) = 0</div>
+      <p>Un producto vale cero si alguno de sus factores es cero:</p>
+      <div class="mid">${x}<sub>1</sub> = <b>0</b> &nbsp;&nbsp;·&nbsp;&nbsp; ${polyHTML([a,b],v)} = 0 → ${x}<sub>2</sub> = ${a===1?'':fracBox(fmt(-b),fmt(a))+' = '}<b>${r.h}</b></div>`};
+  }
+  if(b===0){
+    const t=rat(-c,a);
+    const h=`<p>Es incompleta (no tiene término en ${x}): ${eq}. Despejamos ${x}<sup>2</sup>:</p><div class="mid">${x}<sup>2</sup> = ${a===1?'':fracBox(fmt(-c),fmt(a))+' = '}${t.h}</div>`;
+    if(t.v<0)return {roots:[],h:h+`<p>Un cuadrado no puede ser negativo → <b>no tiene soluciones reales</b>.</p>`};
+    const s=sqrtRat(t);
+    const r2=s.exact?rat(Math.sqrt(t.p),Math.sqrt(t.q)):{v:s.v,h:s.h},r1=s.exact?rat(-Math.sqrt(t.p),Math.sqrt(t.q)):{v:-s.v,h:'−'+s.h};
+    return {roots:[r1,r2],h:h+`<div class="mid">${x} = ±${sq(t.h)}${sq(t.h)!==s.h?` = <b>±${s.h}</b>`:''}</div>`};
+  }
+  const D=b*b-4*a*c;
+  let h=`<p>Resolvemos ${eq} con la fórmula, siendo <span class="m">a = ${fmt(a)}, b = ${fmt(b)}, c = ${fmt(c)}</span>:</p>
+    <div class="mid">${x} = ${fracBox(`−<i>b</i> ± ${sq('<i>b</i><sup>2</sup> − 4<i>ac</i>')}`,'2<i>a</i>')} = ${fracBox(`${fmt(-b)} ± ${sq(`${par(b)}<sup>2</sup> − 4·${par(a)}·${par(c)}`)}`,fmt(2*a))} = ${fracBox(`${fmt(-b)} ± ${sq(fmt(D))}`,fmt(2*a))}</div>`;
+  if(D<0)return {roots:[],h:h+`<p>El discriminante es negativo (Δ = ${fmt(D)}) → <b>no tiene soluciones reales</b>.</p>`};
+  if(D===0){const r=rat(-b,2*a);return {roots:[r],h:h+`<p>Δ = 0 → hay una solución doble:</p><div class="mid">${x} = ${fracBox(fmt(-b),fmt(2*a))} = <b>${r.h}</b></div>`}}
+  if(isSq(D)){
+    const s=Math.sqrt(D),r1=rat(-b+s,2*a),r2=rat(-b-s,2*a);
+    return {roots:[r1,r2],h:h+`<p>Como √${D} = ${s}:</p>
+      <div class="mid">${x}<sub>1</sub> = ${fracBox(`${fmt(-b)} + ${s}`,fmt(2*a))} = <b>${r1.h}</b> &nbsp;&nbsp;&nbsp; ${x}<sub>2</sub> = ${fracBox(`${fmt(-b)} − ${s}`,fmt(2*a))} = <b>${r2.h}</b></div>`};
+  }
+  const {k,m}=sqrtSplit(D);const g=gcd(gcd(b,k),2*a);let B=-b/g,K=k/g,Dd=2*a/g;if(Dd<0){B=-B;Dd=-Dd}
+  const mk=s=>{const tail=(K===1?'':K)+sq(m),num=B!==0?fmt(B)+(s>0?' + ':' − ')+tail:(s>0?'':'−')+tail;return {v:(B+s*K*Math.sqrt(m))/Dd,h:Dd===1?num:fracBox(num,Dd)}};
+  const r1=mk(1),r2=mk(-1);
+  return {roots:[r1,r2],h:h+`<p>${D} no es cuadrado perfecto${k>1?` (${sq(D)} = ${k}${sq(m)})`:''}: las soluciones son irracionales.</p>
+    <div class="mid">${x}<sub>1</sub> = <b>${r1.h}</b> ≈ ${dec(r1.v,3)} &nbsp;&nbsp;&nbsp; ${x}<sub>2</sub> = <b>${r2.h}</b> ≈ ${dec(r2.v,3)}</div>`};
+}
+
+function finalSols(sols,extra=''){
+  const m=new Map();sols.forEach(s=>{const k=s.v.toFixed(9);if(!m.has(k))m.set(k,s)});
+  sols=[...m.values()].sort((a,b)=>a.v-b.v);const n=sols.length;
+  return {t:'Solución',final:true,h:(n?`<p>${n===1?'La ecuación tiene <b>una solución</b>:':`La ecuación tiene <b>${n} soluciones</b>:`}</p>
+    <div class="rootlist">${sols.map(s=>`<span class="root">${X} ${s.rel||'='} ${s.h}</span>`).join('')}</div>`:`<p class="warn">La ecuación <b>no tiene solución real</b>.</p>`)+extra};
+}
+function finalPairs(pairs,extra=''){
+  const m=new Map();pairs.forEach(p=>m.set(p.join(','),p));pairs=[...m.values()].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+  return {t:'Solución',final:true,h:`<p>El sistema tiene <b>${pairs.length===1?'una solución':pairs.length+' soluciones'}</b>:</p>
+    <div class="rootlist">${pairs.map(([x,y])=>`<span class="root">${X} = ${fmt(x)}, ${Y} = ${fmt(y)}</span>`).join('')}</div>${extra}`};
+}
+
+/* =========================================================
+   1) BICUADRADAS
+   ========================================================= */
+function genBi(T){
+  const S=[1,4,9,16,25,36];
+  for(let t=0;t<500;t++){
+    let co;
+    if(T==='4'){const [a,b]=shuffle(S).slice(0,2);co=mul([1,-a],[1,-b])}
+    else if(T==='2')co=mul([1,-pick(S)],[1,pick([1,2,3,4,9])]);
+    else if(T==='irr')co=mul([1,-pick([2,3,5,7,8,12])],Math.random()<.6?[1,-pick([1,4,9])]:[1,pick([1,2,4])]);
+    else if(T==='frac'){const [p,q]=pick([[1,4],[1,9],[4,9],[9,4],[1,16],[9,16]]);co=mul([q,-p],[1,-pick([1,4,9])])}
+    else if(T==='0'){if(Math.random()<.5)co=mul([1,pick([1,2,4])],[1,pick([3,5,9])]);else{const b=pick([1,2,3,-1,-2]);co=[1,b,Math.floor(b*b/4)+ri(1,5)]}}
+    else co=mul([1,0],[1,-pick(S)]);
+    if(T!=='frac'&&Math.random()<.2){const k=pick([2,3]);co=co.map(c=>c*k)}
+    if(Math.max(...co.map(Math.abs))>400)continue;
+    const form=(co[1]!==0&&co[2]!==0&&Math.random()<.35)?'mov':'std';
+    return {co,form};
+  }
+}
+const stmtBi=({co:[a,b,c],form})=>form==='mov'?`${polyHTML([a,0,0,0,c])} = ${polyHTML([-b,0,0])}`:`${polyHTML([a,0,b,0,c])} = 0`;
+function solveBi(E){
+  const [a,b,c]=E.co,st=[];
+  st.push({t:'Planteamiento',h:`<div class="big">${stmtBi(E)}</div><p>Es una ecuación <b>bicuadrada</b>: solo aparecen potencias pares de ${X} (${X}<sup>4</sup> y ${X}<sup>2</sup>).</p>`+
+    (E.form==='mov'?`<p>Primero pasamos todos los términos al primer miembro:</p><div class="mid">${polyHTML([a,0,b,0,c])} = 0</div>`:'')});
+  st.push({t:'Cambio de variable',h:`<p>Llamamos <span class="m"><i>t</i> = ${X}<sup>2</sup></span>; entonces <span class="m">${X}<sup>4</sup> = (${X}<sup>2</sup>)<sup>2</sup> = <i>t</i><sup>2</sup></span>. La ecuación queda:</p>
+    <div class="box"><div class="mid">${polyHTML([a,b,c],'t')} = 0</div></div><p class="note">Es una ecuación de segundo grado en <i>t</i>.</p>`});
+  const Q=quad(a,b,c,'t');st.push({t:'Resolvemos la ecuación en t',h:Q.h});
+  const sols=[];let h=Q.roots.length?`<p>Para cada valor de <i>t</i> resolvemos <span class="m">${X}<sup>2</sup> = <i>t</i></span>:</p>`:`<p>Como no hay valores reales de <i>t</i>, tampoco hay valores reales de ${X}.</p>`;
+  Q.roots.forEach(r=>{
+    if(r.v<0)h+=`<div class="mid">${X}<sup>2</sup> = ${r.h} &nbsp;→&nbsp; <span class="badt">sin solución real (un cuadrado nunca es negativo)</span></div>`;
+    else if(r.v===0){h+=`<div class="mid">${X}<sup>2</sup> = 0 &nbsp;→&nbsp; ${X} = <b>0</b></div>`;sols.push(rat(0))}
+    else{const s=sqrtRat(r);h+=`<div class="mid">${X}<sup>2</sup> = ${r.h} &nbsp;→&nbsp; ${X} = ±${sq(r.h)}${sq(r.h)!==s.h?` = <b>±${s.h}</b>`:''}</div>`;sols.push({v:-s.v,h:'−'+s.h},{v:s.v,h:s.h})}
+  });
+  st.push({t:'Deshacemos el cambio',h});
+  st.push(finalSols(sols,sols.length?`<p class="note">Una bicuadrada tiene como máximo 4 soluciones reales.</p>`:''));
+  return st;
+}
+
+/* =========================================================
+   2) GRADO MAYOR QUE 2: Ruffini + segundo grado
+   ========================================================= */
+function linFactor(r){return r===0?X:`(${X} ${r>0?'−':'+'} ${Math.abs(r)})`}
+function mkRat(p,q){if(q<0){p=-p;q=-q}const g=gcd(p,q)||1;return {kind:'rat',p:p/g,q:q/g}}
+const intRoot=r=>({kind:'rat',p:r,q:1});
+function rootHTML(R){
+  if(R.kind==='rat')return fracHTML(R.p,R.q);
+  const Ks=R.K===1?'':R.K,tail=R.kind==='cx'?(R.m===1?`${Ks}<i>i</i>`:`${Ks}${sq(R.m)}<i>i</i>`):`${Ks}${sq(R.m)}`;
+  const num=R.B!==0?fmt(R.B)+(R.s>0?' + ':' − ')+tail:(R.s>0?'':'−')+tail;
+  return R.D===1?num:fracBox(num,R.D);
+}
+function rootVal(R){return R.kind==='rat'?R.p/R.q:(R.B+R.s*R.K*Math.sqrt(R.m))/R.D}
+function rootFactorHTML(R,k){
+  let f;
+  if(R.kind==='rat')f=R.q===1?linFactor(R.p):`(${X} ${R.p>0?'−':'+'} ${fracBox(Math.abs(R.p),R.q)})`;
+  else if(R.D===1){const b=R.B>0?` − ${R.B}`:R.B<0?` + ${-R.B}`:'';f=`(${X}${b} ${R.s>0?'−':'+'} ${R.K===1?'':R.K}${sq(R.m)})`}
+  else f=`(${X} − ${rootHTML(R)})`;
+  return k>1?f+`<sup>${k}</sup>`:f;
+}
+function groupRoots(roots){
+  const map=new Map();
+  roots.forEach(R=>{const key=R.kind==='rat'?R.p/R.q+'':'irr'+R.B+'_'+R.s+'_'+R.K+'_'+R.m+'_'+R.D;if(!map.has(key))map.set(key,{R,k:0});map.get(key).k++});
+  return [...map.values()].sort((a,b)=>rootVal(a.R)-rootVal(b.R));
+}
+const leadStr=a=>a===1?'':a===-1?'−':fmt(a);
+const multName=k=>({2:'doble',3:'triple',4:'cuádruple',5:'quíntuple'}[k]||'');
+function rufTable(cur,r,prods,q){
+  return `<div class="ruf-wrap"><table class="ruf">
+    <tr><td class="rc"></td>${cur.map(c=>`<td>${fmt(c)}</td>`).join('')}</tr>
+    <tr class="prod"><td class="rc">${fmt(r)}</td><td></td>${prods.map(p=>`<td>${fmt(p)}</td>`).join('')}</tr>
+    <tr class="res"><td class="rc"></td>${q.map(c=>`<td><b>${fmt(c)}</b></td>`).join('')}<td class="rem">0</td></tr></table></div>`;
+}
+const trialChips=trials=>`<div class="chips">${trials.map(([c,v])=>`<span class="chip ${v===0?'ok':''}">P(${fmt(c)}) = ${fmt(v)}${v===0?' ✓':''}</span>`).join('')}</div>`;
+function genPoly(deg){
+  for(let t=0;t<2000;t++){
+    let L=pick([1,1,1,1,1,-1,2,2,-2]);
+    const type=pick(['ent','ent','ent','irr','irr','cx','rat','doble']);let quadP;
+    if(type==='ent'){const a=ri(-5,5),b=ri(-5,5);quadP=[1,-(a+b),a*b]}
+    else if(type==='doble'){const a=ri(-4,4);quadP=[1,-2*a,a*a]}
+    else if(type==='irr'){const b=ri(-6,6),c=ri(-8,6),D=b*b-4*c;if(D<=0||isSq(D))continue;quadP=[1,b,c]}
+    else if(type==='cx'){const b=ri(-5,5),c=ri(1,10),D=b*b-4*c;if(D>=0)continue;quadP=[1,b,c]}
+    else{const LL=pick([2,3,2,-2]);const p=ri(-5,5);if(p===0||gcd(p,LL)!==1)continue;const s=ri(-4,4);quadP=[LL,-(LL*s+p),p*s];L=1}
+    let P=quadP.map(c=>c*L);
+    const pool=[-3,-2,-2,-1,-1,-1,0,1,1,1,2,2,3,4,-4];
+    for(let i=0;i<deg-2;i++)P=mul(P,[1,-pick(pool)]);
+    if(Math.max(...P.map(Math.abs))>600)continue;
+    if(deg>3&&P[P.length-1]===0&&P[P.length-2]===0&&Math.random()<.7)continue;
+    return P;
+  }
+  return [1,-2,-5,6];
+}
+function solvePoly(P){
+  const steps=[],deg=P.length-1,L=P[0];
+  steps.push({t:'Planteamiento',h:`<div class="big">${polyHTML(P)} = 0</div>
+    <p>Llamamos <span class="m">P(${X}) = ${polyHTML(P)}</span>. Es de grado ${deg}: aplicaremos Ruffini ${deg-2} ${deg-2===1?'vez':'veces'} para bajar a grado 2 y terminaremos con la fórmula de la ecuación de segundo grado.</p>
+    <p class="note">Toda raíz entera de P(${X}) es divisor del término independiente.</p>`});
+  let cur=P.slice();const found=[];let stuck=false,nR=0;
+  while(cur.length-1>2){
+    nR++;const a0=cur[cur.length-1];let cands,note;
+    if(a0===0){cands=[0];note=`<p>El término independiente es <b>0</b>, así que <span class="m">${X} = 0</span> es raíz (equivale a sacar ${X} factor común).</p>`}
+    else{const ds=divisors(a0);cands=ds.flatMap(d=>[d,-d]);note=`<p>Candidatos: divisores de <span class="m">${fmt(a0)}</span> → <span class="m">±${ds.join(', ±')}</span></p>`}
+    const trials=[];let r=null;
+    for(const c of cands){const v=evalP(cur,c);trials.push([c,v]);if(v===0){r=c;break}}
+    if(r===null){stuck=true;steps.push({t:'Ruffini: no hay más raíces enteras',h:note+`<div class="chips">${trials.map(([c,v])=>`<span class="chip">P(${fmt(c)}) = ${fmt(v)}</span>`).join('')}</div><div class="warn">Ningún divisor anula <span class="m">${polyHTML(cur)}</span>.</div>`});break}
+    const {q,prods}=ruffini(cur,r);found.push(r);
+    const sofar=groupRoots(found.map(intRoot)).map(g=>rootFactorHTML(g.R,g.k)).join('');
+    steps.push({t:`Ruffini con ${X} = ${fmt(r)}`,h:note+`<p>Probamos hasta que el resto sea 0:</p>${trialChips(trials)}
+      ${nR===1?`<p class="note">Bajamos el primer coeficiente; lo multiplicamos por ${fmt(r)}, lo ponemos bajo el siguiente y sumamos; repetimos hasta el final.</p>`:''}
+      ${rufTable(cur,r,prods,q)}<p>Cociente: <span class="m">${polyHTML(q)}</span> · resto 0. Por tanto <span class="m">${X} = ${fmt(r)}</span> es solución.</p>
+      <div class="box"><div class="mid">${polyHTML(P)} = ${leadStr(1)}${sofar}·(${polyHTML(q)})</div></div>`});
+    cur=q;
+  }
+  const realRoots=found.map(intRoot);let quadLeft=null;
+  if(!stuck){
+    const [a,b,c]=cur,D=b*b-4*a*c;
+    let h=`<p>Queda resolver <span class="m">${polyHTML(cur)} = 0</span> (a = ${fmt(a)}, b = ${fmt(b)}, c = ${fmt(c)}):</p>
+      <div class="mid">${X} = ${fracBox(`−<i>b</i> ± ${sq('<i>b</i><sup>2</sup> − 4<i>ac</i>')}`,'2<i>a</i>')} = ${fracBox(`${fmt(-b)} ± ${sq(`${par(b)}<sup>2</sup> − 4·${par(a)}·${par(c)}`)}`,fmt(2*a))}</div>
+      <p>Discriminante: <span class="m">Δ = ${b*b} ${4*a*c<0?'+':'−'} ${Math.abs(4*a*c)} = <b>${fmt(D)}</b></span></p>`;
+    if(isSq(D)){
+      const s=Math.sqrt(D);
+      if(D===0){realRoots.push(mkRat(-b,2*a),mkRat(-b,2*a));h+=`<p>Δ = 0 → solución doble:</p><div class="mid">${X} = ${fracBox(fmt(-b),fmt(2*a))} = <b>${fracHTML(-b,2*a)}</b></div>`}
+      else{realRoots.push(mkRat(-b+s,2*a),mkRat(-b-s,2*a));h+=`<p>Δ > 0 y √${D} = ${s} → dos soluciones:</p>
+        <div class="mid">${X}<sub>1</sub> = ${fracBox(`${fmt(-b)} + ${s}`,fmt(2*a))} = <b>${fracHTML(-b+s,2*a)}</b> &nbsp;&nbsp;&nbsp; ${X}<sub>2</sub> = ${fracBox(`${fmt(-b)} − ${s}`,fmt(2*a))} = <b>${fracHTML(-b-s,2*a)}</b></div>`}
+    }else{
+      const {k,m}=sqrtSplit(Math.abs(D));const g=gcd(gcd(b,k),2*a);let B=-b/g,K=k/g,Dd=2*a/g;if(Dd<0){B=-B;Dd=-Dd}
+      const r1={kind:'irr',B,K,m,D:Dd,s:1},r2={kind:'irr',B,K,m,D:Dd,s:-1};
+      if(D>0){realRoots.push(r1,r2);h+=`<p>Δ > 0 pero no es cuadrado perfecto${k>1?` (√${D} = ${k}${sq(m)})`:''} → dos soluciones irracionales:</p>
+        <div class="mid">${X}<sub>1</sub> = <b>${rootHTML(r1)}</b> ≈ ${dec(rootVal(r1),3)} &nbsp;&nbsp;&nbsp; ${X}<sub>2</sub> = <b>${rootHTML(r2)}</b> ≈ ${dec(rootVal(r2),3)}</div>`}
+      else{quadLeft=cur;h+=`<p>Δ < 0 → este factor <b>no aporta soluciones reales</b>.</p>`}
+    }
+    steps.push({t:'Ecuación de segundo grado',h});
+  }else quadLeft=cur;
+  const G=groupRoots(realRoots);
+  const fact=(quadLeft?(G.length?'':''):leadStr(L))+G.map(g=>rootFactorHTML(g.R,g.k)).join('')+(quadLeft?`(${polyHTML(quadLeft)})`:'');
+  const rl=G.map(g=>`<span class="root">${X} = ${rootHTML(g.R)}${g.k>1?`<small>${multName(g.k)}</small>`:''}</span>`).join('');
+  steps.push({t:'Solución',final:true,h:`<p>${G.length===1?'La ecuación tiene <b>una solución real</b>:':`La ecuación tiene <b>${G.length} soluciones reales</b>${G.length<realRoots.length?' (alguna es múltiple)':''}:`}</p>
+    <div class="rootlist">${rl}</div><p><b>Forma factorizada:</b></p><div class="mid">${polyHTML(P)} = ${fact}</div>`});
+  return steps;
+}
+
+/* =========================================================
+   3) RACIONALES
+   ========================================================= */
+const denPoly=R=>R.reduce((p,r)=>mul(p,[1,-r]),[1]);
+function fracTerm(T,first){
+  const neg=lead(T.N)<0,Na=neg?scale(T.N,-1):T.N;
+  let body=T.R.length?fracBox(polyHTML(Na),polyHTML(denPoly(T.R))):(neg&&nTerms(Na)>1?'('+polyHTML(Na)+')':polyHTML(Na));
+  return first?(neg?'−':'')+body:(neg?' − ':' + ')+body;
+}
+const sideR=ts=>ts.map((t,i)=>fracTerm(t,i===0)).join('');
+const stmtRac=E=>sideR(E.L)+' = '+sideR(E.R);
+function racPoly(E){
+  const all=[...E.L,...E.R];
+  const Ls=[...new Set(all.flatMap(t=>t.R))].sort((a,b)=>a-b);
+  const mult=t=>Ls.filter(r=>!t.R.includes(r));
+  const prod=t=>mul(t.N,denPoly(mult(t)));
+  const left=E.L.reduce((p,t)=>add(p,prod(t)),[0]),right=E.R.reduce((p,t)=>add(p,prod(t)),[0]);
+  return {Ls,mult,prod,fin:sub(left,right)};
+}
+function genRac(T){
+  const nC=()=>[pick([1,2,3,4,5,6,-1,-2,-3,-4])];
+  const nL=()=>trim(pick([[1,ri(-4,4)],[1,ri(-4,4)],[2,ri(-3,3)]]));
+  const nA=()=>Math.random()<.55?nC():nL();
+  for(let t=0;t<30000;t++){
+    const rs=shuffle([-4,-3,-2,-1,0,1,2,3,4]);let a=rs[0],b=rs[1],E;
+    if(T==='F1')E={L:[{N:nA(),R:[a]},{N:nA(),R:[b]}],R:[{N:[pick([1,2,3,-1,-2,4])],R:[]}]};
+    else if(T==='F2'){if(a!==0&&Math.random()<.5)b=-a;E={L:[{N:nA(),R:[a]},{N:nA(),R:[b]}],R:[{N:nA(),R:[a,b]}]}}
+    else E=Math.random()<.5?{L:[{N:[1,ri(-3,3)],R:[]},{N:nC(),R:[a]}],R:[{N:[ri(-2,6)],R:[]}]}:{L:[{N:nC(),R:[a]}],R:[{N:[1,ri(-4,4)],R:[]}]};
+    const all=[...E.L,...E.R];
+    if(all.some(u=>u.R.length&&(nTerms(u.N)===0||u.R.some(r=>evalP(u.N,r)===0))))continue;
+    const K=racPoly(E);if(nTerms(K.fin)===0)continue;
+    const deg=K.fin.length-1;if(deg<1||deg>2)continue;
+    const {P}=normalize(K.fin);if(Math.max(...P.map(Math.abs))>60)continue;
+    const rr=intRoots(P);if(!rr||Math.max(...rr.map(Math.abs))>12)continue;
+    if(!rr.some(r=>!K.Ls.includes(r)))continue;
+    return E;
+  }
+}
+function solveRac(E){
+  const K=racPoly(E),st=[],dens=[],seen=new Set();
+  [...E.L,...E.R].forEach(t=>{const k=t.R.join();if(t.R.length&&!seen.has(k)){seen.add(k);dens.push(t.R)}});
+  st.push({t:'Planteamiento',h:`<div class="big">${stmtRac(E)}</div><p>Es una ecuación <b>racional</b>: la incógnita aparece en algún denominador. Estrategia: multiplicar por el m.c.m. de los denominadores, resolver la ecuación que resulta y <b>comprobar</b> que las soluciones no anulan ningún denominador.</p>`});
+  let h='';
+  dens.forEach(R=>{
+    if(R.length===1)h+=`<p class="m">${polyHTML(denPoly(R))} <span class="note">— ya está factorizado</span></p>`;
+    else h+=`<p class="m">${polyHTML(denPoly(R))} = ${R.map(lf).join('')} <span class="note">— ${R[0]===-R[1]?'diferencia de cuadrados':`sus raíces son ${fmt(R[0])} y ${fmt(R[1])}`}</span></p>`;
+  });
+  h+=`<div class="box"><div class="mid">m.c.m. = ${K.Ls.map(lf).join('')}</div></div><p class="note">Condición: <span class="m">${X} ≠ ${K.Ls.map(fmt).join(', ')}</span>, porque ${K.Ls.length>1?'anulan':'anula'} algún denominador.</p>`;
+  st.push({t:'Denominadores y m.c.m.',h});
+  const prodHTML=(t,first)=>{
+    const fs=K.mult(t),neg=lead(t.N)<0,Na=neg?scale(t.N,-1):t.N,core=nTerms(Na)>1?'('+polyHTML(Na)+')':polyHTML(Na);
+    const body=fs.length?((Na.length===1&&Na[0]===1)?'':core)+fs.map(lf).join(''):(neg?core:polyHTML(Na));
+    return first?(neg?'−':'')+body:(neg?' − ':' + ')+body;
+  };
+  const sideP=ts=>ts.map((t,i)=>prodHTML(t,i===0)).join('');
+  st.push({t:'Multiplicamos por el m.c.m.',h:`<p>Multiplicamos los dos miembros por el m.c.m. Cada denominador se simplifica y en su lugar queda multiplicando lo que le faltaba para llegar al m.c.m.:</p><div class="mid">${sideP(E.L)} = ${sideP(E.R)}</div>`});
+  const expS=ts=>ts.map((t,i)=>{const p=K.prod(t),s=polyHTML(p);return i===0?s:(lead(p)<0?' − '+s.slice(1):' + '+s)}).join('');
+  const {P,g}=normalize(K.fin);
+  let h2=`<div class="mid">${expS(E.L)} = ${expS(E.R)}</div><p>Pasamos todo al primer miembro y agrupamos términos semejantes:</p><div class="mid">${polyHTML(K.fin)} = 0</div>`;
+  if(g!==1)h2+=`<p>${g===-1?'Multiplicamos por −1':`Dividimos entre ${fmt(g)}`}:</p><div class="mid">${polyHTML(P)} = 0</div>`;
+  st.push({t:'Desarrollamos y ordenamos',h:h2});
+  const Q=quad(...(P.length===3?P:[0,...P]));st.push({t:'Resolvemos',h:Q.h});
+  const val=(t,x)=>rat(evalP(t.N,x),t.R.reduce((p,r)=>p*(x-r),1));
+  const sideV=(ts,x)=>ts.reduce((s,t)=>addR(s,val(t,x)),rat(0));
+  const uniq=[...new Map(Q.roots.map(r=>[r.v,r])).values()];const sols=[];let h3='';
+  uniq.forEach(r=>{
+    if(K.Ls.includes(r.v))h3+=`<div class="chk bad"><span class="m">${X} = ${r.h}</span> anula el denominador <span class="m">${lf(r.v)}</span> → <b>no es válida</b> (se descarta).</div>`;
+    else{const l=sideV(E.L,r.v),rr=sideV(E.R,r.v);h3+=`<div class="chk ok"><span class="m">${X} = ${r.h}</span>: primer miembro = <span class="m">${l.h}</span>, segundo miembro = <span class="m">${rr.h}</span> → <b>válida ✓</b></div>`;sols.push(r)}
+  });
+  st.push({t:'Comprobamos las soluciones',h:h3});
+  st.push(finalSols(sols));
+  return st;
+}
+
+/* =========================================================
+   4) IRRACIONALES
+   ========================================================= */
+function genIrr(T){
+  for(let t=0;t<5000;t++){
+    if(T==='A'){
+      const m=pick([1,1,-1]),r1=ri(-4,7),r2=ri(-4,7),d=ri(-3,5);if(r1===r2)continue;
+      const p=m===1?2*d+r1+r2:r1+r2-2*d,q=d*d-r1*r2;
+      if(p===0||Math.abs(p)>12||Math.abs(q)>40)continue;
+      if(![r1,r2].some(r=>m*r+d>=0))continue;
+      return {T,p,q,m,d,arr:m===1?(d===0?'iso':pick(['iso','minus','plus'])):pick(['iso','sum'])};
+    }
+    const x0=ri(-3,8);let s=ri(1,6),u=ri(1,5);if(s===u)continue;const diff=Math.random()<.4;if(diff&&s<u)[s,u]=[u,s];
+    const a=s*s-x0,b=u*u-x0;if(Math.abs(a)>40||Math.abs(b)>40)continue;
+    return {T,x0,s,u,a,b,diff,c:diff?s-u:s+u};
+  }
+}
+const rhsIso=(m,d)=>m===1?polyHTML([1,d]):(d===0?'−'+X:`${fmt(d)} − ${X}`);
+function stmtIrr(E){
+  if(E.T==='B')return `${sq(polyHTML([1,E.a]))} ${E.diff?'−':'+'} ${sq(polyHTML([1,E.b]))} = ${E.c}`;
+  const R=sq(polyHTML([E.p,E.q])),{m,d}=E;
+  if(E.arr==='minus')return `${R} − ${X} = ${fmt(d)}`;
+  if(E.arr==='plus')return `${R} ${-d>0?'+':'−'} ${Math.abs(d)} = ${X}`;
+  if(E.arr==='sum')return `${X} + ${R} = ${fmt(d)}`;
+  return `${R} = ${rhsIso(m,d)}`;
+}
+function solveIrr(E){
+  const st=[];
+  if(E.T==='A'){
+    const {p,q,m,d}=E,R=sq(polyHTML([p,q])),rhs=rhsIso(m,d);
+    st.push({t:'Planteamiento',h:`<div class="big">${stmtIrr(E)}</div><p>Es una ecuación <b>irracional</b>: la incógnita está dentro de una raíz. Estrategia: <b>aislar la raíz</b>, <b>elevar al cuadrado</b> los dos miembros y <b>comprobar</b> al final (al elevar al cuadrado pueden aparecer soluciones falsas).</p>`});
+    if(E.arr!=='iso')st.push({t:'Aislamos la raíz',h:`<p>Dejamos la raíz sola en un miembro:</p><div class="box"><div class="mid">${R} = ${rhs}</div></div>`});
+    const S2=mul([m,d],[m,d]);
+    st.push({t:'Elevamos al cuadrado',h:`<div class="mid">(${R})<sup>2</sup> = (${rhs})<sup>2</sup></div><p class="note">La raíz desaparece. A la derecha usamos (a ± b)<sup>2</sup> = a<sup>2</sup> ± 2ab + b<sup>2</sup>.</p><div class="mid">${polyHTML([p,q])} = ${polyHTML(S2)}</div>`});
+    const F=sub(S2,[p,q]);
+    st.push({t:'Ordenamos',h:`<p>Pasamos todo al segundo miembro, para que el coeficiente de ${X}<sup>2</sup> quede positivo:</p><div class="mid">0 = ${polyHTML(F)} &nbsp;⇔&nbsp; ${polyHTML(F)} = 0</div>`});
+    const Q=quad(...F);st.push({t:'Resolvemos',h:Q.h});
+    const sols=[];let h=`<p>Sustituimos en la ecuación con la raíz aislada, <span class="m">${R} = ${rhs}</span>:</p>`;
+    Q.roots.forEach(r=>{const x=r.v,val=p*x+q,s=Math.sqrt(val),rv=m*x+d,ok=s===rv;
+      const rs=m===1?subLin(1,d,x):(d===0?'−'+par(x):`${fmt(d)} − ${par(x)}`);
+      h+=`<div class="chk ${ok?'ok':'bad'}"><span class="m">${X} = ${r.h}</span>: &nbsp;<span class="m">${sq(subLin(p,q,x))} = ${sq(val)} = ${s}</span> &nbsp;y&nbsp; <span class="m">${rs} = ${fmt(rv)}</span> → ${ok?'<b>coinciden ✓</b>':'<b>no coinciden ✗</b> (solución falsa)'}</div>`;
+      if(ok)sols.push(r)});
+    st.push({t:'Comprobamos las soluciones',h});
+    st.push(finalSols(sols));
+    return st;
+  }
+  const {a,b,c,diff,x0,s,u}=E,pa=polyHTML([1,a]),pb=polyHTML([1,b]),Ra=sq(pa),Rb=sq(pb),sg=diff?'+':'−';
+  st.push({t:'Planteamiento',h:`<div class="big">${stmtIrr(E)}</div><p>Ecuación <b>irracional con dos raíces</b>. Aislamos una raíz y elevamos al cuadrado; la otra raíz se quedará sola y repetiremos el proceso. Al final comprobamos.</p>`});
+  st.push({t:'Aislamos una raíz',h:`<div class="box"><div class="mid">${Ra} = ${c} ${sg} ${Rb}</div></div>`});
+  st.push({t:'Primer cuadrado',h:`<div class="mid">(${Ra})<sup>2</sup> = (${c} ${sg} ${Rb})<sup>2</sup></div><p class="note">(a ${sg} b)<sup>2</sup> = a<sup>2</sup> ${sg} 2ab + b<sup>2</sup></p><div class="mid">${pa} = ${c*c} ${sg} ${2*c}${Rb} + ${b===0?X:'('+pb+')'}</div>`});
+  const val=diff?a-b-c*c:c*c+b-a;
+  st.push({t:'Simplificamos y aislamos la otra raíz',h:`<p>Las ${X} se anulan. Dejamos la raíz sola en un miembro:</p><div class="mid">${2*c}${Rb} = ${fmt(val)}</div><div class="box"><div class="mid">${Rb} = ${fracBox(fmt(val),2*c)} = ${u}</div></div>`});
+  st.push({t:'Segundo cuadrado',h:`<div class="mid">${pb} = ${u}<sup>2</sup> = ${u*u}</div><div class="mid">${X} = ${u*u} ${b>=0?'−':'+'} ${Math.abs(b)} = <b>${fmt(x0)}</b></div>`});
+  st.push({t:'Comprobamos',h:`<div class="chk ok"><span class="m">${X} = ${fmt(x0)}</span>: &nbsp;<span class="m">${sq(subLin(1,a,x0))} ${diff?'−':'+'} ${sq(subLin(1,b,x0))} = ${sq(s*s)} ${diff?'−':'+'} ${sq(u*u)} = ${s} ${diff?'−':'+'} ${u} = ${c}</span> → <b>válida ✓</b></div>`});
+  st.push(finalSols([rat(x0)]));
+  return st;
+}
+
+/* =========================================================
+   5) LOGARÍTMICAS
+   ========================================================= */
+const LB=B=>`log${B===10?'':`<sub>${B}</sub>`}`;
+const lg=(B,arg)=>`${LB(B)}(${arg})`;
+function genLog(T){
+  for(let t=0;t<5000;t++){
+    const B=pick([10,10,2,3]);
+    if(T==='suma'){
+      const rhsLog=Math.random()<.3;let K,n=null;
+      if(rhsLog)K=pick([6,8,12,15,20,24]);else{n=B===10?pick([1,1,2]):B===2?pick([2,3,4]):pick([2,3]);K=B**n}
+      const pairs=[];for(let u=1;u<=K;u++)if(K%u===0&&u!==K/u&&u<=25&&K/u<=25)pairs.push([u,K/u]);
+      if(!pairs.length)continue;
+      const [u,v]=pick(pairs),r=ri(-2,6);return {T,B,a:u-r,b:v-r,K,n};
+    }
+    if(T==='resta'){const n=B===10?1:pick([1,1,2]),K=B**n,r=ri(-3,6),w=ri(1,4),b=w-r,a=K*w-r;if(Math.abs(a)>45||a===b)continue;return {T,B,a,b,K,n,r}}
+    if(T==='doble'){const a=ri(-2,3),r1=ri(-4,6),r2=ri(-4,6);if(r1===r2)continue;const p=2*a+r1+r2,q=a*a-r1*r2;
+      if(p===0||Math.abs(p)>14||Math.abs(q)>40||![r1,r2].some(r=>r+a>0))continue;return {T,B,a,p,q}}
+    const t1=ri(B===10?-1:-2,3),t2=ri(B===10?-1:-2,3);if(t1===t2)continue;return {T:'cambio',B,co:[1,-(t1+t2),t1*t2]};
+  }
+}
+function logPoly([,b,c],B){const L=lg(B,X);let s=`(${L})<sup>2</sup>`;
+  if(b)s+=` ${b<0?'−':'+'} ${Math.abs(b)===1?'':Math.abs(b)+'·'}${L}`;if(c)s+=` ${c<0?'−':'+'} ${Math.abs(c)}`;return s}
+function stmtLog(E){const {B}=E;
+  if(E.T==='suma')return `${lg(B,polyHTML([1,E.a]))} + ${lg(B,polyHTML([1,E.b]))} = ${E.n!==null?E.n:lg(B,E.K)}`;
+  if(E.T==='resta')return `${lg(B,polyHTML([1,E.a]))} − ${lg(B,polyHTML([1,E.b]))} = ${E.n}`;
+  if(E.T==='doble')return `2·${lg(B,polyHTML([1,E.a]))} = ${lg(B,polyHTML([E.p,E.q]))}`;
+  return logPoly(E.co,E.B)+' = 0';
+}
+const condLog=args=>`<p class="note">Condiciones de existencia: el argumento de un logaritmo debe ser positivo → ${args.map(p=>`<span class="m">${polyHTML(p)} &gt; 0</span>`).join(' y ')}.</p>`;
+function chkLog(roots,args){
+  const sols=[];let h='';
+  roots.forEach(r=>{const vs=args.map(p=>evalP(p,r.v)),ok=vs.every(v=>v>0);
+    h+=`<div class="chk ${ok?'ok':'bad'}"><span class="m">${X} = ${r.h}</span>: ${args.map((p,i)=>`<span class="m">${polyHTML(p)} = ${fmt(vs[i])}</span>`).join(', ')} → ${ok?'<b>válida ✓</b>':'<b>no válida ✗</b> (no existe el logaritmo de un número negativo ni de 0)'}</div>`;
+    if(ok)sols.push(r)});
+  return {t:'Comprobamos las soluciones',h,sols};
+}
+function solveLog(E){
+  const {B}=E,st=[],plan=`<div class="big">${stmtLog(E)}</div>`;
+  const asLog=(n,K)=>`<p>Escribimos ${n} como logaritmo en base ${B}: <span class="m">${n} = ${lg(B,PW(B,n))} = ${lg(B,K)}</span></p>`;
+  const iny=`<p>Si dos logaritmos de la misma base son iguales, sus argumentos también lo son:</p>`;
+  if(E.T==='suma'){
+    const A=[1,E.a],Bp=[1,E.b],K=E.K,F=sub(mul(A,Bp),[K]);
+    st.push({t:'Planteamiento',h:plan+`<p>Ecuación <b>logarítmica</b>: agrupamos los logaritmos en uno solo y después igualamos argumentos.</p>`+condLog([A,Bp])});
+    st.push({t:'Propiedad del producto',h:`<p>Usamos <span class="m">log A + log B = log(A·B)</span>:</p><div class="mid">${lg(B,wrap(A)+'·'+wrap(Bp))} = ${E.n!==null?E.n:lg(B,K)}</div>`+(E.n!==null?asLog(E.n,K)+`<div class="mid">${lg(B,wrap(A)+'·'+wrap(Bp))} = ${lg(B,K)}</div>`:'')});
+    st.push({t:'Igualamos argumentos',h:iny+`<div class="mid">${wrap(A)}·${wrap(Bp)} = ${K}</div><div class="mid">${polyHTML(mul(A,Bp))} = ${K}</div><div class="box"><div class="mid">${polyHTML(F)} = 0</div></div>`});
+    const Q=quad(...F);st.push({t:'Resolvemos',h:Q.h});
+    const C=chkLog(Q.roots,[A,Bp]);st.push(C);st.push(finalSols(C.sols));return st;
+  }
+  if(E.T==='resta'){
+    const A=[1,E.a],Bp=[1,E.b],K=E.K,r=rat(E.r);
+    st.push({t:'Planteamiento',h:plan+`<p>Ecuación <b>logarítmica</b>: agrupamos los logaritmos en uno solo y después igualamos argumentos.</p>`+condLog([A,Bp])});
+    st.push({t:'Propiedad del cociente',h:`<p>Usamos <span class="m">log A − log B = log ${fracBox('A','B')}</span>:</p><div class="mid">${lg(B,fracBox(polyHTML(A),polyHTML(Bp)))} = ${E.n}</div>`+asLog(E.n,K)});
+    st.push({t:'Igualamos argumentos',h:iny+`<div class="mid">${fracBox(polyHTML(A),polyHTML(Bp))} = ${K} &nbsp;→&nbsp; ${polyHTML(A)} = ${K}·${wrap(Bp)}</div>
+      <div class="mid">${polyHTML(A)} = ${polyHTML(scale(Bp,K))}</div><div class="mid">${polyHTML([1-K,0])} = ${fmt(K*E.b-E.a)} &nbsp;→&nbsp; ${X} = ${fracBox(fmt(K*E.b-E.a),fmt(1-K))} = <b>${r.h}</b></div>`});
+    const C=chkLog([r],[A,Bp]);st.push(C);st.push(finalSols(C.sols));return st;
+  }
+  if(E.T==='doble'){
+    const A=[1,E.a],R=[E.p,E.q],F=sub(mul(A,A),R);
+    st.push({t:'Planteamiento',h:plan+`<p>Ecuación <b>logarítmica</b>: convertimos el coeficiente en exponente y después igualamos argumentos.</p>`+condLog([A,R])});
+    st.push({t:'Propiedad de la potencia',h:`<p>Usamos <span class="m">n·log A = log A<sup>n</sup></span>:</p><div class="mid">${lg(B,wrap(A)+'<sup>2</sup>')} = ${lg(B,polyHTML(R))}</div>`});
+    st.push({t:'Igualamos argumentos',h:iny+`<div class="mid">${wrap(A)}<sup>2</sup> = ${polyHTML(R)}</div><div class="mid">${polyHTML(mul(A,A))} = ${polyHTML(R)}</div><div class="box"><div class="mid">${polyHTML(F)} = 0</div></div>`});
+    const Q=quad(...F);st.push({t:'Resolvemos',h:Q.h});
+    const C=chkLog(Q.roots,[A,R]);st.push(C);st.push(finalSols(C.sols));return st;
+  }
+  st.push({t:'Planteamiento',h:plan+`<p>El logaritmo aparece al cuadrado y sin más: hacemos un <b>cambio de variable</b>.</p><p class="note">Condición de existencia: <span class="m">${X} &gt; 0</span>.</p>`});
+  st.push({t:'Cambio de variable',h:`<p>Llamamos <span class="m"><i>t</i> = ${lg(B,X)}</span>:</p><div class="box"><div class="mid">${polyHTML(E.co,'t')} = 0</div></div>`});
+  const Q=quad(...E.co,'t');st.push({t:'Resolvemos la ecuación en t',h:Q.h});
+  const sols=Q.roots.map(r=>{const t=r.v,v=t>=0?rat(B**t):rat(1,B**(-t));return {t,v}});
+  st.push({t:'Deshacemos el cambio',h:`<p>Por definición de logaritmo: <span class="m">${lg(B,X)} = <i>t</i> ⇔ ${X} = ${PW(B,'<i>t</i>')}</span></p>`+
+    sols.map(({t,v})=>`<div class="mid">${lg(B,X)} = ${fmt(t)} &nbsp;→&nbsp; ${X} = ${PW(B,fmt(t))} = <b>${v.h}</b></div>`).join('')+`<p class="note">Las dos son positivas, así que ambas son válidas.</p>`});
+  st.push(finalSols(sols.map(s=>s.v)));return st;
+}
+
+/* =========================================================
+   6) EXPONENCIALES
+   ========================================================= */
+function genExp(T){
+  for(let t=0;t<5000;t++){
+    if(T==='base'){
+      if(Math.random()<.5){const B=pick([2,3,5]),km={2:6,3:4,5:3}[B],k=ri(-2,km),r1=ri(-3,5),r2=ri(-3,5);if(r1===r2)continue;
+        const p=-(r1+r2),q=k+r1*r2;if(Math.abs(q)>15)continue;return {T,v:'q',B,p,q,k}}
+      const B=pick([2,3]),pows=B===2?[1,2,3,4]:[1,2,3],[m,n]=shuffle(pows).slice(0,2);
+      const c1=pick([1,1,2]),c2=pick([1,1,2]),d1=ri(-4,4),d2=ri(-4,4),A=m*c1-n*c2,R=n*d2-m*d1;
+      if(A===0||R%A!==0)continue;const x0=R/A;if(Math.abs(x0)>8)continue;
+      return {T,v:'l',B,m,n,e1:[c1,d1],e2:[c2,d2],A,R,x0};
+    }
+    if(T==='factor'){
+      const B=pick([2,3,5]),o=pick([[1,0],[2,0],[1,-1],[0,-1],[2,1,0],[1,0,-1],[0,-2],[2,-1]]),cs=o.map((_,i)=>i===0?pick([1,1,2]):pick([1,1,1,2,-1]));
+      const mo=Math.min(0,...o),den=B**(-mo),Sp=o.reduce((s,oi,i)=>s+cs[i]*B**(oi-mo),0);
+      if(Sp<=0)continue;const x0=ri(-mo,B===5?2:4),N=B**x0*Sp/den;
+      if(!Number.isInteger(N)||N>3000)continue;
+      return {T,B,o,cs,x0,N,S:rat(Sp,den)};
+    }
+    if(T==='cambio'){
+      const B=pick([2,3]),pw=B===2?[1,2,4,8]:[1,3,9,27],t1=pick(pw),t2=Math.random()<.25?-pick([1,2,B]):pick(pw);
+      if(t1===t2||t1+t2===0)continue;const S=t1+t2,P=t1*t2;
+      return {T,B,S,P,f1:pick(['sq','2x']),f2:(S%B===0&&Math.random()<.5)?'x1':'x'};
+    }
+    const B=pick([2,3,5,7]),N=pick([5,6,7,10,12,15,20,30,50,100]);let k=1;while(k<N)k*=B;if(k===N)continue;
+    return {T:'logs',B,N,a:pick([0,0,1,-1,2,-2])};
+  }
+}
+function stmtExp(E){const {B}=E;
+  if(E.T==='base')return E.v==='q'?`${PW(B,polyHTML([1,E.p,E.q]))} = ${E.k>=0?B**E.k:fracBox(1,B**-E.k)}`:`${PW(B**E.m,polyHTML(E.e1))} = ${PW(B**E.n,polyHTML(E.e2))}`;
+  if(E.T==='factor')return E.o.map((oi,i)=>{const c=E.cs[i],t=(Math.abs(c)===1?'':Math.abs(c)+'·')+PW(B,polyHTML([1,oi]));return i===0?(c<0?'−':'')+t:(c<0?' − ':' + ')+t}).join('')+` = ${E.N}`;
+  if(E.T==='cambio'){const f1=E.f1==='sq'?PW(B*B,X):PW(B,'2'+X),mc=E.f2==='x1'?E.S/B:E.S,f2=E.f2==='x1'?PW(B,polyHTML([1,1])):PW(B,X);
+    return `${f1} ${mc>0?'−':'+'} ${Math.abs(mc)===1?'':Math.abs(mc)+'·'}${f2} ${E.P>0?'+':'−'} ${Math.abs(E.P)} = 0`}
+  return `${PW(B,polyHTML([1,E.a]))} = ${E.N}`;
+}
+const logB=(B,v)=>{let k=0,p=1;while(p<v){p*=B;k++}return k};
+function solveExp(E){
+  const {B}=E,st=[],plan=`<div class="big">${stmtExp(E)}</div>`,BX=PW(B,X);
+  if(E.T==='base'&&E.v==='q'){
+    const {p,q,k}=E,rhs=k>=0?B**k:fracBox(1,B**-k);
+    st.push({t:'Planteamiento',h:plan+`<p>Ecuación <b>exponencial</b>: la incógnita está en el exponente. Si escribimos los dos miembros como potencias de la <b>misma base</b>, podemos igualar los exponentes.</p>`});
+    st.push({t:`Escribimos todo en base ${B}`,h:`<div class="mid">${rhs} = ${PW(B,fmt(k))}</div>${k===0?`<p class="note">Todo número (≠ 0) elevado a 0 vale 1.</p>`:k<0?`<p class="note">Recuerda: ${fracBox(1,PW('<i>a</i>','<i>n</i>'))} = ${PW('<i>a</i>','−<i>n</i>')}.</p>`:''}<div class="box"><div class="mid">${PW(B,polyHTML([1,p,q]))} = ${PW(B,fmt(k))}</div></div>`});
+    const F=[1,p,q-k];
+    st.push({t:'Igualamos exponentes',h:`<div class="mid">${polyHTML([1,p,q])} = ${fmt(k)} &nbsp;→&nbsp; ${polyHTML(F)} = 0</div>`});
+    const Q=quad(...F);st.push({t:'Resolvemos',h:Q.h});
+    st.push(finalSols(Q.roots,`<p class="note">En las exponenciales no hay que descartar soluciones por condiciones de existencia.</p>`));return st;
+  }
+  if(E.T==='base'){
+    const {m,n,e1,e2,A,R,x0}=E,s1=scale(e1,m),s2=scale(e2,n);
+    st.push({t:'Planteamiento',h:plan+`<p>Ecuación <b>exponencial</b>: ${B**m} y ${B**n} son potencias de ${B}. Escribimos todo en base ${B} e igualamos exponentes.</p>`});
+    const pw=(k,e)=>k===1?PW(B,polyHTML(e)):`(${PW(B,k)})<sup>${polyHTML(e)}</sup>`;
+    st.push({t:`Escribimos todo en base ${B}`,h:`<div class="mid">${pw(m,e1)} = ${pw(n,e2)}</div><p class="note">Potencia de una potencia: (a<sup>m</sup>)<sup>n</sup> = a<sup>m·n</sup></p><div class="box"><div class="mid">${PW(B,polyHTML(s1))} = ${PW(B,polyHTML(s2))}</div></div>`});
+    st.push({t:'Igualamos exponentes',h:`<div class="mid">${polyHTML(s1)} = ${polyHTML(s2)}</div><div class="mid">${polyHTML([A,0])} = ${fmt(R)} &nbsp;→&nbsp; ${X} = ${A===1?'':fracBox(fmt(R),fmt(A))+' = '}<b>${fmt(x0)}</b></div>`});
+    st.push(finalSols([rat(x0)]));return st;
+  }
+  if(E.T==='factor'){
+    const {o,cs,x0,N,S}=E,cf=o.map((oi,i)=>oi>=0?rat(cs[i]*B**oi):rat(cs[i],B**(-oi)));
+    st.push({t:'Planteamiento',h:plan+`<p>Ecuación <b>exponencial</b> con sumas de potencias de la misma base. Separamos cada potencia como producto y sacamos <b>factor común</b> ${BX}.</p>`});
+    const props=o.filter(oi=>oi!==0).map(oi=>`<span class="m">${PW(B,polyHTML([1,oi]))} = ${oi>0?`${BX}·${PW(B,oi)}`:fracBox(BX,PW(B,-oi))}</span>`).join(' &nbsp; ');
+    const terms=cf.map((c,i)=>{const t=(Math.abs(c.v)===1?'':(c.q===1?Math.abs(c.p):fracBox(Math.abs(c.p),c.q))+'·')+BX;return i===0?(c.v<0?'−':'')+t:(c.v<0?' − ':' + ')+t}).join('');
+    st.push({t:'Separamos las potencias',h:`<p>Usamos a<sup>m+n</sup> = a<sup>m</sup>·a<sup>n</sup>:</p><p>${props}</p><div class="mid">${terms} = ${N}</div>`});
+    const inner=cf.map((c,i)=>i===0?c.h:(c.v<0?' − '+rat(-c.p,c.q).h:' + '+c.h)).join('');
+    st.push({t:'Sacamos factor común',h:`<div class="mid">${BX}·(${inner}) = ${N}</div><div class="mid">${BX}·${S.h} = ${N}</div><div class="box"><div class="mid">${BX} = ${S.q===1?fracBox(N,S.p):`${N}·${fracBox(S.q,S.p)}`} = ${B**x0}</div></div>`});
+    st.push({t:'Igualamos exponentes',h:`<div class="mid">${BX} = ${B**x0} = ${PW(B,x0)} &nbsp;→&nbsp; ${X} = <b>${x0}</b></div>`});
+    st.push(finalSols([rat(x0)]));return st;
+  }
+  if(E.T==='cambio'){
+    const {S,P}=E;
+    st.push({t:'Planteamiento',h:plan+`<p>Ecuación <b>exponencial</b> en la que aparece ${BX} y su cuadrado: la resolvemos con un <b>cambio de variable</b>.</p>`});
+    let h='';
+    h+=E.f1==='sq'?`<p class="m">${PW(B*B,X)} = (${PW(B,2)})<sup>${X}</sup> = (${BX})<sup>2</sup></p>`:`<p class="m">${PW(B,'2'+X)} = (${BX})<sup>2</sup></p>`;
+    if(E.f2==='x1')h+=`<p class="m">${PW(B,polyHTML([1,1]))} = ${B}·${BX}, así que ${S/B}·${PW(B,polyHTML([1,1]))} = ${S}·${BX}</p>`;
+    h+=`<div class="mid">(${BX})<sup>2</sup> ${S>0?'−':'+'} ${Math.abs(S)===1?'':Math.abs(S)+'·'}${BX} ${P>0?'+':'−'} ${Math.abs(P)} = 0</div>`;
+    st.push({t:`Escribimos todo con ${B}^x`,h});
+    st.push({t:'Cambio de variable',h:`<p>Llamamos <span class="m"><i>t</i> = ${BX}</span>:</p><div class="box"><div class="mid">${polyHTML([1,-S,P],'t')} = 0</div></div>`});
+    const Q=quad(1,-S,P,'t');st.push({t:'Resolvemos la ecuación en t',h:Q.h});
+    const sols=[];let h2='';
+    Q.roots.forEach(r=>{if(r.v<=0)h2+=`<div class="mid">${BX} = ${r.h} &nbsp;→&nbsp; <span class="badt">imposible: ${BX} siempre es positivo</span></div>`;
+      else{const k=logB(B,r.v);h2+=`<div class="mid">${BX} = ${r.h} = ${PW(B,k)} &nbsp;→&nbsp; ${X} = <b>${k}</b></div>`;sols.push(rat(k))}});
+    st.push({t:'Deshacemos el cambio',h:h2});st.push(finalSols(sols));return st;
+  }
+  const {N,a}=E,ex=polyHTML([1,a]),v=Math.log(N)/Math.log(B);
+  st.push({t:'Planteamiento',h:plan+`<p>${N} no es una potencia de ${B}, así que no podemos igualar bases. <b>Tomamos logaritmos</b> en los dos miembros.</p>`});
+  st.push({t:'Tomamos logaritmos',h:`<div class="mid">log ${PW(B,a===0?X:'('+ex+')')} = log ${N}</div><p>Usamos log A<sup>n</sup> = n·log A:</p><div class="mid">${wrap([1,a])}·log ${B} = log ${N}</div>`});
+  st.push({t:'Despejamos',h:`<div class="mid">${ex} = ${fracBox('log '+N,'log '+B)} ≈ ${dec(v)}</div>${a!==0?`<div class="mid">${X} ≈ ${dec(v)} ${a>0?'−':'+'} ${Math.abs(a)} = <b>${dec(v-a)}</b></div>`:''}<p class="note">Con calculadora: log ${N} ≈ ${dec(Math.log10(N))}, log ${B} ≈ ${dec(Math.log10(B))}.</p>`});
+  st.push(finalSols([{v:v-a,h:dec(v-a),rel:'≈'}]));return st;
+}
+
+/* =========================================================
+   7) SISTEMAS 3×3 POR GAUSS
+   ========================================================= */
+const det3=A=>A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1])-A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0])+A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
+function rowOp(M,i,j,col){
+  const g=gcd(M[j][col],M[i][col]);let c1=M[j][col]/g,c2=M[i][col]/g;if(c1<0){c1=-c1;c2=-c2}
+  let row=M[i].map((v,k)=>c1*v-c2*M[j][k]);
+  let note=`${EQ(i)} → ${c1===1?'':c1}${EQ(i)} ${c2>0?'−':'+'} ${Math.abs(c2)===1?'':Math.abs(c2)}${EQ(j)}`;
+  let rg=row.reduce((a,v)=>gcd(a,v),0);if(row.find(v=>v!==0)<0)rg=-rg;
+  if(rg&&rg!==1){row=row.map(v=>v/rg||0);note+=rg===-1?', cambiando el signo':` y ÷ ${par(rg)}`}
+  return {row,note};
+}
+function gaussRun(A,b){
+  const M=A.map((r,i)=>[...r,b[i]]),out={M0:M.map(r=>r.slice())};
+  let k=-1;
+  if(Math.abs(M[0][0])!==1){k=M.findIndex(r=>Math.abs(r[0])===1);if(k<=0)k=-1}
+  if(M[0][0]===0&&k<0)k=M.findIndex(r=>r[0]!==0);
+  if(k>0){[M[0],M[k]]=[M[k],M[0]];out.swap1=`${EQ(0)} ↔ ${EQ(k)}`;out.Ms=M.map(r=>r.slice())}
+  const ops1=['','',''],M1=M.map(r=>r.slice());
+  for(const i of [1,2]){if(M[i][0]===0){ops1[i]='ya tiene 0';continue}const o=rowOp(M,i,0,0);M1[i]=o.row;ops1[i]=o.note}
+  out.M1=M1;out.ops1=ops1;
+  const M2=M1.map(r=>r.slice());
+  if(M2[1][1]===0){if(M2[2][1]===0)return null;[M2[1],M2[2]]=[M2[2],M2[1]];out.swap2=`${EQ(1)} ↔ ${EQ(2)}`;out.M2s=M2.map(r=>r.slice())}
+  const ops2=['','',''],M3=M2.map(r=>r.slice());
+  if(M2[2][1]!==0){const o=rowOp(M2,2,1,1);M3[2]=o.row;ops2[2]=o.note}else ops2[2]='ya tiene 0';
+  if(M3[2][2]===0)return null;
+  out.M3=M3;out.ops2=ops2;out.max=Math.max(...[...M1,...M3].flat().map(Math.abs));
+  return out;
+}
+function genGauss(){
+  for(let t=0;t<30000;t++){
+    const s=[ri(-4,4),ri(-4,4),ri(-4,4)];
+    const A=[[pick([1,1,1,-1,2,3]),ri(-3,3),ri(-3,3)],[ri(-3,3),ri(-3,3),ri(-3,3)],[ri(-3,3),ri(-3,3),ri(-3,3)]];
+    if(A.some(r=>r.filter(v=>v===0).length>1)||A.flat().filter(v=>v===0).length>2||det3(A)===0)continue;
+    const b=A.map(r=>r[0]*s[0]+r[1]*s[1]+r[2]*s[2]);
+    const G=gaussRun(A,b);if(!G||G.max>60||Math.abs(G.M3[2][2])>12)continue;
+    return {A,b,s};
+  }
+}
+const eq3=r=>`${linHTML([[r[0],X],[r[1],Y],[r[2],Z]])} = ${fmt(r[3])}`;
+const matHTML=(M,ops,chg=[])=>`<div class="mxw"><div class="mxs">${M.map((_,i)=>`<div>${EQ(i)}</div>`).join('')}</div>
+  <div class="mxb"><table>${M.map((r,i)=>`<tr class="${chg.includes(i)?'chg':''}">${r.map((v,j)=>`<td class="${j===3?'sep':''}">${fmt(v)}</td>`).join('')}</tr>`).join('')}</table></div>
+  ${ops?`<div class="mxs ops">${ops.map(o=>`<div>${o||'&nbsp;'}</div>`).join('')}</div>`:''}</div>`;
+function backLine(row,i,sol){
+  const names=[X,Y,Z];let s='';
+  for(let j=i;j<3;j++){const c=row[j];if(c===0)continue;const abs=Math.abs(c),t=j===i?(abs===1?'':abs)+names[j]:(abs===1?'':abs+'·')+par(sol[j]);s+=s===''?(c<0?'−':'')+t:(c<0?' − ':' + ')+t}
+  const known=row.slice(i+1,3).reduce((a,c,k)=>a+c*sol[i+1+k],0),rhs=row[3]-known,ci=row[i];
+  if(known===0&&ci===1)return `<div class="mid"><b>${names[i]} = ${fmt(sol[i])}</b></div>`;
+  let h=`<div class="mid">${s} = ${fmt(row[3])}`;
+  if(known!==0)h+=` &nbsp;→&nbsp; ${linHTML([[ci,names[i]]])} = ${fmt(row[3])} ${known>0?'−':'+'} ${Math.abs(known)} = ${fmt(rhs)}`;
+  h+=ci===1?` &nbsp;→&nbsp; <b>${names[i]} = ${fmt(sol[i])}</b></div>`:` &nbsp;→&nbsp; ${names[i]} = ${fracBox(fmt(rhs),fmt(ci))} = <b>${fmt(sol[i])}</b></div>`;
+  return h;
+}
+function chkLine(row,sol){let s='';row.slice(0,3).forEach((c,j)=>{if(!c)return;const abs=Math.abs(c),t=(abs===1?'':abs+'·')+par(sol[j]);s+=s===''?(c<0?'−':'')+t:(c<0?' − ':' + ')+t});return `<div class="mid">${s} = ${fmt(row[3])} ✓</div>`}
+function solveGauss(E){
+  const G=gaussRun(E.A,E.b),st=[],sol=E.s;
+  st.push({t:'Planteamiento',h:`<div class="big">${sysHTML(G.M0.map(eq3))}</div><p>Método de <b>Gauss</b>: hacemos ceros debajo de la diagonal para obtener un sistema <b>escalonado</b> y lo resolvemos de abajo arriba. Trabajamos con la matriz ampliada (coeficientes | términos independientes):</p>${matHTML(G.M0)}`});
+  if(G.swap1)st.push({t:'Reordenamos las ecuaciones',h:`<p>Ponemos primero una ecuación con coeficiente ±1 en ${X}; así las cuentas son más sencillas (${G.swap1}):</p>${matHTML(G.Ms)}`});
+  st.push({t:`Paso 1: ceros en la columna de ${X}`,h:`<p>Con ${EQ(0)} eliminamos la ${X} de ${EQ(1)} y de ${EQ(2)}. Multiplicamos cada fila por el número adecuado y restamos:</p>${matHTML(G.M1,G.ops1,[1,2])}<p class="note">Cuando todos los números de una fila tienen un divisor común, dividimos la fila para trabajar con números más pequeños.</p>`});
+  let h='';
+  if(G.swap2)h+=`<p>El coeficiente de ${Y} en ${EQ(1)} es 0, así que intercambiamos ${G.swap2}:</p>${matHTML(G.M2s)}`;
+  h+=`<p>Con ${EQ(1)} eliminamos la ${Y} de ${EQ(2)}:</p>${matHTML(G.M3,G.ops2,[2])}`;
+  st.push({t:`Paso 2: cero en la columna de ${Y}`,h});
+  st.push({t:'Sistema escalonado',h:`<p>La matriz ya es triangular. El sistema equivalente es:</p><div class="big">${sysHTML(G.M3.map(eq3))}</div>`});
+  st.push({t:'Sustitución regresiva',h:`<p>Despejamos ${Z} de la última ecuación y vamos subiendo:</p>${backLine(G.M3[2],2,sol)}${backLine(G.M3[1],1,sol)}${backLine(G.M3[0],0,sol)}`});
+  st.push({t:'Comprobación',h:`<p>Sustituimos en las ecuaciones originales:</p>${G.M0.map(r=>chkLine(r,sol)).join('')}`});
+  st.push({t:'Solución',final:true,h:`<div class="rootlist"><span class="root">${X} = ${fmt(sol[0])}</span><span class="root">${Y} = ${fmt(sol[1])}</span><span class="root">${Z} = ${fmt(sol[2])}</span></div><p>Sistema <b>compatible determinado</b> (una única solución).</p>`});
+  return st;
+}
+
+/* =========================================================
+   8) SISTEMAS NO LINEALES
+   ========================================================= */
+function subCore(E){
+  const {a,b,c}=E.lin;let Q={...E.Q},u='x',w='y',m,n;
+  if(Math.abs(b)===1){m=-a*b;n=c*b}else{u='y';w='x';m=-b*a;n=c*a;Q={A:Q.B,B:Q.A,C:Q.C,D:Q.E,E:Q.D,F:Q.F}}
+  m=m||0;n=n||0;const W=[m,n];
+  let P=[Q.A,0,0];P=add(P,scale(mul(W,W),Q.B));P=add(P,scale(mul([1,0],W),Q.C));P=add(P,[Q.D,0]);P=add(P,scale(W,Q.E));P=add(P,[-Q.F]);
+  return {u,w,m,n,Q,P};
+}
+function genNL(T){
+  for(let t=0;t<30000;t++){
+    if(T==='red'){const x0=ri(0,5),y0=ri(0,5);if(x0+y0===0||x0===y0)continue;const a1=pick([1,1,2,3]),b1=pick([1,1,-1,2]),a2=pick([1,1,2,-1,3]),b2=pick([1,-1,-2,3,-1]);
+      if(a1*b2-a2*b1===0)continue;const X0=x0*x0,Y0=y0*y0;return {T,a1,b1,c1:a1*X0+b1*Y0,a2,b2,c2:a2*X0+b2*Y0,x0,y0}}
+    if(T==='bic'){const a=ri(1,5),b=ri(1,5);if(a===b)continue;return {T,k:a*a+b*b,P:pick([1,-1])*a*b}}
+    const x1=ri(-5,5);let y1=ri(-5,5),lin,Q;
+    if(T==='recta'){const f=pick(['c','c','h','e']);Q=f==='c'?{A:1,B:1}:f==='h'?{A:1,B:-1}:{A:pick([1,2]),B:pick([2,3])};
+      lin=Math.random()<.6?{b:pick([1,-1]),a:ri(-3,3)}:{a:pick([1,-1]),b:ri(-3,3)};if(lin.a===0||lin.b===0)continue}
+    else if(T==='sp'){lin={a:1,b:pick([1,1,-1])};Q={C:1}}
+    else{const p=ri(-4,4),q=ri(-5,5),mm=ri(-3,3);y1=x1*x1+p*x1+q;if(Math.abs(y1)>30)continue;Q={A:1,D:p,E:-1};lin={a:-mm,b:1}}
+    lin.c=lin.a*x1+lin.b*y1;
+    Q={A:0,B:0,C:0,D:0,E:0,...Q};Q.F=Q.A*x1*x1+Q.B*y1*y1+Q.C*x1*y1+Q.D*x1+Q.E*y1;
+    const S=subCore({lin,Q}),{P}=normalize(S.P);
+    if(P.length!==3)continue;const rr=intRoots(P);if(!rr||rr[0]===rr[1])continue;
+    if(Math.max(...P.map(Math.abs))>120||Math.abs(Q.F)>80||Math.abs(lin.c)>20)continue;
+    const sols=rr.map(r=>S.u==='x'?[r,S.m*r+S.n]:[S.m*r+S.n,r]);
+    if(sols.some(([x,y])=>Math.abs(x)>12||Math.abs(y)>30))continue;
+    return {T,lin,Q};
+  }
+}
+const X2=X+'<sup>2</sup>',Y2=Y+'<sup>2</sup>';
+function nlLines(E){
+  if(E.T==='red')return [linHTML([[E.a1,X2],[E.b1,Y2]])+' = '+fmt(E.c1),linHTML([[E.a2,X2],[E.b2,Y2]])+' = '+fmt(E.c2)];
+  if(E.T==='bic')return [`${X2} + ${Y2} = ${E.k}`,`${X}·${Y} = ${fmt(E.P)}`];
+  const {lin,Q}=E;
+  if(E.T==='parab')return [`${Y} = ${polyHTML([-lin.a,lin.c])}`,`${Y} = ${polyHTML([1,Q.D,-Q.F])}`];
+  return [linHTML([[lin.a,X],[lin.b,Y]])+' = '+fmt(lin.c),linHTML([[Q.A,X2],[Q.B,Y2],[Q.C,X+'·'+Y],[Q.D,X],[Q.E,Y]])+' = '+fmt(Q.F)];
+}
+function solveNL(E){
+  const st=[],big=`<div class="big">${sysHTML(nlLines(E))}</div>`;
+  if(E.T==='red'){
+    const {a1,b1,c1,a2,b2,c2,x0,y0}=E,g=gcd(b1,b2);let k1=b2/g,k2=b1/g;if(k1<0){k1=-k1;k2=-k2}
+    const A=k1*a1-k2*a2,C=k1*c1-k2*c2,X0=x0*x0,Y0=y0*y0;
+    st.push({t:'Planteamiento',h:big+`<p>Sistema <b>no lineal</b> en el que las incógnitas solo aparecen al cuadrado. Tratamos ${X2} e ${Y2} como si fueran las incógnitas de un sistema lineal y aplicamos <b>reducción</b>.</p>`});
+    const row=(k,a,b,c)=>`<div class="mid">${linHTML([[k*a,X2],[k*b,Y2]])} = ${fmt(k*c)}</div>`;
+    st.push({t:`Eliminamos ${Y2}`,h:`<p>Multiplicamos para que los coeficientes de ${Y2} sean opuestos y sumamos (${k1===1?'':k1}${EQ(0)} ${k2>0?'−':'+'} ${Math.abs(k2)===1?'':Math.abs(k2)}${EQ(1)}):</p>
+      <div class="red">${row(k1,a1,b1,c1)}${row(-k2,a2,b2,c2)}<div class="mid sum">${linHTML([[A,X2]])} = ${fmt(C)}</div></div>
+      <div class="box"><div class="mid">${X2} = ${A===1?'':fracBox(fmt(C),fmt(A))+' = '}${X0}</div></div>`});
+    const rest=c1-a1*X0;
+    st.push({t:`Calculamos ${Y2}`,h:`<p>Sustituimos ${X2} = ${X0} en ${EQ(0)}:</p><div class="mid">${a1===1?'':a1+'·'}${X0} ${b1<0?'−':'+'} ${Math.abs(b1)===1?'':Math.abs(b1)}${Y2} = ${fmt(c1)} &nbsp;→&nbsp; ${linHTML([[b1,Y2]])} = ${fmt(rest)} &nbsp;→&nbsp; ${Y2} = ${Y0}</div>`});
+    const xs=x0===0?[0]:[x0,-x0],ys=y0===0?[0]:[y0,-y0];
+    st.push({t:'Sacamos las raíces cuadradas',h:`<div class="mid">${X2} = ${X0} → ${X} = ${x0===0?'0':'±'+x0} &nbsp;&nbsp;&nbsp; ${Y2} = ${Y0} → ${Y} = ${y0===0?'0':'±'+y0}</div><p class="note">Cada valor de ${X} se combina con cada valor de ${Y}.</p>`});
+    st.push(finalPairs(xs.flatMap(x=>ys.map(y=>[x,y])),`<p class="note">Geométricamente son los puntos de corte de las dos cónicas.</p>`));
+    return st;
+  }
+  if(E.T==='bic'){
+    const {k,P}=E;
+    st.push({t:'Planteamiento',h:big+`<p>Sistema <b>no lineal</b>. Despejamos ${Y} de la segunda ecuación y sustituimos en la primera: saldrá una ecuación <b>bicuadrada</b>.</p>`});
+    st.push({t:`Despejamos ${Y}`,h:`<div class="box"><div class="mid">${Y} = ${fracBox(fmt(P),X)}</div></div><p class="note">${X} ≠ 0, porque ${X}·${Y} = ${fmt(P)} ≠ 0.</p>`});
+    st.push({t:'Sustituimos en la primera',h:`<div class="mid">${X2} + (${fracBox(fmt(P),X)})<sup>2</sup> = ${k} &nbsp;→&nbsp; ${X2} + ${fracBox(P*P,X2)} = ${k}</div><p>Multiplicamos todo por ${X2}:</p><div class="mid">${X}<sup>4</sup> + ${P*P} = ${k}${X2} &nbsp;→&nbsp; <b>${polyHTML([1,0,-k,0,P*P])} = 0</b></div>`});
+    const Q=quad(1,-k,P*P,'t');
+    st.push({t:'Resolvemos la bicuadrada',h:`<p>Cambio <span class="m"><i>t</i> = ${X2}</span>:</p>`+Q.h});
+    const xs=Q.roots.flatMap(r=>{const s=Math.sqrt(r.v);return [s,-s]});
+    st.push({t:`Calculamos ${X} e ${Y}`,h:Q.roots.map(r=>`<div class="mid">${X2} = ${r.h} → ${X} = ±${Math.sqrt(r.v)}</div>`).join('')+`<p>Para cada ${X}, <span class="m">${Y} = ${fracBox(fmt(P),X)}</span>:</p>`+
+      xs.sort((a,b)=>a-b).map(x=>`<div class="mid">${X} = ${fmt(x)} → ${Y} = ${fracBox(fmt(P),fmt(x))} = <b>${fmt(P/x)}</b></div>`).join('')});
+    st.push(finalPairs(xs.map(x=>[x,P/x]),`<p class="note">Geométricamente: corte de una circunferencia con una hipérbola.</p>`));
+    return st;
+  }
+  const S=subCore(E),{u,w,m,n,Q}=S,U=V(u),Wv=V(w),Wp=polyHTML([m,n],u),Wh='('+Wp+')';
+  st.push({t:'Planteamiento',h:big+`<p>Sistema <b>no lineal</b>. Una de las ecuaciones es de primer grado, así que lo resolvemos por <b>${E.T==='parab'?'igualación':'sustitución'}</b>.</p>`});
+  let h='';
+  if(E.T==='parab'){
+    st.push({t:'Igualamos',h:`<p>Las dos ecuaciones tienen la ${Y} despejada, así que igualamos los segundos miembros:</p><div class="box"><div class="mid">${polyHTML([m,n])} = ${polyHTML([1,Q.D,-Q.F])}</div></div>`});
+  }else{
+    st.push({t:`Despejamos ${w}`,h:`<p>De la ecuación lineal despejamos la ${Wv}:</p><div class="box"><div class="mid">${Wv} = ${Wp}</div></div>`});
+    st.push({t:'Sustituimos en la otra ecuación',h:`<div class="mid">${linHTML([[Q.A,U+'<sup>2</sup>'],[Q.B,Wh+'<sup>2</sup>'],[Q.C,U+'·'+Wh],[Q.D,U],[Q.E,Wh]])} = ${fmt(Q.F)}</div>`});
+    const ex=[];
+    if(Q.B)ex.push(`${Wh}<sup>2</sup> = ${polyHTML(mul([m,n],[m,n]),u)}`);
+    if(Q.C)ex.push(`${U}·${Wh} = ${polyHTML(mul([1,0],[m,n]),u)}`);
+    if(ex.length)h+=`<p>Desarrollamos:</p>${ex.map(e=>`<div class="mid">${e}</div>`).join('')}`;
+  }
+  const {P,g}=normalize(S.P);
+  h+=`<p>Pasamos todo a un mismo miembro y agrupamos:</p><div class="mid">${polyHTML(S.P,u)} = 0</div>`;
+  if(g!==1)h+=`<p>${g===-1?'Multiplicamos por −1':`Dividimos entre ${fmt(g)}`}:</p><div class="mid">${polyHTML(P,u)} = 0</div>`;
+  st.push({t:'Desarrollamos y ordenamos',h});
+  const Qd=quad(P[0],P[1],P[2],u);st.push({t:'Resolvemos',h:Qd.h});
+  st.push({t:`Calculamos ${w}`,h:`<p>Sustituimos cada valor en <span class="m">${Wv} = ${Wp}</span>:</p>`+Qd.roots.map(r=>`<div class="mid">${U} = ${r.h} → ${Wv} = ${subLin(m,n,r.v)} = <b>${fmt(m*r.v+n)}</b></div>`).join('')});
+  const kind=E.T==='parab'?'la parábola y la recta':E.T==='sp'?'la recta y la hipérbola':'la recta y la cónica';
+  st.push(finalPairs(Qd.roots.map(r=>{const wv=m*r.v+n;return u==='x'?[r.v,wv]:[wv,r.v]}),`<p class="note">Geométricamente son los puntos de corte de ${kind}.</p>`));
+  return st;
+}
+
+/* =========================================================
+   Pestañas
+   ========================================================= */
+const TABS=[
+  {id:'bicuadradas',name:'Bicuadradas',desc:'Ecuaciones ax⁴ + bx² + c = 0: cambio de variable t = x², ecuación de segundo grado y deshacer el cambio.',
+    subs:[['mix','Mezcla'],['4','4 soluciones'],['2','2 soluciones'],['irr','Irracionales'],['frac','Fraccionarias'],['cero','Con x = 0'],['0','Sin solución']],
+    make:s=>{const E=genBi(s);return {E,stmt:stmtBi(E),solve:()=>solveBi(E)}}},
+  {id:'grado-mayor',name:'Grado mayor que 2',desc:'Buscamos raíces enteras con Ruffini hasta llegar a grado 2 y terminamos con la fórmula de la ecuación de segundo grado.',
+    subs:[['mix','Mezcla'],['3','Grado 3'],['4','Grado 4'],['5','Grado 5']],
+    make:s=>{const P=genPoly(+s);return {E:P,stmt:`${polyHTML(P)} = 0`,solve:()=>solvePoly(P)}}},
+  {id:'racionales',name:'Racionales',desc:'La incógnita está en algún denominador: m.c.m., ecuación polinómica y comprobación de las soluciones.',
+    subs:[['mix','Mezcla'],['F1','Dos fracciones'],['F2','Factorizando el denominador'],['F3','Polinomio y fracción']],
+    make:s=>{const E=genRac(s);return {E,stmt:stmtRac(E),solve:()=>solveRac(E)}}},
+  {id:'irracionales',name:'Irracionales',desc:'La incógnita está bajo una raíz: aislar la raíz, elevar al cuadrado y comprobar.',
+    subs:[['mix','Mezcla'],['A','Una raíz'],['B','Dos raíces']],
+    make:s=>{const E=genIrr(s);return {E,stmt:stmtIrr(E),solve:()=>solveIrr(E)}}},
+  {id:'logaritmicas',name:'Logarítmicas',desc:'Propiedades de los logaritmos, igualar argumentos y comprobar que los logaritmos existen.',
+    subs:[['mix','Mezcla'],['suma','Suma de logaritmos'],['resta','Resta de logaritmos'],['doble','n·log A'],['cambio','Cambio de variable']],
+    make:s=>{const E=genLog(s);return {E,stmt:stmtLog(E),solve:()=>solveLog(E)}}},
+  {id:'exponenciales',name:'Exponenciales',desc:'La incógnita en el exponente: igualar bases, sacar factor común, cambio de variable o tomar logaritmos.',
+    subs:[['mix','Mezcla'],['base','Igualar bases'],['factor','Factor común'],['cambio','Cambio de variable'],['logs','Tomando logaritmos']],
+    make:s=>{const E=genExp(s);return {E,stmt:stmtExp(E),solve:()=>solveExp(E)}}},
+  {id:'gauss',name:'Sistemas 3×3 (Gauss)',desc:'Tres ecuaciones con tres incógnitas y soluciones enteras: matriz ampliada, sistema escalonado y sustitución regresiva.',
+    subs:null,make:()=>{const E=genGauss();return {E,stmt:sysHTML([0,1,2].map(i=>eq3([...E.A[i],E.b[i]]))),solve:()=>solveGauss(E)}}},
+  {id:'no-lineales',name:'Sistemas no lineales',desc:'Sistemas en los que aparecen x², y² o x·y: sustitución, igualación o reducción.',
+    subs:[['mix','Mezcla'],['recta','Recta y cónica'],['sp','x + y, x·y'],['parab','Parábola y recta'],['red','Reducción con x² e y²'],['bic','x² + y² y x·y']],
+    make:s=>{const E=genNL(s);return {E,stmt:sysHTML(nlLines(E)),solve:()=>solveNL(E)}}},
+];
+globalThis.__TABS=TABS;
+
+if(typeof document!=='undefined'&&document.getElementById('list')){
+  const $=id=>document.getElementById(id);
+  let cur=0,EX=[];const subSel={};
+  function setList(list){
+    const T=TABS[cur];
+    EX=list.map(e=>({...e,steps:null,shown:0}));
+    $('list').innerHTML=`<div class="list-head"><h2>${T.name}</h2><span>Pulsa «Ver solución» para resolver cada ejercicio paso a paso</span></div>`+
+      EX.map((e,i)=>`<div class="ex" id="ex${i}">
+        <div class="ex-head"><span class="num">${i+1}</span><div class="stmt">${e.stmt}</div>
+          <button class="btn sm" data-a="open" data-i="${i}">Ver solución</button></div>
+        <div class="ex-body hidden" id="exb${i}"><div id="exs${i}"></div>
+          <div class="controls">
+            <button class="btn" data-a="next" data-i="${i}" id="nx${i}">Siguiente paso ▸</button>
+            <button class="btn alt" data-a="all" data-i="${i}" id="al${i}">Ver todos los pasos</button>
+            <button class="btn alt" data-a="hide" data-i="${i}" id="hd${i}">Volver a empezar</button>
+          </div><div class="progress" id="pg${i}"></div></div></div>`).join('');
+  }
+  function updEx(i){
+    const e=EX[i];
+    e.steps.forEach((_,j)=>$(`st${i}_${j}`).classList.toggle('hidden',j>=e.shown));
+    $('nx'+i).disabled=$('al'+i).disabled=e.shown>=e.steps.length;
+    $('hd'+i).disabled=e.shown<=1;
+    $('pg'+i).textContent=`Paso ${e.shown} de ${e.steps.length}`;
+  }
+  $('list').addEventListener('click',ev=>{
+    const b=ev.target.closest('button[data-a]');if(!b)return;
+    const i=+b.dataset.i,e=EX[i],a=b.dataset.a;
+    if(a==='open'){
+      const body=$('exb'+i),open=body.classList.contains('hidden');
+      if(open&&!e.steps){
+        e.steps=e.solve();e.shown=1;
+        $('exs'+i).innerHTML=e.steps.map((s,j)=>`<div class="step hidden ${s.final?'final':''}" id="st${i}_${j}"><h3><span class="num">${s.final?'✓':j+1}</span>${s.t}</h3>${s.h}</div>`).join('');
+        updEx(i);
+      }
+      body.classList.toggle('hidden',!open);$('ex'+i).classList.toggle('open',open);
+      b.textContent=open?'Ocultar':'Ver solución';return;
+    }
+    if(a==='next'){e.shown++;updEx(i);$(`st${i}_${e.shown-1}`).scrollIntoView({behavior:'smooth',block:'nearest'})}
+    if(a==='all'){e.shown=e.steps.length;updEx(i)}
+    if(a==='hide'){e.shown=1;updEx(i)}
+  });
+  function generate(){
+    const T=TABS[cur],sel=subSel[T.id]||'mix';
+    const pool=T.subs?(sel==='mix'?shuffle(T.subs.slice(1).map(s=>s[0])):[sel]):['std'];
+    const list=[],seen=new Set();let i=0,guard=0;
+    while(list.length<5&&guard++<80){const ex=T.make(pool[i%pool.length]);if(!ex||!ex.E||seen.has(ex.stmt))continue;seen.add(ex.stmt);list.push(ex);i++}
+    setList(list);
+  }
+  function renderTab(){
+    const T=TABS[cur];
+    $('tabs').innerHTML=TABS.map((t,i)=>`<button class="tab ${i===cur?'on':''}" data-t="${i}" role="tab" aria-selected="${i===cur}">${t.name}</button>`).join('');
+    $('pTitle').textContent=T.name;$('pDesc').textContent=T.desc;
+    $('subRow').classList.toggle('hidden',!T.subs);
+    if(T.subs){const sel=subSel[T.id]||'mix';$('subs').innerHTML=T.subs.map(([k,l])=>`<button data-s="${k}" class="${k===sel?'on':''}">${l}</button>`).join('')}
+    generate();
+  }
+  $('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;cur=+b.dataset.t;try{history.replaceState(null,'','#'+TABS[cur].id)}catch(_){try{location.hash=TABS[cur].id}catch(__){}}renderTab()});
+  $('subs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;subSel[TABS[cur].id]=b.dataset.s;[...$('subs').children].forEach(x=>x.classList.toggle('on',x===b));generate()});
+  $('gen').addEventListener('click',generate);
+  const fromHash=()=>{const k=TABS.findIndex(t=>'#'+t.id===location.hash);return k<0?0:k};
+  window.addEventListener('hashchange',()=>{const k=fromHash();if(k!==cur){cur=k;renderTab()}});
+  cur=fromHash();renderTab();
+}
+}
+</script>
+</body>
+</html>
