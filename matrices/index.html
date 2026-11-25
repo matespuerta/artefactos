@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matrices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday learning: a clear study tool for secondary/bachillerato students
+   IDEA a squared maths notebook written in blue ballpoint, results marked with highlighter
+   PICTURE the header animates "row × column" on a live product A·B, then every section has its own working example lab
+   COLOUR white paper + blue grid, ballpoint blue #1f4fd1 dominant, highlighter yellow for results, red pen for warnings
+   TYPE Outfit for titles, Inter for text and tabular figures in matrices
+   LAYOUT blue grid header with title, nav and the A·B picture; each section = theory column + wide lab; stacks under 860px */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0d1222);--ink:light-dark(#151a30,#e8ecfa);--mut:light-dark(#4a5170,#a9b1cf);--blue:light-dark(#1f4fd1,#8fb0ff);--blue2:light-dark(#eef3ff,#161e3a);--line:light-dark(#d5def5,#2a3458);--hl:light-dark(#ffe45c,#ffe45c);--hlink:#151a30;--red:light-dark(#c8102e,#ff8a9a);--card:light-dark(#ffffff,#121933)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,h4{font-family:Outfit,Inter,sans-serif;line-height:1.08;letter-spacing:-.02em;margin:0}
+.band{padding:clamp(28px,4vw,56px) max(5vw,16px)}
+.in{max-width:1240px;margin:0 auto}
+header.band{background-color:var(--blue);color:#fff;background-image:linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px);background-size:24px 24px}
+:root[data-theme=dark] header.band{background-color:#1a3aa3}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) header.band{background-color:#1a3aa3}}
+.hero{display:block}
+header h1{font-size:clamp(44px,7vw,84px);text-wrap:balance}
+header p{font-size:18px;max-width:52ch;margin:14px 0 0;color:#eaf0ff}
+.pic{background:#fff;color:#151a30;border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 0 rgba(0,0,0,.15)}
+.pic .row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;font-size:22px}
+.pic .cap{font-size:17px;text-align:center;min-height:2.6em;color:#333a55}
+.pic .cap b{background:#ffe45c;padding:0 4px;border-radius:3px}
+nav.scroll{display:flex;gap:8px;overflow-x:auto;padding:12px max(5vw,16px);background:var(--bg);border-bottom:1px solid var(--line);position:relative;z-index:5}
+@media(min-width:900px){nav.scroll{position:sticky;top:0}}
+nav a{flex:none;color:var(--blue);text-decoration:none;font-weight:600;padding:10px 14px;border-radius:999px;border:1.5px solid var(--line);font-size:15px}
+nav a:hover,nav a:focus-visible{background:var(--blue2);outline:2px solid var(--blue);outline-offset:1px}
+section.band{border-bottom:1px solid var(--line)}
+section.band:nth-of-type(even){background:var(--blue2)}
+.sec{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:36px;align-items:start}
+.sec h2{font-size:clamp(32px,4vw,44px);margin-bottom:16px;color:var(--blue)}
+.th p,.th li{color:var(--mut)}
+.th p{margin:0 0 12px}
+.th ul{padding-left:20px;margin:0 0 14px}
+.th li{margin-bottom:6px}
+.th b{color:var(--ink)}
+.fx{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 14px;font-size:19px;text-align:center;overflow-x:auto}
+.warn{border-left:0;background:color-mix(in srgb,var(--red) 10%,transparent);color:var(--ink);border-radius:12px;padding:12px 14px;font-size:15px}
+.warn b{color:var(--red)}
+.lab{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:clamp(16px,2.4vw,28px);display:flex;flex-direction:column;gap:18px}
+.ctl{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.ctl label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--mut);font-weight:500}
+select{font:16px Inter,sans-serif;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+button{font:600 16px Inter,sans-serif;border-radius:10px;min-height:44px;padding:10px 18px;cursor:pointer;border:2px solid var(--blue)}
+button.go{background:var(--blue);color:var(--bg)}
+button.ghost{background:transparent;color:var(--blue)}
+button:hover{filter:brightness(1.08)}
+button:focus-visible,select:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.tag{display:inline-block;font-size:14px;font-weight:600;color:var(--blue);background:var(--blue2);border-radius:999px;padding:4px 12px}
+.prob{display:flex;flex-direction:column;gap:10px}
+.prob h3{font-size:24px}
+.eq{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;font-size:18px;overflow-x:auto;padding:2px 0}
+.mx{display:inline-grid;grid-template-columns:repeat(var(--c),auto);gap:4px 16px;padding:6px 14px;position:relative;vertical-align:middle;text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.5}
+.mx::before,.mx::after{content:"";position:absolute;top:0;bottom:0;width:7px;border:2px solid currentColor}
+.mx::before{left:0;border-right:0;border-radius:9px 0 0 9px}
+.mx::after{right:0;border-left:0;border-radius:0 9px 9px 0}
+.mx.dt::before{border:0;border-left:2px solid currentColor;border-radius:0}
+.mx.dt::after{border:0;border-right:2px solid currentColor;border-radius:0}
+.mx.sm{font-size:15px;gap:2px 10px;padding:4px 10px}
+.mx span{border-radius:4px;padding:0 3px;transition:background .25s}
+.mx span.on{background:#ffe45c;color:#151a30}
+.k0,.k1,.k2{color:#151a30;border-radius:4px;padding:0 4px}
+.k0,.mx span.k0{background:#ffe45c}
+.k1,.mx span.k1{background:#9fd8ff}
+.k2,.mx span.k2{background:#ffb8cf}
+.th .pic{margin:0 0 14px;border:1.5px solid var(--line);box-shadow:none}
+.th .pic .row{font-size:18px}
+.th .pic .cap{font-size:15px}
+.sar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:center;font-size:16px;margin:0 0 14px}
+.sar figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sar figcaption{font-size:14px;color:var(--mut)}
+.mx.res{background:color-mix(in srgb,var(--hl) 45%,transparent);border-radius:8px}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.82em;line-height:1.1}
+.fr span:first-child{border-bottom:1.5px solid currentColor;padding:0 2px}
+.v{font-style:italic;font-weight:600}
+.hlt{background:color-mix(in srgb,var(--hl) 60%,transparent);padding:0 4px;border-radius:4px;font-weight:600}
+ol.steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;counter-reset:s}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:36px minmax(0,1fr);gap:12px;align-items:start}
+ol.steps>li::before{content:counter(s);width:32px;height:32px;border-radius:50%;background:var(--blue);color:var(--bg);font-weight:700;display:grid;place-items:center;font-size:15px}
+ol.steps h4{font-size:19px;margin:4px 0 8px}
+ol.steps .b{display:flex;flex-direction:column;gap:10px;color:var(--ink)}
+.lines{display:grid;gap:6px;font-variant-numeric:tabular-nums}
+.lines div{background:var(--blue2);border-radius:8px;padding:6px 10px;overflow-x:auto;white-space:nowrap}
+.cof{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:8px}
+.cof div{background:var(--blue2);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px}
+.solbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.note{font-size:15px;color:var(--mut)}
+footer.band{font-size:15px;color:var(--mut)}
+@media(max-width:860px){.hero,.sec{grid-template-columns:minmax(0,1fr)}.hero{gap:24px}}
+@media(max-width:600px){.pic{padding:16px}.pic .row{font-size:17px;gap:6px}.eq{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.mx span{transition:none}}
+</style>
+</head>
+<body>
+<header class="band">
+<div class="in hero">
+<div>
+<h1>Matrices</h1>
+<p>Suma y resta, producto, potencias, determinantes, inversa y ecuaciones matriciales. Cada apartado trae un ejemplo resuelto y un generador de ejercicios nuevos para practicar.</p>
+</div>
+</div>
+</header>
+<nav class="scroll" aria-label="Apartados">
+<a href="#suma">Suma y resta</a><a href="#producto">Multiplicación</a><a href="#potencias">Potencias</a><a href="#determinantes">Determinantes</a><a href="#inversa">Matriz inversa</a><a href="#ecuaciones">Ecuaciones matriciales</a>
+</nav>
+<main>
+<section class="band" id="suma"><div class="in sec">
+<div class="th">
+<h2>Suma y resta</h2>
+<p>Solo se pueden sumar o restar matrices de la <b>misma dimensión</b> (mismo número de filas y de columnas). Se opera <b>elemento a elemento</b>, cada uno con el que ocupa su misma posición.</p>
+<div class="fx">(<span class="v">A</span> ± <span class="v">B</span>)<sub>ij</sub> = <span class="v">a</span><sub>ij</sub> ± <span class="v">b</span><sub>ij</sub></div>
+<ul>
+<li><b>Producto por un número:</b> k·<span class="v">A</span> multiplica todos los elementos de <span class="v">A</span> por k.</li>
+<li>Es conmutativa y asociativa; el neutro es la matriz nula <span class="v">O</span> y la opuesta de <span class="v">A</span> es −<span class="v">A</span>.</li>
+</ul>
+<div class="warn"><b>Ojo con los signos:</b> al restar un número negativo, 3 − (−3) = 6.</div>
+</div>
+<div class="lab" data-s="suma">
+<div class="ctl">
+<label for="suma-op">Operación<select id="suma-op" data-k="op"><option value="+">A + B</option><option value="−" selected>A − B</option><option value="comb">kA ± mB</option></select></label>
+<label for="suma-dim">Dimensión<select id="suma-dim" data-k="dim"><option value="2x2">2×2</option><option value="2x3" selected>2×3</option><option value="3x2">3×2</option><option value="3x3">3×3</option></select></label>
+<button class="go" data-act="new">Generar ejemplo</button>
+</div>
+<div class="out"></div>
+</div>
+</div></section>
+
+<section class="band" id="producto"><div class="in sec">
+<div class="th">
+<h2>Multiplicación</h2>
+<p><span class="v">A</span>·<span class="v">B</span> existe solo si el <b>número de columnas de <span class="v">A</span></b> es igual al <b>número de filas de <span class="v">B</span></b>. El resultado tiene las filas de <span class="v">A</span> y las columnas de <span class="v">B</span>.</p>
+<div class="fx">(m×<b>n</b>)·(<b>n</b>×p) → m×p</div>
+<p>Cada elemento se obtiene multiplicando <b>la fila i de <span class="v">A</span> por la columna j de <span class="v">B</span></b>, término a término, y sumando:</p>
+<div class="pic rxc" aria-live="polite"><div class="row"></div><div class="cap"></div></div>
+<div class="fx"><span class="v">c</span><sub>ij</sub> = <span class="v">a</span><sub>i1</sub><span class="v">b</span><sub>1j</sub> + <span class="v">a</span><sub>i2</sub><span class="v">b</span><sub>2j</sub> + … + <span class="v">a</span><sub>in</sub><span class="v">b</span><sub>nj</sub></div>
+<ul><li>Es asociativa y distributiva. La identidad <span class="v">I</span> es el neutro: <span class="v">AI</span> = <span class="v">IA</span> = <span class="v">A</span>.</li></ul>
+<div class="warn"><b>No es conmutativa:</b> en general <span class="v">A</span>·<span class="v">B</span> ≠ <span class="v">B</span>·<span class="v">A</span>, e incluso puede que uno de los dos productos no exista.</div>
+</div>
+<div class="lab" data-s="producto">
+<div class="ctl">
+<label for="prod-dim">Dimensiones<select id="prod-dim" data-k="dim"><option value="2x2-2x2">(2×2)·(2×2)</option><option value="2x3-3x2" selected>(2×3)·(3×2)</option><option value="3x2-2x3">(3×2)·(2×3)</option><option value="2x3-3x3">(2×3)·(3×3)</option><option value="3x3-3x3">(3×3)·(3×3)</option></select></label>
+<button class="go" data-act="new">Generar ejemplo</button>
+</div>
+<div class="out"></div>
+</div>
+</div></section>
+
+<section class="band" id="potencias"><div class="in sec">
+<div class="th">
+<h2>Potencias</h2>
+<p>Solo tienen sentido para matrices <b>cuadradas</b>. Elevar a n es multiplicar la matriz por sí misma n veces:</p>
+<div class="fx"><span class="v">A</span><sup>2</sup> = <span class="v">A</span>·<span class="v">A</span> &nbsp; <span class="v">A</span><sup>3</sup> = <span class="v">A</span><sup>2</sup>·<span class="v">A</span> &nbsp; <span class="v">A</span><sup>n</sup> = <span class="v">A</span><sup>n−1</sup>·<span class="v">A</span></div>
+<p>Para un exponente grande (<span class="v">A</span><sup>50</sup>, <span class="v">A</span><sup>2026</sup>…) se calculan <span class="v">A</span><sup>2</sup>, <span class="v">A</span><sup>3</sup>, <span class="v">A</span><sup>4</sup>… hasta descubrir un <b>patrón</b>: que aparezca la identidad (las potencias se repiten de forma cíclica) o que algún elemento crezca de forma regular.</p>
+<div class="warn"><b>Cuidado:</b> (<span class="v">A</span>+<span class="v">B</span>)<sup>2</sup> = <span class="v">A</span><sup>2</sup> + <span class="v">AB</span> + <span class="v">BA</span> + <span class="v">B</span><sup>2</sup>, que en general no es <span class="v">A</span><sup>2</sup> + 2<span class="v">AB</span> + <span class="v">B</span><sup>2</sup>.</div>
+</div>
+<div class="lab" data-s="potencias">
+<div class="ctl">
+<label for="pot-mode">Tipo<select id="pot-mode" data-k="mode"><option value="calc" selected>Calcular A², A³…</option><option value="patron">Hallar Aⁿ buscando un patrón</option></select></label>
+<label for="pot-size">Tamaño<select id="pot-size" data-k="size"><option value="2" selected>2×2</option><option value="3">3×3</option></select></label>
+<label for="pot-n">Hasta la potencia<select id="pot-n" data-k="n"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></label>
+<button class="go" data-act="new">Generar ejemplo</button>
+</div>
+<div class="out"></div>
+</div>
+</div></section>
+
+<section class="band" id="determinantes"><div class="in sec">
+<div class="th">
+<h2>Determinantes</h2>
+<p>Solo existen para matrices <b>cuadradas</b>; el determinante |<span class="v">A</span>| es un <b>número</b>.</p>
+<div class="fx">Orden 2: |<span class="v">A</span>| = <span class="k0"><span class="v">a</span><sub>11</sub><span class="v">a</span><sub>22</sub></span> − <span class="k2"><span class="v">a</span><sub>12</sub><span class="v">a</span><sub>21</sub></span></div>
+<p><b>Regla de Sarrus (orden 3):</b> se suman los productos de la diagonal principal y de los dos “triángulos” paralelos a ella, y se restan los de la diagonal secundaria y sus paralelos.</p>
+<div class="sar" id="sarPic"></div>
+<div class="fx" style="font-size:16px;line-height:2">+ <span class="k0"><span class="v">a</span><sub>11</sub><span class="v">a</span><sub>22</sub><span class="v">a</span><sub>33</sub></span> + <span class="k1"><span class="v">a</span><sub>12</sub><span class="v">a</span><sub>23</sub><span class="v">a</span><sub>31</sub></span> + <span class="k2"><span class="v">a</span><sub>13</sub><span class="v">a</span><sub>21</sub><span class="v">a</span><sub>32</sub></span><br>− <span class="k0"><span class="v">a</span><sub>13</sub><span class="v">a</span><sub>22</sub><span class="v">a</span><sub>31</sub></span> − <span class="k1"><span class="v">a</span><sub>11</sub><span class="v">a</span><sub>23</sub><span class="v">a</span><sub>32</sub></span> − <span class="k2"><span class="v">a</span><sub>12</sub><span class="v">a</span><sub>21</sub><span class="v">a</span><sub>33</sub></span></div>
+<p><b>Desarrollo por adjuntos:</b> se elige una fila (mejor la que tenga más ceros) y |<span class="v">A</span>| = Σ <span class="v">a</span><sub>ij</sub>·<span class="v">A</span><sub>ij</sub>, con <span class="v">A</span><sub>ij</sub> = (−1)<sup>i+j</sup>·|<span class="v">M</span><sub>ij</sub>|.</p>
+<ul><li>|<span class="v">A</span><sup>t</sup>| = |<span class="v">A</span>| y |<span class="v">AB</span>| = |<span class="v">A</span>|·|<span class="v">B</span>|.</li><li>Si hay una fila de ceros o dos filas iguales o proporcionales, |<span class="v">A</span>| = 0. Intercambiar dos filas cambia el signo.</li></ul>
+</div>
+<div class="lab" data-s="determinantes">
+<div class="ctl">
+<label for="det-size">Orden<select id="det-size" data-k="size"><option value="2">2×2</option><option value="3" selected>3×3</option></select></label>
+<label for="det-met">Método (orden 3)<select id="det-met" data-k="met"><option value="sarrus" selected>Regla de Sarrus</option><option value="laplace">Desarrollo por adjuntos</option></select></label>
+<button class="go" data-act="new">Generar ejemplo</button>
+</div>
+<div class="out"></div>
+</div>
+</div></section>
+
+<section class="band" id="inversa"><div class="in sec">
+<div class="th">
+<h2>Matriz inversa</h2>
+<p><span class="v">A</span><sup>−1</sup> es la matriz que cumple <span class="v">A</span>·<span class="v">A</span><sup>−1</sup> = <span class="v">A</span><sup>−1</sup>·<span class="v">A</span> = <span class="v">I</span>. Existe <b>solo si |<span class="v">A</span>| ≠ 0</b> (matriz regular).</p>
+<div class="fx"><span class="v">A</span><sup>−1</sup> = <span class="fr"><span>1</span><span>|<span class="v">A</span>|</span></span> · (Adj <span class="v">A</span>)<sup>t</sup></div>
+<ul>
+<li><b>Adjunto</b> de <span class="v">a</span><sub>ij</sub>: <span class="v">A</span><sub>ij</sub> = (−1)<sup>i+j</sup>·|<span class="v">M</span><sub>ij</sub>|, donde <span class="v">M</span><sub>ij</sub> es el menor que queda al tachar la fila i y la columna j.</li>
+<li>Los signos (−1)<sup>i+j</sup> forman un tablero de ajedrez: <b>+ − +</b> / <b>− + −</b> / <b>+ − +</b>.</li>
+<li>Pasos: determinante → matriz de adjuntos → traspuesta → dividir entre |<span class="v">A</span>|.</li>
+</ul>
+<div class="warn"><b>Comprueba siempre:</b> <span class="v">A</span>·<span class="v">A</span><sup>−1</sup> debe dar la identidad.</div>
+</div>
+<div class="lab" data-s="inversa">
+<div class="ctl">
+<label for="inv-size">Orden<select id="inv-size" data-k="size"><option value="2">2×2</option><option value="3" selected>3×3</option></select></label>
+<button class="go" data-act="new">Generar ejemplo</button>
+</div>
+<div class="out"></div>
+</div>
+</div></section>
+
+<section class="band" id="ecuaciones"><div class="in sec">
+<div class="th">
+<h2>Ecuaciones matriciales</h2>
+<p>Entre matrices <b>no se puede dividir</b>. Para despejar <span class="v">X</span> se multiplica por la inversa, y <b>por el mismo lado</b> en los dos miembros, porque el producto no es conmutativo.</p>
+<div class="fx"><span class="v">AX</span> = <span class="v">B</span> → <span class="v">X</span> = <span class="v">A</span><sup>−1</sup><span class="v">B</span><br><span class="v">XA</span> = <span class="v">B</span> → <span class="v">X</span> = <span class="v">BA</span><sup>−1</sup></div>
+<ul>
+<li>Primero se agrupan los términos con <span class="v">X</span> y se saca factor común usando la identidad: <span class="v">AX</span> + <span class="v">X</span> = (<span class="v">A</span> + <span class="v">I</span>)<span class="v">X</span>.</li>
+<li>La matriz que multiplica a <span class="v">X</span> debe tener inversa (determinante distinto de 0).</li>
+</ul>
+<div class="warn"><b>Error típico:</b> escribir <span class="v">X</span> = <span class="v">B</span>·<span class="v">A</span><sup>−1</sup> cuando la ecuación es <span class="v">AX</span> = <span class="v">B</span>. El lado importa.</div>
+</div>
+<div class="lab" data-s="ecuaciones">
+<div class="ctl">
+<label for="ecu-t">Ecuación<select id="ecu-t" data-k="t"><option value="1">AX = B</option><option value="2">XA = B</option><option value="3" selected>AX + B = C</option><option value="4">XA + B = C</option><option value="5">AX + X = B</option><option value="6">XA = 2X + B</option></select></label>
+<label for="ecu-size">Orden<select id="ecu-size" data-k="size"><option value="2" selected>2×2</option><option value="3">3×3</option></select></label>
+<button class="go" data-act="new">Generar ejemplo</button>
+</div>
+<div class="out"></div>
+</div>
+</div></section>
+</main>
+<footer class="band"><div class="in">Los ejemplos generados usan números enteros pequeños y, en inversas y ecuaciones, matrices elegidas para que las cuentas salgan manejables.</div></footer>
+
+<script>
+{
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const fi=n=>n<0?'−'+(-n):String(n);
+class Q{
+constructor(n,d=1){if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;this.n=n/g+0;this.d=d/g}
+static of(x){return x instanceof Q?x:new Q(x)}
+add(o){o=Q.of(o);return new Q(this.n*o.d+o.n*this.d,this.d*o.d)}
+sub(o){o=Q.of(o);return new Q(this.n*o.d-o.n*this.d,this.d*o.d)}
+mul(o){o=Q.of(o);return new Q(this.n*o.n,this.d*o.d)}
+div(o){o=Q.of(o);return new Q(this.n*o.d,this.d*o.n)}
+z(){return this.n===0}
+eq(o){o=Q.of(o);return this.n===o.n&&this.d===o.d}
+h(){if(this.d===1)return fi(this.n);return (this.n<0?'−':'')+'<span class="fr"><span>'+Math.abs(this.n)+'</span><span>'+this.d+'</span></span>'}
+}
+const q=x=>Q.of(x);
+const P=x=>q(x).n<0?'('+q(x).h()+')':q(x).h();
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const toQ=M=>M.map(r=>r.map(q));
+const rm=(r,c,a,b)=>Array.from({length:r},()=>Array.from({length:c},()=>q(ri(a,b))));
+const eye=n=>Array.from({length:n},(_,i)=>Array.from({length:n},(_,j)=>q(i===j?1:0)));
+const madd=(A,B)=>A.map((r,i)=>r.map((x,j)=>x.add(B[i][j])));
+const msub=(A,B)=>A.map((r,i)=>r.map((x,j)=>x.sub(B[i][j])));
+const msc=(k,A)=>A.map(r=>r.map(x=>x.mul(k)));
+const mmul=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,x,k)=>s.add(x.mul(B[k][j])),q(0))));
+const tr=A=>A[0].map((_,j)=>A.map(r=>r[j]));
+const minor=(A,i,j)=>A.filter((_,r)=>r!==i).map(r=>r.filter((_,c)=>c!==j));
+const det=A=>A.length===1?A[0][0]:A[0].reduce((s,x,j)=>s.add(x.mul(j%2?-1:1).mul(det(minor(A,0,j)))),q(0));
+const cof=A=>A.map((r,i)=>r.map((_,j)=>A.length===1?q(1):det(minor(A,i,j)).mul((i+j)%2?-1:1)));
+const meq=(A,B)=>A.every((r,i)=>r.every((x,j)=>x.eq(B[i][j])));
+const cell=x=>typeof x==='string'?x:x.h();
+const mat=(M,o={})=>'<span class="mx'+(o.det?' dt':'')+(o.res?' res':'')+(o.sm?' sm':'')+'" style="--c:'+M[0].length+'">'+M.map((r,i)=>r.map((x,j)=>'<span'+(o.on&&o.on(i,j)?' class="on"':o.cls?' class="'+o.cls(i,j)+'"':'')+'>'+cell(x)+'</span>').join('')).join('')+'</span>';
+const eq=(...p)=>'<div class="eq">'+p.join(' ')+'</div>';
+const V=s=>'<span class="v">'+s+'</span>';
+const sub=(i,j)=>'<sub>'+(i+1)+(j+1)+'</sub>';
+const prodExpr=(A,B)=>A.map(r=>B[0].map((_,j)=>r.map((x,k)=>x.h()+'·'+P(B[k][j])).join(' + ')));
+const st=(t,h)=>({t,h});
+const sizeTxt=M=>M.length+'×'+M[0].length;
+const randDet=(n,a,b,ok)=>{for(let t=0;t<4000;t++){const M=rm(n,n,a,b);const d=det(M);if(d.d===1&&ok(d.n))return M}return eye(n)};
+
+/* ---------- inversa (se reutiliza en ecuaciones) ---------- */
+function invSteps(M,nm,check){
+const n=M.length,d=det(M),S=[];
+let dl;
+if(n===2)dl=eq('|'+nm+'| =',mat(M,{det:1}),'=',M[0][0].h()+'·'+P(M[1][1])+' − '+P(M[0][1])+'·'+P(M[1][0]),'=',d.h());
+else dl=eq('|'+nm+'| =',mat(M,{det:1}),'=',d.h(),'<span class="note">(por Sarrus)</span>');
+S.push(st('Determinante de '+nm,dl+'<div>'+(d.z()?'Como |'+nm+'| = 0, la matriz <b>no tiene inversa</b>.':'Como |'+nm+'| = '+d.h()+' ≠ 0, la matriz tiene inversa.')+'</div>'));
+if(d.z())return{S,inv:null};
+const C=cof(M);
+const items=[];
+for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+const s=(i+j)%2?'−':'+';
+const mn=n===2?P(minor(M,i,j)[0][0]):mat(minor(M,i,j),{det:1,sm:1});
+items.push('<div>'+V('A')+sub(i,j)+' = '+s+' '+mn+' = <b>'+C[i][j].h()+'</b></div>');
+}
+S.push(st('Matriz de adjuntos','<div class="note">Tachamos la fila i y la columna j, calculamos el menor y aplicamos el signo (−1)<sup>i+j</sup>.</div><div class="cof">'+items.join('')+'</div>'+eq('Adj('+nm+') =',mat(C))));
+const T=tr(C);
+S.push(st('Traspuesta de la adjunta',eq('(Adj '+nm+')<sup>t</sup> =',mat(T))+'<div class="note">Las filas pasan a ser columnas.</div>'));
+const I=msc(q(1).div(d),T);
+S.push(st('Dividimos entre el determinante',eq(nm+'<sup>−1</sup> =','<span class="fr"><span>1</span><span>'+d.h()+'</span></span>','·',mat(T),'=',mat(I,{res:1}))));
+if(check)S.push(st('Comprobación',eq(nm+'·'+nm+'<sup>−1</sup> =',mat(mmul(M,I)),'= '+V('I')+(meq(mmul(M,I),eye(n))?' ✓':''))));
+return{S,inv:I};
+}
+
+/* ---------- generadores ---------- */
+const G={};
+G.suma={
+init:()=>G.suma.make('−',toQ([[3,-2,5],[0,4,-1]]),toQ([[1,6,-3],[-2,4,2]]),2,3,'−'),
+gen:c=>{const[r,k]=c.dim.split('x').map(Number);return G.suma.make(c.op,rm(r,k,-9,9),rm(r,k,-9,9),ri(2,4),ri(2,4),pick(['+','−']))},
+make(op,A,B,k,m,sg){
+const S=[];let R,title;
+const dims='<div><b>'+V('A')+'</b> y <b>'+V('B')+'</b> son '+sizeTxt(A)+': tienen la misma dimensión, así que se pueden operar.</div>';
+if(op==='comb'){
+title=k+V('A')+' '+sg+' '+m+V('B');
+const kA=msc(k,A),mB=msc(m,B);
+S.push(st('Comprobamos dimensiones',dims));
+S.push(st('Multiplicamos '+V('A')+' por '+k,eq(k+V('A')+' =',mat(A.map(r=>r.map(x=>k+'·'+P(x)))),'=',mat(kA))));
+S.push(st('Multiplicamos '+V('B')+' por '+m,eq(m+V('B')+' =',mat(B.map(r=>r.map(x=>m+'·'+P(x)))),'=',mat(mB))));
+R=sg==='+'?madd(kA,mB):msub(kA,mB);
+S.push(st((sg==='+'?'Sumamos':'Restamos')+' elemento a elemento',eq(title+' =',mat(kA.map((r,i)=>r.map((x,j)=>x.h()+' '+sg+' '+P(mB[i][j])))))));
+}else{
+title=V('A')+' '+op+' '+V('B');
+S.push(st('Comprobamos dimensiones',dims));
+S.push(st((op==='+'?'Sumamos':'Restamos')+' cada elemento con el de su misma posición',eq(title+' =',mat(A.map((r,i)=>r.map((x,j)=>x.h()+' '+op+' '+P(B[i][j])))))));
+R=op==='+'?madd(A,B):msub(A,B);
+}
+S.push(st('Resultado',eq(title+' =',mat(R,{res:1}))));
+return{q:'Calcula '+title,data:eq(V('A')+' =',mat(A),'&nbsp;',V('B')+' =',mat(B)),S};
+}};
+
+G.producto={
+init:()=>G.producto.make(toQ([[1,2,-1],[0,3,4]]),toQ([[2,1],[-1,0],[3,5]])),
+gen:c=>{const[a,b]=c.dim.split('-').map(s=>s.split('x').map(Number));return G.producto.make(rm(a[0],a[1],-4,5),rm(b[0],b[1],-4,5))},
+make(A,B){
+const m=A.length,n=A[0].length,p=B[0].length,S=[];
+S.push(st('¿Se puede multiplicar?','<div>'+V('A')+' es '+m+'×<b>'+n+'</b> y '+V('B')+' es <b>'+n+'</b>×'+p+'. Columnas de '+V('A')+' = filas de '+V('B')+' = '+n+', así que '+V('A')+'·'+V('B')+' existe y será de dimensión <b>'+m+'×'+p+'</b>.</div>'));
+const C=mmul(A,B),L=[];
+for(let i=0;i<m;i++)for(let j=0;j<p;j++){
+const terms=A[i].map((x,k)=>x.h()+'·'+P(B[k][j])).join(' + ');
+const prods=A[i].map((x,k)=>P(x.mul(B[k][j]))).join(' + ');
+L.push('<div>'+V('c')+sub(i,j)+' = fila '+(i+1)+' · columna '+(j+1)+' = '+terms+' = '+prods+' = <b>'+C[i][j].h()+'</b></div>');
+}
+S.push(st('Fila por columna, elemento a elemento','<div class="lines">'+L.join('')+'</div>'));
+S.push(st('Resultado',eq(V('A')+'·'+V('B')+' =',mat(C,{res:1}))));
+if(m===n&&n===p){const D=mmul(B,A);S.push(st('¿Y '+V('B')+'·'+V('A')+'?',eq(V('B')+'·'+V('A')+' =',mat(D))+'<div>'+(meq(C,D)?'En este caso coinciden, pero es una casualidad: en general no ocurre.':'Sale distinto: <b>'+V('A')+'·'+V('B')+' ≠ '+V('B')+'·'+V('A')+'</b>. El producto no es conmutativo.')+'</div>'))}
+else S.push(st('¿Y '+V('B')+'·'+V('A')+'?','<div>'+V('B')+' es '+n+'×'+p+' y '+V('A')+' es '+m+'×'+n+': '+(p===m?V('B')+'·'+V('A')+' existiría, pero sería de dimensión '+n+'×'+n+', distinta de '+V('A')+'·'+V('B')+'.':V('B')+'·'+V('A')+' ni siquiera existe ('+p+' ≠ '+m+').')+'</div>'));
+return{q:'Calcula '+V('A')+'·'+V('B'),data:eq(V('A')+' =',mat(A),'&nbsp;',V('B')+' =',mat(B)),S};
+}};
+
+const pw=(A,k)=>{let R=A;for(let i=1;i<k;i++)R=mmul(R,A);return R};
+G.potencias={
+init:()=>G.potencias.calc(toQ([[1,2],[-1,0]]),3),
+gen:c=>c.mode==='calc'?G.potencias.calc(rm(+c.size,+c.size,-2,3),+c.n):G.potencias.patron(),
+calc(A,n){
+const S=[];let R=A;
+for(let k=2;k<=n;k++){
+const prev=R;R=mmul(prev,A);
+const lhs=k===2?V('A')+'·'+V('A'):V('A')+'<sup>'+(k-1)+'</sup>·'+V('A');
+S.push(st('Calculamos '+V('A')+'<sup>'+k+'</sup> = '+lhs,eq(V('A')+'<sup>'+k+'</sup> =',mat(prev),'·',mat(A),'=',mat(prodExpr(prev,A),{sm:1}),'=',mat(R,{res:k===n}))));
+}
+S.push(st('Idea clave','<div>Cada potencia se obtiene multiplicando la anterior por '+V('A')+'. Fíjate en que '+V('A')+'<sup>2</sup> <b>no</b> es elevar al cuadrado cada elemento.</div>'));
+return{q:'Calcula '+(n>2?Array.from({length:n-1},(_,i)=>V('A')+'<sup>'+(i+2)+'</sup>').join(', '):V('A')+'<sup>2</sup>'),data:eq(V('A')+' =',mat(A)),S};
+},
+patron(){
+const fam=pick(['shear','diag','per','per','per']);
+let A,N,S=[],rule,res;
+if(fam==='shear'){
+const k=pick([-3,-2,-1,1,2,3]);A=toQ([[1,k],[0,1]]);N=pick([10,20,50,100,2026]);
+for(let e=2;e<=4;e++)S.push(st(V('A')+'<sup>'+e+'</sup> = '+V('A')+'<sup>'+(e-1)+'</sup>·'+V('A'),eq(V('A')+'<sup>'+e+'</sup> =',mat(pw(A,e)))));
+const kn=k===1?'n':k===-1?'−n':fi(k)+'n';
+rule=st('Observamos el patrón','<div>La diagonal se mantiene en 1 y el elemento de arriba a la derecha va sumando '+fi(k)+' cada vez: '+fi(k)+', '+fi(2*k)+', '+fi(3*k)+', '+fi(4*k)+'…</div>'+eq(V('A')+'<sup>n</sup> =',mat([['1',kn],['0','1']])));
+res=toQ([[1,k*N],[0,1]]);
+}else if(fam==='diag'){
+let a=pick([-2,-1,2,3]),b=pick([-2,2,3]);if(a===b)b=-b;A=toQ([[a,0],[0,b]]);N=ri(5,8);
+for(let e=2;e<=4;e++)S.push(st(V('A')+'<sup>'+e+'</sup> = '+V('A')+'<sup>'+(e-1)+'</sup>·'+V('A'),eq(V('A')+'<sup>'+e+'</sup> =',mat(pw(A,e)))));
+rule=st('Observamos el patrón','<div>En una matriz diagonal basta con elevar cada elemento de la diagonal.</div>'+eq(V('A')+'<sup>n</sup> =',mat([['('+fi(a)+')<sup>n</sup>','0'],['0','('+fi(b)+')<sup>n</sup>']])));
+res=pw(A,N);
+}else{
+const k=pick([1,2,-2,3]);
+const opts=[[[0,1],[1,0]],[[1,0],[k,-1]],[[0,-1],[1,0]],[[0,1],[-1,0]],[[0,0,1],[1,0,0],[0,1,0]],[[0,1,0],[0,0,1],[1,0,0]],[[-1,k],[0,1]]];
+A=toQ(pick(opts));N=pick([2026,100,75,50,33,2027]);
+const n=A.length;let p=1;
+for(let e=2;e<=6;e++){const E=pw(A,e);S.push(st('Calculamos '+V('A')+'<sup>'+e+'</sup>',eq(V('A')+'<sup>'+e+'</sup> =',mat(E))));if(meq(E,eye(n))){p=e;break}}
+const r=N%p;
+rule=st('Observamos el patrón','<div>Ha salido la identidad: '+V('A')+'<sup>'+p+'</sup> = '+V('I')+'. A partir de aquí las potencias se repiten cada '+p+'. Dividimos el exponente entre '+p+':</div>'+eq(N+' = '+p+'·'+Math.floor(N/p)+' + '+r)+eq(V('A')+'<sup>'+N+'</sup> = ('+V('A')+'<sup>'+p+'</sup>)<sup>'+Math.floor(N/p)+'</sup>·'+V('A')+'<sup>'+r+'</sup> = '+V('I')+'·'+V('A')+'<sup>'+r+'</sup> = '+V('A')+'<sup>'+r+'</sup>'));
+res=r===0?eye(n):pw(A,r);
+}
+S.push(rule);
+S.push(st('Resultado',eq(V('A')+'<sup>'+N+'</sup> =',mat(res,{res:1}))));
+return{q:'Calcula '+V('A')+'<sup>'+N+'</sup>',data:eq(V('A')+' =',mat(A)),S};
+}};
+
+G.determinantes={
+init:()=>G.determinantes.make(toQ([[2,-1,3],[1,0,2],[4,1,-2]]),'sarrus'),
+gen:c=>G.determinantes.make(+c.size===2?rm(2,2,-6,7):rm(3,3,-4,5),c.met),
+make(A,met){
+const S=[],d=det(A);
+if(A.length===2){
+S.push(st('Producto de la diagonal principal menos el de la secundaria',eq('|'+V('A')+'| =',mat(A,{det:1,cls:(i,j)=>i===j?'k0':'k2'}),'=','<span class="k0">'+A[0][0].h()+'·'+P(A[1][1])+'</span> − <span class="k2">'+P(A[0][1])+'·'+P(A[1][0])+'</span>','=','<span class="k0">'+P(A[0][0].mul(A[1][1]))+'</span> − <span class="k2">'+P(A[0][1].mul(A[1][0]))+'</span>','=',d.h())+'<div class="note">En amarillo, la diagonal principal (se suma); en rosa, la secundaria (se resta).</div>'));
+}else if(met==='sarrus'){
+const a=A;
+const pos=[[[0,0],[1,1],[2,2]],[[0,1],[1,2],[2,0]],[[0,2],[1,0],[2,1]]];
+const neg=[[[0,2],[1,1],[2,0]],[[0,0],[1,2],[2,1]],[[0,1],[1,0],[2,2]]];
+const term=(t,x)=>'<span class="k'+x+'">'+t.map(([i,j])=>P(a[i][j])).join('·')+'</span>';
+const kv=(v,x)=>'<span class="k'+x+'">'+P(v)+'</span>';
+const val=t=>t.reduce((s,[i,j])=>s.mul(a[i][j]),q(1));
+const Ps=pos.reduce((s,t)=>s.add(val(t)),q(0)),Ns=neg.reduce((s,t)=>s.add(val(t)),q(0));
+S.push(st('Productos con signo + (diagonal principal y paralelas)',eq(mat(a,{det:1,cls:(i,j)=>'k'+((j-i+3)%3)}))+'<div class="note">Amarillo: diagonal principal · azul y rosa: sus dos paralelas (triángulos).</div><div class="lines"><div>'+pos.map(term).join(' + ')+' = '+pos.map((t,x)=>kv(val(t),x)).join(' + ')+' = <b>'+Ps.h()+'</b></div></div>'));
+S.push(st('Productos con signo − (diagonal secundaria y paralelas)',eq(mat(a,{det:1,cls:(i,j)=>'k'+[1,2,0][(i+j)%3]}))+'<div class="note">Amarillo: diagonal secundaria · azul y rosa: sus dos paralelas (triángulos).</div><div class="lines"><div>'+neg.map(term).join(' + ')+' = '+neg.map((t,x)=>kv(val(t),x)).join(' + ')+' = <b>'+Ns.h()+'</b></div></div>'));
+S.push(st('Restamos',eq('|'+V('A')+'| =',Ps.h()+' − '+P(Ns),'=',d.h())));
+}else{
+let r=0,best=-1;A.forEach((row,i)=>{const z=row.filter(x=>x.z()).length;if(z>best){best=z;r=i}});
+S.push(st('Elegimos la fila '+(r+1),'<div>'+(best>0?'Es la fila con más ceros ('+best+'), así que hay menos cuentas.':'No hay ceros, así que usamos la primera fila.')+'</div>'+eq('|'+V('A')+'| = '+[0,1,2].map(j=>V('a')+'<sub>'+(r+1)+(j+1)+'</sub>'+V('A')+'<sub>'+(r+1)+(j+1)+'</sub>').join(' + '))));
+const L=[0,1,2].map(j=>{const x=A[r][j];const s=(r+j)%2?'−':'+';const mi=minor(A,r,j);const md=det(mi);const v=x.mul(md).mul((r+j)%2?-1:1);
+if(x.z())return'<div>'+V('a')+'<sub>'+(r+1)+(j+1)+'</sub> = 0 → este término vale 0</div>';
+return'<div>'+P(x)+' · ('+s+') '+mat(mi,{det:1,sm:1})+' = '+P(x)+' · ('+s+'('+md.h()+')) = <b>'+v.h()+'</b></div>'});
+S.push(st('Calculamos cada término','<div class="lines">'+L.join('')+'</div>'));
+S.push(st('Sumamos',eq('|'+V('A')+'| =',d.h())));
+}
+S.push(st('Resultado',eq('|'+V('A')+'| =','<span class="hlt">'+d.h()+'</span>')+'<div class="note">'+(d.z()?'Determinante nulo: la matriz no tiene inversa.':'Como es distinto de 0, '+V('A')+' tiene inversa.')+'</div>'));
+return{q:'Calcula el determinante de '+V('A'),data:eq(V('A')+' =',mat(A)),S};
+}};
+
+G.inversa={
+init:()=>G.inversa.make(toQ([[1,2,0],[0,1,3],[1,0,1]])),
+gen:c=>G.inversa.make(+c.size===2?randDet(2,-4,5,d=>d!==0&&Math.abs(d)<=6):randDet(3,-2,3,d=>d!==0&&Math.abs(d)<=8)),
+make(A){const{S}=invSteps(A,V('A'),true);return{q:'Calcula la inversa de '+V('A')+' mediante los adjuntos',data:eq(V('A')+' =',mat(A)),S}}
+};
+
+const TY={
+1:{eq:V('AX')+' = '+V('B'),side:'L',coef:V('A'),rhs:V('B'),des:[V('A')+'<sup>−1</sup>·'+V('A')+'·'+V('X')+' = '+V('A')+'<sup>−1</sup>·'+V('B'),V('I')+'·'+V('X')+' = '+V('A')+'<sup>−1</sup>·'+V('B'),V('X')+' = '+V('A')+'<sup>−1</sup>·'+V('B')],how:'Multiplicamos por '+V('A')+'<sup>−1</sup> <b>por la izquierda</b> en los dos miembros:'},
+2:{eq:V('XA')+' = '+V('B'),side:'R',coef:V('A'),rhs:V('B'),des:[V('X')+'·'+V('A')+'·'+V('A')+'<sup>−1</sup> = '+V('B')+'·'+V('A')+'<sup>−1</sup>',V('X')+'·'+V('I')+' = '+V('B')+'·'+V('A')+'<sup>−1</sup>',V('X')+' = '+V('B')+'·'+V('A')+'<sup>−1</sup>'],how:'Multiplicamos por '+V('A')+'<sup>−1</sup> <b>por la derecha</b> en los dos miembros:'},
+3:{eq:V('AX')+' + '+V('B')+' = '+V('C'),side:'L',coef:V('A'),rhs:'('+V('C')+' − '+V('B')+')',des:[V('AX')+' = '+V('C')+' − '+V('B'),V('X')+' = '+V('A')+'<sup>−1</sup>·('+V('C')+' − '+V('B')+')'],how:'Pasamos '+V('B')+' restando y multiplicamos por '+V('A')+'<sup>−1</sup> por la izquierda:'},
+4:{eq:V('XA')+' + '+V('B')+' = '+V('C'),side:'R',coef:V('A'),rhs:'('+V('C')+' − '+V('B')+')',des:[V('XA')+' = '+V('C')+' − '+V('B'),V('X')+' = ('+V('C')+' − '+V('B')+')·'+V('A')+'<sup>−1</sup>'],how:'Pasamos '+V('B')+' restando y multiplicamos por '+V('A')+'<sup>−1</sup> por la derecha:'},
+5:{eq:V('AX')+' + '+V('X')+' = '+V('B'),side:'L',coef:'('+V('A')+' + '+V('I')+')',rhs:V('B'),des:[V('AX')+' + '+V('IX')+' = '+V('B'),'('+V('A')+' + '+V('I')+')·'+V('X')+' = '+V('B'),V('X')+' = ('+V('A')+' + '+V('I')+')<sup>−1</sup>·'+V('B')],how:'Escribimos '+V('X')+' = '+V('IX')+' para sacar factor común '+V('X')+' por la derecha:'},
+6:{eq:V('XA')+' = 2'+V('X')+' + '+V('B'),side:'R',coef:'('+V('A')+' − 2'+V('I')+')',rhs:V('B'),des:[V('XA')+' − 2'+V('X')+' = '+V('B'),V('XA')+' − 2'+V('XI')+' = '+V('B'),V('X')+'·('+V('A')+' − 2'+V('I')+') = '+V('B'),V('X')+' = '+V('B')+'·('+V('A')+' − 2'+V('I')+')<sup>−1</sup>'],how:'Agrupamos las '+V('X')+' en un miembro y sacamos factor común '+V('X')+' por la izquierda (2'+V('X')+' = 2'+V('XI')+'):'}
+};
+G.ecuaciones={
+init:()=>G.ecuaciones.make(3,toQ([[2,1],[1,1]]),toQ([[1,-2],[0,3]]),toQ([[1,0],[2,-1]])),
+gen:c=>{const n=+c.size;const M=randDet(n,n===2?-3:-2,n===2?4:2,d=>Math.abs(d)===1);return G.ecuaciones.make(+c.t,M,rm(n,n,-3,3),rm(n,n,-4,4))},
+make(t,M,X,Bx){
+const n=M.length,T=TY[t],I=eye(n),S=[];
+let A,B,C;const given=[];
+if(t===1){A=M;B=mmul(M,X);given.push([V('A'),A],[V('B'),B])}
+if(t===2){A=M;B=mmul(X,M);given.push([V('A'),A],[V('B'),B])}
+if(t===3){A=M;B=Bx;C=madd(mmul(M,X),Bx);given.push([V('A'),A],[V('B'),B],[V('C'),C])}
+if(t===4){A=M;B=Bx;C=madd(mmul(X,M),Bx);given.push([V('A'),A],[V('B'),B],[V('C'),C])}
+if(t===5){A=msub(M,I);B=mmul(M,X);given.push([V('A'),A],[V('B'),B])}
+if(t===6){A=madd(M,msc(2,I));B=mmul(X,M);given.push([V('A'),A],[V('B'),B])}
+S.push(st('Despejamos '+V('X'),'<div>'+T.how+'</div>'+T.des.map(l=>eq(l)).join('')));
+let R=B;
+if(t===3||t===4){R=msub(C,B);S.push(st('Calculamos '+V('C')+' − '+V('B'),eq(V('C')+' − '+V('B')+' =',mat(C),'−',mat(B),'=',mat(R))))}
+if(t===5)S.push(st('Calculamos '+T.coef,eq(T.coef+' =',mat(A),'+',mat(I),'=',mat(M))));
+if(t===6)S.push(st('Calculamos '+T.coef,eq(T.coef+' =',mat(A),'−',mat(msc(2,I)),'=',mat(M))));
+const iv=invSteps(M,T.coef,false);
+iv.S.forEach(s=>S.push(st(s.t+(s.t.startsWith('Determinante')?'':' de '+T.coef),s.h)));
+const Mi=iv.inv;
+const L=T.side==='L'?Mi:R,Rr=T.side==='L'?R:Mi;
+const Xs=mmul(L,Rr);
+const expr=T.side==='L'?T.coef+'<sup>−1</sup>·'+T.rhs:T.rhs+'·'+T.coef+'<sup>−1</sup>';
+S.push(st('Multiplicamos en el orden correcto',eq(V('X')+' = '+expr+' =',mat(L),'·',mat(Rr),'=',mat(Xs,{res:1}))));
+let chk;
+if(t===1)chk=eq(V('AX')+' =',mat(mmul(A,Xs)),'= '+V('B')+' ✓');
+if(t===2)chk=eq(V('XA')+' =',mat(mmul(Xs,A)),'= '+V('B')+' ✓');
+if(t===3)chk=eq(V('AX')+' + '+V('B')+' =',mat(madd(mmul(A,Xs),B)),'= '+V('C')+' ✓');
+if(t===4)chk=eq(V('XA')+' + '+V('B')+' =',mat(madd(mmul(Xs,A),B)),'= '+V('C')+' ✓');
+if(t===5)chk=eq(V('AX')+' + '+V('X')+' =',mat(madd(mmul(A,Xs),Xs)),'= '+V('B')+' ✓');
+if(t===6)chk=eq(V('XA')+' =',mat(mmul(Xs,A)),'&nbsp; y &nbsp;2'+V('X')+' + '+V('B')+' =',mat(madd(msc(2,Xs),B)),'✓');
+S.push(st('Comprobación',chk));
+return{q:'Resuelve la ecuación '+T.eq,data:eq(...given.map(([nm,Mx])=>nm+' = '+mat(Mx)+'&nbsp;')),S};
+}};
+
+/* ---------- interfaz ---------- */
+const state={};
+const render=k=>{
+const lab=document.querySelector('.lab[data-s="'+k+'"]'),o=lab.querySelector('.out'),s=state[k];
+const steps='<ol class="steps">'+s.ex.S.map(x=>'<li><div><h4>'+x.t+'</h4><div class="b">'+x.h+'</div></div></li>').join('')+'</ol>';
+o.innerHTML='<div class="prob"><span class="tag">'+(s.first?'Ejemplo resuelto':'Ejemplo nuevo · inténtalo antes de mirar')+'</span><h3>'+s.ex.q+'</h3>'+s.ex.data+'</div>'+
+'<div class="solbar"><button class="ghost" data-act="toggle" aria-expanded="'+s.shown+'">'+(s.shown?'Ocultar solución':'Resolver paso a paso')+'</button></div>'+(s.shown?steps:'');
+};
+for(const k of Object.keys(G)){state[k]={ex:G[k].init(),shown:true,first:true};render(k)}
+document.addEventListener('click',e=>{
+const b=e.target.closest('button[data-act]');if(!b)return;
+const lab=b.closest('.lab'),k=lab.dataset.s,s=state[k];
+if(b.dataset.act==='new'){
+const c={};lab.querySelectorAll('[data-k]').forEach(x=>c[x.dataset.k]=x.value);
+try{s.ex=G[k].gen(c)}catch(err){console.error(err);return}
+s.shown=false;s.first=false;render(k);
+}else{s.shown=!s.shown;render(k)}
+});
+const potMode=document.getElementById('pot-mode');
+const syncPot=()=>{const p=potMode.value==='patron';document.getElementById('pot-size').disabled=p;document.getElementById('pot-n').disabled=p};
+potMode.addEventListener('change',syncPot);syncPot();
+const detSize=document.getElementById('det-size');
+const syncDet=()=>{document.getElementById('det-met').disabled=detSize.value==='2'};
+detSize.addEventListener('change',syncDet);syncDet();
+
+const gen3=[0,1,2].map(i=>[0,1,2].map(j=>V('a')+'<sub>'+(i+1)+(j+1)+'</sub>'));
+document.getElementById('sarPic').innerHTML='<figure>'+mat(gen3,{det:1,cls:(i,j)=>'k'+((j-i+3)%3)})+'<figcaption>Términos con signo +</figcaption></figure><figure>'+mat(gen3,{det:1,cls:(i,j)=>'k'+[1,2,0][(i+j)%3]})+'<figcaption>Términos con signo −</figcaption></figure>';
+/* ---------- dibujo de cabecera: fila × columna ---------- */
+const HA=toQ([[2,1,-1],[0,3,1]]),HB=toQ([[1,2],[0,-1],[4,1]]),HC=mmul(HA,HB);
+const boxes=[...document.querySelectorAll('.rxc')];
+let pi=0,pj=0;
+const draw=()=>boxes.forEach(bx=>{
+const row=bx.querySelector('.row'),cap=bx.querySelector('.cap');
+row.innerHTML=mat(HA,{on:i=>i===pi})+'<span>·</span>'+mat(HB,{on:(i,j)=>j===pj})+'<span>=</span>'+mat(HC,{on:(i,j)=>i===pi&&j===pj});
+cap.innerHTML='Fila '+(pi+1)+' × columna '+(pj+1)+': '+HA[pi].map((x,k)=>x.h()+'·'+P(HB[k][pj])).join(' + ')+' = <b>'+HC[pi][pj].h()+'</b>';
+});
+draw();
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+const tick=setInterval(()=>{pj++;if(pj>1){pj=0;pi=(pi+1)%2}draw()},2200);
+}
+}
+</script>
+</body>
+</html>
