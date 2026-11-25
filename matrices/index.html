@@ -101,8 +101,20 @@ footer.band{font-size:15px;color:var(--mut)}
 @media(max-width:600px){.pic{padding:16px}.pic .row{font-size:17px;gap:6px}.eq{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.mx span{transition:none}}
 </style>
+<style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+header h1{padding-right:70px}
+.logo-centro{background:#fff;padding:3px;border-radius:9px}
+</style>
 </head>
 <body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
 <header class="band">
 <div class="in hero">
 <div>

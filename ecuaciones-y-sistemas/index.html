@@ -110,8 +110,19 @@ table.ruf tr.prod td{color:var(--muted)}
 .hidden{display:none}
 @media (max-width:600px){.ex-head{flex-wrap:wrap}.stmt{flex-basis:100%;order:3}.wrap{padding:24px 14px 60px}.step{padding:14px}.ex-body{padding:6px 10px 14px}}
 </style>
+<style id="logo-css">
+body{position:relative}
+.logo-centro{position:absolute;top:12px;right:14px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+@media(max-width:560px){.logo-centro{top:8px;right:10px}.logo-centro img{width:38px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+header h1{padding-right:70px}
+</style>
 </head>
 <body>
+<a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
 <div class="wrap">
   <header>
     <h1>Ecuaciones y sistemas</h1>
