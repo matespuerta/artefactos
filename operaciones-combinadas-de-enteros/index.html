@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operaciones Combinadas de números Enteros</title>
+<style>
+:root{
+  --bg:#f5f6fb; --card:#ffffff; --ink:#1c2333; --muted:#5b6478; --line:#e2e6f0;
+  --accent:#4338ca; --accent-soft:#e0e7ff;
+  --pow:#7c3aed; --pow-bg:#ede9fe;
+  --md:#c2410c;  --md-bg:#ffedd5;
+  --as:#0369a1;  --as-bg:#e0f2fe;
+  --ok:#15803d;  --ok-bg:#dcfce7; --bad:#b91c1c; --bad-bg:#fee2e2;
+  --shadow:0 1px 2px rgba(20,30,60,.06),0 6px 20px rgba(20,30,60,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#10131c; --card:#181c28; --ink:#e8ebf5; --muted:#9aa3b8; --line:#2a3042;
+    --accent:#a5b4fc; --accent-soft:#25295a;
+    --pow:#c4b5fd; --pow-bg:rgba(124,58,237,.28);
+    --md:#fdba74;  --md-bg:rgba(234,88,12,.25);
+    --as:#7dd3fc;  --as-bg:rgba(3,105,161,.35);
+    --ok:#86efac; --ok-bg:rgba(21,128,61,.3); --bad:#fca5a5; --bad-bg:rgba(185,28,28,.3);
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 48px;position:relative}
+.logo-centro{position:absolute;top:14px;right:16px;z-index:10;display:block;line-height:0;border-radius:8px;opacity:.95;transition:opacity .15s ease,transform .15s ease}
+.logo-centro:hover{opacity:1;transform:scale(1.05)}
+.logo-centro img{width:60px;height:auto;display:block}
+header{padding-right:76px}
+@media(max-width:560px){.logo-centro{top:10px;right:12px}.logo-centro img{width:44px}header{padding-right:56px}}
+@media(prefers-color-scheme:dark){.logo-centro{background:#fff;padding:3px;border-radius:9px}}
+@media print{.logo-centro{display:none}}
+.kicker{margin:0;color:var(--accent);font-weight:800;letter-spacing:.06em;text-transform:uppercase;font-size:.78rem}
+h1{margin:2px 0 6px;font-size:clamp(1.6rem,4.5vw,2.3rem);line-height:1.15;font-weight:800}
+.lead{margin:0 0 16px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+details.recuerda{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 16px;margin-bottom:16px}
+details.recuerda summary{cursor:pointer;font-weight:800;padding:10px 0;list-style-position:inside}
+.orden{list-style:none;margin:6px 0 10px;padding:0;display:grid;gap:8px}
+.orden li{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.orden .n{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.85rem;background:var(--accent-soft);color:var(--accent)}
+.orden .c1 .n{background:var(--line);color:var(--ink)}
+.orden .c2 .n{background:var(--pow-bg);color:var(--pow)}
+.orden .c3 .n{background:var(--md-bg);color:var(--md)}
+.orden .c4 .n{background:var(--as-bg);color:var(--as)}
+.signos{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin:0 0 12px}
+.signos div{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:.95rem}
+.signos b{display:block;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin:0 0 14px}
+.lv{font:inherit;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:8px 6px;text-align:center;line-height:1.2;transition:transform .12s,border-color .12s,background .12s}
+.lv:hover{border-color:var(--accent)}
+.lv b{display:block;font-size:1rem;font-weight:800}
+.lv span{font-size:.78rem;color:var(--muted)}
+.lv[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.lv[aria-pressed="true"] span{color:#e8eaff}
+@media (prefers-color-scheme: dark){.lv[aria-pressed="true"]{color:#10131c}.lv[aria-pressed="true"] span{color:#23284d}}
+.lv:focus-visible,.btn:focus-visible,.tab:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.lvinfo{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.lvinfo p{margin:0;color:var(--muted);font-size:.95rem;flex:1 1 280px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:.8rem;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:2px 10px;border-radius:99px}
+.tabs{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:12px}
+.tab{font:inherit;font-weight:700;border:0;background:transparent;color:var(--muted);padding:6px 14px;border-radius:9px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+
+.expr{font-size:clamp(1.3rem,3.4vw + .6rem,2.1rem);font-weight:700;line-height:2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.expr sup{font-size:.62em;line-height:0;margin-left:1px}
+.rad{white-space:nowrap}
+.rv{border-top:2px solid currentColor;padding:0 3px;margin-left:1px}
+.main-expr{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px 16px;margin-bottom:12px}
+.main-expr .q{color:var(--muted)}
+.hl{border-radius:8px;padding:2px 5px;margin:0 -1px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hl-pow{background:var(--pow-bg);color:var(--pow);box-shadow:inset 0 -3px 0 var(--pow)}
+.hl-md{background:var(--md-bg);color:var(--md);box-shadow:inset 0 -3px 0 var(--md)}
+.hl-as{background:var(--as-bg);color:var(--as);box-shadow:inset 0 -3px 0 var(--as)}
+
+.practice{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}
+.practice label{font-weight:700}
+.practice input{font:inherit;font-size:1.15rem;font-weight:700;width:120px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink)}
+.fb{margin:6px 0 0;padding:8px 12px;border-radius:12px;font-weight:700}
+.fb.ok{background:var(--ok-bg);color:var(--ok)} .fb.bad{background:var(--bad-bg);color:var(--bad)} .fb.info{background:var(--as-bg);color:var(--as)}
+.score{margin-left:auto;color:var(--muted);font-size:.9rem}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{font:inherit;font-weight:800;border:1.5px solid var(--accent);background:var(--card);color:var(--accent);border-radius:12px;padding:8px 16px;cursor:pointer;transition:transform .1s}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn.primary{background:var(--accent);color:#fff}
+@media (prefers-color-scheme: dark){.btn.primary{color:#10131c}}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+#steps{margin-top:16px;display:grid;gap:12px}
+.step{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:16px;padding:12px 16px 14px;box-shadow:var(--shadow);animation:pop .28s ease-out}
+.step.k-pow{border-left-color:var(--pow)} .step.k-md{border-left-color:var(--md)} .step.k-as{border-left-color:var(--as)}
+.step header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.step .num{font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.step h3{margin:0;font-size:1.05rem}
+.step .hint{margin:0 0 4px;color:var(--muted);font-size:.9rem}
+.notes{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.notes li{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:6px 12px}
+.notes .calc{font-weight:800;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.notes .calc sup{font-size:.65em;line-height:0}
+.notes .why{display:block;color:var(--muted);font-size:.9rem}
+.final{background:var(--ok-bg);border:1px solid var(--ok);border-radius:16px;padding:12px 16px;animation:pop .3s ease-out}
+.final strong{color:var(--ok);font-size:1.4rem}
+.final p{margin:0 0 4px;font-weight:700}
+.empty{color:var(--muted);text-align:center;padding:14px;border:1.5px dashed var(--line);border-radius:14px}
+footer{margin-top:28px;text-align:center;color:var(--muted);font-size:.85rem}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="logo-centro" href="../" title="IES Puerta de Cuartos · Departamento de Matemáticas"><img src="../logo.png" alt="Logo del IES Puerta de Cuartos, Departamento de Matemáticas"></a>
+  <header>
+    <p class="kicker">1.º ESO · Números enteros</p>
+    <h1>Operaciones Combinadas de números Enteros</h1>
+    <p class="lead">Elige un nivel. Cada ejercicio se resuelve paso a paso, explicando qué se calcula primero y por qué.</p>
+  </header>
+
+  <details class="recuerda" open>
+    <summary>Recuerda: orden de las operaciones y regla de los signos</summary>
+    <ol class="orden">
+      <li class="c1"><span class="n">1</span><span><b>Paréntesis</b> ( ) y corchetes [ ]: se empieza por los más internos.</span></li>
+      <li class="c2"><span class="n">2</span><span><b>Potencias y raíces</b></span></li>
+      <li class="c3"><span class="n">3</span><span><b>Multiplicaciones (·) y divisiones (:)</b>, de izquierda a derecha.</span></li>
+      <li class="c4"><span class="n">4</span><span><b>Sumas (+) y restas (−)</b>, de izquierda a derecha.</span></li>
+    </ol>
+    <div class="signos">
+      <div><b>Multiplicar y dividir</b>Signos iguales → <b style="display:inline;text-transform:none;letter-spacing:0;color:inherit">+</b><br>Signos distintos → <b style="display:inline;text-transform:none;letter-spacing:0;color:inherit">−</b></div>
+      <div><b>Sumar y restar</b>5 + (−3) = 5 − 3<br>5 − (−3) = 5 + 3</div>
+      <div><b>Potencias de base negativa</b>Exponente par → +<br>Exponente impar → −</div>
+    </div>
+  </details>
+
+  <div class="levels" id="levels" role="group" aria-label="Nivel de dificultad"></div>
+
+  <section class="card" aria-live="polite">
+    <div class="lvinfo"><p id="lvdesc"></p><div class="chips" id="lvchips"></div></div>
+    <div class="tabs" role="tablist" aria-label="Modo">
+      <button class="tab" role="tab" id="tab-ejemplo" aria-selected="true">📖 Ver ejemplo</button>
+      <button class="tab" role="tab" id="tab-practica" aria-selected="false">✏️ Practicar</button>
+    </div>
+    <div class="main-expr"><div class="expr" id="main"></div></div>
+    <div id="practiceBox" hidden>
+      <div class="practice">
+        <label for="ans">Resultado:</label>
+        <input id="ans" type="text" inputmode="text" autocomplete="off" placeholder="p. ej. −12">
+        <button class="btn primary" id="check">Comprobar</button>
+        <span class="score" id="score"></span>
+      </div>
+      <div id="fb"></div>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="next">Siguiente paso ▶</button>
+      <button class="btn" id="all">Ver todos los pasos</button>
+      <button class="btn" id="new">↻ Otro ejemplo</button>
+    </div>
+  </section>
+
+  <section id="steps" aria-label="Explicación paso a paso"></section>
+
+  <footer>IES Puerta de Cuartos · Departamento de Matemáticas</footer>
+</main>
+
+<script>
+(function(){
+'use strict';
+var MINUS='−', NB=' ';
+var PREC={'+':1,'-':1,'*':2,'/':2};
+var SYM={'+':'+','-':MINUS,'*':'·','/':':'};
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function pick(a){return a[rnd(0,a.length-1)];}
+
+/* ---------- Niveles ---------- */
+var LEVELS=[
+ {n:3,minG:0,maxG:0,maxH:0,pow:false,root:false,minPow:0,minRoot:0,minNeg:1,maxVal:60,extra:false,
+  title:'3 números',short:'sin paréntesis',desc:'Jerarquía básica: hay sumas o restas junto a multiplicaciones o divisiones. ¿Qué va primero?',chips:['+ − · :']},
+ {n:4,minG:1,maxG:1,maxH:1,pow:false,root:false,minPow:0,minRoot:0,minNeg:1,maxVal:80,extra:true,
+  title:'4 números',short:'paréntesis',desc:'Aparece un paréntesis: lo de dentro se calcula antes que lo de fuera.',chips:['+ − · :','( )']},
+ {n:5,minG:1,maxG:2,maxH:1,pow:true,root:false,minPow:1,minRoot:0,minNeg:1,maxVal:120,extra:true,
+  title:'5 números',short:'potencias',desc:'Paréntesis y potencias de exponente 2 o 3. Cuidado con las bases negativas.',chips:['( )','potencias']},
+ {n:6,minG:1,maxG:2,maxH:1,pow:true,root:true,minPow:1,minRoot:1,minNeg:1,maxVal:120,extra:true,
+  title:'6 números',short:'raíces',desc:'Se añaden las raíces cuadradas exactas, que se calculan igual que las potencias.',chips:['( )','potencias','√ raíces']},
+ {n:7,minG:1,maxG:3,maxH:1,pow:true,root:true,minPow:1,minRoot:1,minNeg:2,maxVal:150,extra:true,
+  title:'7 números',short:'todo mezclado',desc:'Paréntesis, potencias y raíces en la misma operación.',chips:['( )','potencias','√ raíces']},
+ {n:8,minG:2,maxG:3,maxH:2,pow:true,root:true,minPow:1,minRoot:1,minNeg:2,maxVal:150,extra:true,
+  title:'8 números',short:'corchetes',desc:'Pueden aparecer corchetes con paréntesis dentro: se resuelven de dentro hacia fuera.',chips:['( )','[ ]','potencias','√ raíces']},
+ {n:9,minG:2,maxG:4,maxH:2,needNested:true,pow:true,root:true,minPow:1,minRoot:1,minNeg:2,maxVal:150,extra:true,
+  title:'9 números',short:'reto final',desc:'Reto final: corchetes con paréntesis dentro, potencias y raíces. Sin prisa y paso a paso.',chips:['( )','[ ]','potencias','√ raíces']}
+];
+
+/* ---------- Generación ---------- */
+function numLeaf(v){return {t:'n',v:v,val:v};}
+function genLeaf(cfg){
+  var r=Math.random();
+  if(cfg.root && r<0.14){var rad=pick([4,9,16,25,36,49,64,81,100]);return {t:'sqrt',x:numLeaf(rad),val:Math.round(Math.sqrt(rad))};}
+  if(cfg.pow && r<(cfg.root?0.32:0.2)){
+    var e=Math.random()<0.7?2:3, m=e===2?rnd(2,6):rnd(2,3), b=(Math.random()<0.4?-1:1)*m;
+    return {t:'pow',b:numLeaf(b),e:e,val:Math.pow(b,e)};
+  }
+  var mag=Math.random()<0.07?1:rnd(2,9);
+  return numLeaf((Math.random()<0.35?-1:1)*mag);
+}
+function genNode(n,cfg){
+  for(var i=0;i<6;i++){var x=genNode1(n,cfg);if(x)return x;}
+  return null;
+}
+function genNode1(n,cfg){
+  if(n===1)return genLeaf(cfg);
+  if(cfg.pow && n<=3 && Math.random()<0.18){
+    var inner=genOp(n,cfg); if(!inner)return null;
+    var v=inner.val, av=Math.abs(v);
+    var e=(av>=2&&av<=3&&Math.random()<0.4)?3:2;
+    if(av<2||(e===2&&av>9))return null;
+    inner.p=true;
+    return {t:'pow',b:inner,e:e,val:Math.pow(v,e)};
+  }
+  return genOp(n,cfg);
+}
+function genDivisible(nl,m,cfg){
+  var i;
+  if(nl===1){
+    if(Math.random()<0.4){for(i=0;i<8;i++){var lf=genLeaf(cfg);if(lf.val!==0&&lf.val%m===0)return lf;}}
+    var ks=[];for(var k=-9;k<=9;k++){if(k!==0&&Math.abs(k*m)<=60)ks.push(k);}
+    if(!ks.length)return null;
+    return numLeaf(pick(ks)*m);
+  }
+  for(i=0;i<25;i++){var x=genNode(nl,cfg);if(x&&x.val!==0&&x.val%m===0)return x;}
+  return null;
+}
+function genOp(n,cfg){
+  var nl=rnd(1,n-1), nr=n-nl;
+  var o=pick(['+','+','-','-','*','*','*','/','/']);
+  var l,r,val;
+  if(o==='/'){
+    r=genNode(nr,cfg); if(!r||r.val===0)return null;
+    if(Math.abs(r.val)===1&&Math.random()<0.85)return null;
+    l=genDivisible(nl,r.val,cfg); if(!l)return null;
+    val=l.val/r.val; if(val===0)return null;
+  }else{
+    l=genNode(nl,cfg); r=genNode(nr,cfg); if(!l||!r)return null;
+    if(o==='+')val=l.val+r.val; else if(o==='-')val=l.val-r.val; else{val=l.val*r.val;if(val===0)return null;}
+  }
+  if(Math.abs(val)>cfg.maxVal)return null;
+  return {t:'op',o:o,l:l,r:r,p:false,val:val};
+}
+function mark(n,cfg){
+  if(n.t==='op'){
+    [['l',n.l],['r',n.r]].forEach(function(a){
+      var side=a[0],c=a[1];
+      if(c.t==='op'){
+        var need=PREC[c.o]<PREC[n.o]||(side==='r'&&PREC[c.o]===PREC[n.o]);
+        if(need||(cfg.extra&&Math.random()<0.12))c.p=true;
+      }
+      mark(c,cfg);
+    });
+  }else if(n.t==='pow'){mark(n.b,cfg);}
+}
+function height(n){
+  if(n.t==='op')return Math.max(height(n.l),height(n.r))+(n.p?1:0);
+  if(n.t==='pow')return height(n.b);
+  return 0;
+}
+function assignBk(n){
+  if(n.t==='op'){if(n.p)n.bk=height(n);assignBk(n.l);assignBk(n.r);}
+  else if(n.t==='pow')assignBk(n.b);
+}
+function stats(n,s){
+  s=s||{g:0,pow:0,root:0,neg:0,md:false,as:false,nums:0};
+  if(n.t==='n'){s.nums++;if(n.v<0)s.neg++;}
+  else if(n.t==='sqrt'){s.nums++;s.root++;}
+  else if(n.t==='pow'){s.pow++;stats(n.b,s);}
+  else{
+    if(n.p)s.g++;
+    if(n.o==='*'||n.o==='/')s.md=true;else s.as=true;
+    stats(n.l,s);stats(n.r,s);
+  }
+  return s;
+}
+function valid(t,cfg){
+  var s=stats(t);
+  if(s.nums!==cfg.n)return false;
+  if(s.g<cfg.minG||s.g>cfg.maxG)return false;
+  var h=height(t);
+  if(h>cfg.maxH)return false;
+  if(cfg.needNested&&h<2)return false;
+  if(s.pow<cfg.minPow||s.pow>3)return false;
+  if(s.root<cfg.minRoot||s.root>2)return false;
+  if(s.neg<cfg.minNeg)return false;
+  if(!s.md||!s.as)return false;
+  return true;
+}
+function generate(li){
+  var cfg=LEVELS[li];
+  for(var i=0;i<20000;i++){
+    var t=genNode(cfg.n,cfg);
+    if(!t||t.t!=='op')continue;
+    mark(t,cfg);
+    if(valid(t,cfg)){assignBk(t);return t;}
+  }
+  throw new Error('No se pudo generar el nivel '+(li+1));
+}
+
+/* ---------- Cálculo y pasos ---------- */
+function isLeaf(n){return n.t==='n';}
+function klass(n){if(n.t==='pow'||n.t==='sqrt')return 'pow';return (n.o==='*'||n.o==='/')?'md':'as';}
+function ready(n){
+  if(n.t==='op')return isLeaf(n.l)&&isLeaf(n.r);
+  if(n.t==='pow')return isLeaf(n.b);
+  if(n.t==='sqrt')return isLeaf(n.x);
+  return false;
+}
+function calc(n){
+  if(n.t==='sqrt')return Math.round(Math.sqrt(n.x.v));
+  if(n.t==='pow')return Math.pow(n.b.v,n.e);
+  var a=n.l.v,b=n.r.v;
+  switch(n.o){case '+':return a+b;case '-':return a-b;case '*':return a*b;default:return a/b;}
+}
+function hasGroupInside(n){
+  if(n.t==='op'){return n.l.t!=='n'&&(n.l.p||hasGroupInside(n.l))||n.r.t!=='n'&&(n.r.p||hasGroupInside(n.r));}
+  if(n.t==='pow')return !!(n.b.p||hasGroupInside(n.b));
+  return false;
+}
+function hasGroup(n){return !!(n.p||hasGroupInside(n));}
+function innermost(n,out){
+  if(n.t==='op'){
+    if(n.p&&!hasGroupInside(n))out.push(n);
+    innermost(n.l,out);innermost(n.r,out);
+  }else if(n.t==='pow')innermost(n.b,out);
+}
+function inorder(n,out){
+  if(n.t==='op'){inorder(n.l,out);out.push(n);inorder(n.r,out);}
+  else if(n.t==='pow'){inorder(n.b,out);out.push(n);}
+  else if(n.t==='sqrt'){out.push(n);}
+}
+function replace(n,set){
+  if(set.has(n))return numLeaf(calc(n));
+  if(n.t==='op'){var c=Object.assign({},n);c.l=replace(n.l,set);c.r=replace(n.r,set);return c;}
+  if(n.t==='pow'){var d=Object.assign({},n);d.b=replace(n.b,set);return d;}
+  return n;
+}
+function fmt(v){return (v<0?MINUS:'')+Math.abs(v);}
+function fmtP(v){return v<0?'('+MINUS+Math.abs(v)+')':String(v);}
+function sgn(v){return v<0?MINUS:'+';}
+
+function note(t){
+  var r=calc(t),c,w='';
+  if(t.t==='sqrt'){
+    return {calc:'√'+t.x.v+' = '+r,why:'Porque '+r+'<sup>2</sup> = '+t.x.v+'.'};
+  }
+  if(t.t==='pow'){
+    var b=t.b.v,e=t.e,prod=[];
+    for(var i=0;i<e;i++)prod.push(fmtP(b));
+    if(b<0)w=(e%2===0?'Base negativa y exponente par: el resultado es positivo.':'Base negativa y exponente impar: el resultado es negativo.');
+    return {calc:fmtP(b)+'<sup>'+e+'</sup> = '+prod.join(' · ')+' = '+fmt(r),why:w};
+  }
+  var a=t.l.v,d=t.r.v,A=Math.abs(a),B=Math.abs(d);
+  if(t.o==='+'){
+    if(d<0&&a>=0){c=a+' + ('+MINUS+B+') = '+a+' '+MINUS+' '+B+' = '+fmt(r);w='Sumar un número negativo es lo mismo que restar su valor absoluto.';}
+    else if(a<0&&d>=0){
+      c='('+MINUS+A+') + '+d+' = '+fmt(r);
+      w=r===0?'Son números opuestos: su suma es 0.':'Signos distintos: se restan los valores absolutos ('+Math.max(A,d)+' '+MINUS+' '+Math.min(A,d)+' = '+Math.abs(r)+') y se deja el signo del que tiene mayor valor absoluto ('+sgn(r)+').';
+    }
+    else if(a<0&&d<0){c='('+MINUS+A+') + ('+MINUS+B+') = '+fmt(r);w='Signos iguales: se suman los valores absolutos ('+A+' + '+B+' = '+(A+B)+') y se deja el signo '+MINUS+'.';}
+    else{c=a+' + '+d+' = '+r;}
+  }else if(t.o==='-'){
+    if(d<0){c=fmtP(a)+' '+MINUS+' ('+MINUS+B+') = '+fmtP(a)+' + '+B+' = '+fmt(r);w='Restar un número negativo es lo mismo que sumar su opuesto.';}
+    else if(a>=0){c=a+' '+MINUS+' '+d+' = '+fmt(r);if(r<0)w='Restamos un número mayor que el primero, así que el resultado es negativo.';}
+    else{c='('+MINUS+A+') '+MINUS+' '+d+' = '+fmt(r);w='Se suman los valores absolutos ('+A+' + '+d+' = '+(A+d)+') y el resultado es negativo.';}
+  }else if(t.o==='*'){
+    c=fmtP(a)+' · '+fmtP(d)+' = '+fmt(r);
+    if(a<0&&d<0)w='Signos iguales ('+MINUS+' · '+MINUS+'): el resultado es positivo.';
+    else if((a<0)!==(d<0))w='Signos distintos: el resultado es negativo.';
+  }else{
+    c=fmtP(a)+' : '+fmtP(d)+' = '+fmt(r);
+    if(a<0&&d<0)w='Signos iguales: el cociente es positivo. ';
+    else if((a<0)!==(d<0))w='Signos distintos: el cociente es negativo. ';
+    w+='Comprobación: '+fmtP(r)+' · '+fmtP(d)+' = '+fmt(a)+'.';
+  }
+  if(t.p){w+=(w?' ':'')+'El '+(t.bk>=2?'corchete':'paréntesis')+' ya solo contiene un número, así que desaparece.';}
+  return {calc:c,why:w};
+}
+
+function labelFor(cls,ts){
+  var m=ts.length>1;
+  if(cls==='pow'){
+    var p=ts.some(function(t){return t.t==='pow';}),q=ts.some(function(t){return t.t==='sqrt';});
+    if(p&&q)return 'potencias y raíces';
+    return p?(m?'potencias':'potencia'):(m?'raíces':'raíz');
+  }
+  if(cls==='md'){
+    var x=ts.some(function(t){return t.o==='*';}),y=ts.some(function(t){return t.o==='/';});
+    if(x&&y)return 'multiplicaciones y divisiones';
+    return x?(m?'multiplicaciones':'multiplicación'):(m?'divisiones':'división');
+  }
+  var s=ts.some(function(t){return t.o==='+';}),rr=ts.some(function(t){return t.o==='-';});
+  if(s&&rr)return 'sumas y restas';
+  return s?(m?'sumas':'suma'):(m?'restas':'resta');
+}
+var HINT={
+  pow:'Las potencias y las raíces se calculan antes que las multiplicaciones, divisiones, sumas y restas.',
+  md:'Las multiplicaciones y divisiones van antes que las sumas y restas. Se hacen de izquierda a derecha.',
+  as:'Lo último son las sumas y las restas, de izquierda a derecha.'
+};
+function nextStep(cur,had){
+  var inner=[];innermost(cur,inner);
+  var scopes=inner.length?inner:[cur];
+  var targets=[],classes=[],labels=[],bks=[];
+  scopes.forEach(function(sc){
+    var nodes=[];inorder(sc,nodes);
+    var cls=nodes.some(function(x){return klass(x)==='pow';})?'pow':(nodes.some(function(x){return klass(x)==='md';})?'md':'as');
+    var rd=nodes.filter(function(x){return klass(x)===cls&&ready(x);});
+    if(!rd.length)throw new Error('Sin operación lista');
+    rd.forEach(function(x){targets.push(x);});
+    if(classes.indexOf(cls)<0)classes.push(cls);
+    labels.push({cls:cls,ts:rd});
+    if(inner.length)bks.push(sc.bk);
+  });
+  var texts=[];
+  classes.forEach(function(c){
+    var ts=[];labels.forEach(function(l){if(l.cls===c)l.ts.forEach(function(t){ts.push(t);});});
+    texts.push(labelFor(c,ts));
+  });
+  var label=texts.join(' · ');
+  var prefix='';
+  if(inner.length){
+    var hasB=bks.some(function(b){return b>=2;}), hasP=bks.some(function(b){return b<2;});
+    var plural=inner.length>1;
+    prefix=hasB&&hasP?'Dentro de paréntesis y corchetes':hasB?(plural?'Dentro de los corchetes':'Dentro del corchete'):(plural?'Dentro de los paréntesis':'Dentro del paréntesis');
+  }else if(had)prefix='Ya sin paréntesis';
+  var title=prefix?prefix+': '+label:label.charAt(0).toUpperCase()+label.slice(1);
+  var hints=classes.map(function(c){return HINT[c];});
+  var set=new Set(targets);
+  return {before:cur,targets:set,cls:classes,title:title,hints:hints,
+          notes:targets.map(note),after:replace(cur,set),group:inner.length>0};
+}
+function solve(tree){
+  var steps=[],cur=tree,had=hasGroup(tree);
+  while(!isLeaf(cur)){
+    var s=nextStep(cur,had);
+    if(steps.length===0&&s.group)s.hints.unshift('Primero lo que hay dentro de los paréntesis, empezando por los más internos.');
+    steps.push(s);cur=s.after;
+  }
+  return {steps:steps,result:cur.v};
+}
+
+/* ---------- Dibujo de la expresión ---------- */
+var OPEN={1:'(',2:'[',3:'{'},CLOSE={1:')',2:']',3:'}'};
+function rx(n,T,first,force){
+  var s;
+  if(n.t==='n'){
+    s=n.v<0?((first&&!force)?MINUS+(-n.v):'('+MINUS+(-n.v)+')'):String(n.v);
+  }else if(n.t==='sqrt'){
+    s='<span class="rad">√<span class="rv">'+n.x.v+'</span></span>';
+  }else if(n.t==='pow'){
+    s=rx(n.b,T,false,true)+'<sup>'+n.e+'</sup>';
+  }else{
+    var lf=n.p?true:first;
+    s=rx(n.l,T,lf,false)+NB+SYM[n.o]+' '+rx(n.r,T,false,false);
+    if(n.p){var k=n.bk||1;s=OPEN[k]+s+CLOSE[k];}
+  }
+  if(T&&T.has(n))s='<span class="hl hl-'+klass(n)+'">'+s+'</span>';
+  return s;
+}
+
+var E={LEVELS:LEVELS,generate:generate,solve:solve,rx:rx,stats:stats,fmt:fmt,hasGroup:hasGroup};
+
+if(typeof document==='undefined'){globalThis.__E=E;return;}
+
+/* ---------- Interfaz ---------- */
+var $=function(s){return document.querySelector(s);};
+var S={level:0,mode:'ejemplo',tree:null,solved:null,shown:1,hits:0,tries:0,fb:null};
+
+function buildLevels(){
+  var box=$('#levels');box.innerHTML='';
+  LEVELS.forEach(function(L,i){
+    var b=document.createElement('button');
+    b.className='lv';b.type='button';
+    b.innerHTML='<b>Nivel '+(i+1)+'</b><span>'+L.title+'</span>';
+    b.addEventListener('click',function(){S.level=i;newEx();});
+    box.appendChild(b);
+  });
+}
+function newEx(){
+  S.tree=generate(S.level);
+  S.solved=solve(S.tree);
+  S.shown=S.mode==='ejemplo'?1:0;
+  S.fb=null;
+  var a=$('#ans');if(a)a.value='';
+  render();
+}
+function stepHTML(s,i){
+  return '<article class="step k-'+s.cls[0]+'"><header><span class="num">Paso '+(i+1)+'</span><h3>'+s.title+'</h3></header>'+
+    '<div class="expr">'+rx(s.before,s.targets,true,false)+'</div>'+
+    s.hints.map(function(h){return '<p class="hint">'+h+'</p>';}).join('')+
+    '<ul class="notes">'+s.notes.map(function(n){return '<li><span class="calc">'+n.calc+'</span>'+(n.why?'<span class="why">'+n.why+'</span>':'')+'</li>';}).join('')+'</ul></article>';
+}
+function render(){
+  var L=LEVELS[S.level],st=S.solved.steps;
+  Array.prototype.forEach.call($('#levels').children,function(b,i){b.setAttribute('aria-pressed',String(i===S.level));});
+  $('#lvdesc').textContent=L.desc;
+  $('#lvchips').innerHTML=L.chips.map(function(c){return '<span class="chip">'+c+'</span>';}).join('');
+  $('#tab-ejemplo').setAttribute('aria-selected',String(S.mode==='ejemplo'));
+  $('#tab-practica').setAttribute('aria-selected',String(S.mode==='practica'));
+  $('#practiceBox').hidden=S.mode!=='practica';
+  $('#main').innerHTML=rx(S.tree,null,true,false)+' <span class="q">= ?</span>';
+  $('#score').textContent=S.tries?('Aciertos: '+S.hits+' de '+S.tries):'';
+  $('#fb').innerHTML=S.fb?'<p class="fb '+S.fb.k+'">'+S.fb.m+'</p>':'';
+  var html='';
+  if(S.shown===0)html='<div class="empty">Resuelve el ejercicio y pulsa «Comprobar». Cuando quieras ver la explicación, pulsa «Siguiente paso».</div>';
+  for(var i=0;i<S.shown&&i<st.length;i++)html+=stepHTML(st[i],i);
+  if(S.shown>=st.length)html+='<div class="final"><p>Resultado</p><div class="expr"><strong>'+rx(S.tree,null,true,false)+' = '+fmt(S.solved.result)+'</strong></div></div>';
+  $('#steps').innerHTML=html;
+  $('#next').disabled=S.shown>=st.length;
+  $('#all').disabled=S.shown>=st.length;
+}
+function reveal(all){
+  var before=S.shown;
+  S.shown=all?S.solved.steps.length:Math.min(S.shown+1,S.solved.steps.length);
+  render();
+  try{
+    var kids=$('#steps').children,target=all?kids[before]:kids[kids.length-1];
+    if(target&&before>0)target.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(e){}
+}
+function check(){
+  var t=$('#ans').value.trim().replace(/[−–—]/g,'-').replace(/\s+/g,'');
+  if(!/^-?\d+$/.test(t)){S.fb={k:'info',m:'Escribe un número entero, por ejemplo −12.'};render();return;}
+  S.tries++;
+  if(parseInt(t,10)===S.solved.result){S.hits++;S.fb={k:'ok',m:'¡Correcto! 🎉 Puedes ver la explicación o pasar a otro ejemplo.'};}
+  else S.fb={k:'bad',m:'Todavía no. Revisa el orden de las operaciones y los signos, o mira la explicación paso a paso.'};
+  render();
+}
+function setMode(m){S.mode=m;newEx();}
+
+document.addEventListener('DOMContentLoaded',function(){
+  buildLevels();
+  $('#next').addEventListener('click',function(){reveal(false);});
+  $('#all').addEventListener('click',function(){reveal(true);});
+  $('#new').addEventListener('click',newEx);
+  $('#check').addEventListener('click',check);
+  $('#ans').addEventListener('keydown',function(e){if(e.key==='Enter')check();});
+  $('#tab-ejemplo').addEventListener('click',function(){setMode('ejemplo');});
+  $('#tab-practica').addEventListener('click',function(){setMode('practica');});
+  newEx();
+});
+})();
+</script>
+</body>
+</html>
